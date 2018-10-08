@@ -1,0 +1,400 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "linear.sublime-project",
+			"settings":
+			{
+				"buffer_size": 188,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Assets/Scripts/CSVtest.cs",
+			"settings":
+			{
+				"buffer_size": 372,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Assets/Scripts/CSVReader.cs",
+			"settings":
+			{
+				"buffer_size": 40403,
+				"encoding": "UTF-8 with BOM",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Assets/Scripts/TestScript1.cs",
+			"settings":
+			{
+				"buffer_size": 887,
+				"encoding": "UTF-8 with BOM",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"packag",
+				"Package Control: Install Package"
+			],
+			[
+				"package ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 157.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/F/LinearTest/LinearTest/Assets/Scripts"
+	],
+	"file_history":
+	[
+	],
+	"find":
+	{
+		"height": 0.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "linear.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 188,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								149,
+								149
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Assets/Scripts/CSVtest.cs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 372,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								356,
+								356
+							]
+						],
+						"settings":
+						{
+							"oops":
+							{
+								"261,262": "Invocation error: AmbiguousMatch"
+							},
+							"syntax": "Packages/Unity3D/UnityC#.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Assets/Scripts/CSVReader.cs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 40403,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1982,
+								1982
+							]
+						],
+						"settings":
+						{
+							"oops":
+							{
+								"16983,16988": "'Debug' is not a known identifier",
+								"16989,16992": "'?' does not contain a definition for 'Log'",
+								"17036,17037": "'?' does not contain a definition for 'Log'",
+								"26592,26597": "'Debug' is not a known identifier",
+								"26598,26601": "'?' does not contain a definition for 'Log'",
+								"26645,26646": "'?' does not contain a definition for 'Log'",
+								"29710,29722": "'Dictionary' does not contain a definition for 'ToDictionary'",
+								"29730,29733": "'?' does not contain a definition for 'Key'",
+								"29740,29741": "Cannot convert from System.Int32 to ?",
+								"29742,29743": "Cannot convert from ? to System.Collections.Generic.Dictionary`2[[System.String],[System.Int32]]",
+								"3488,3493": "'Debug' is not a known identifier",
+								"3494,3497": "'?' does not contain a definition for 'Log'",
+								"3509,3510": "'?' does not contain a definition for 'Log'",
+								"356,367": "'UnityEngine' is not a known identifier",
+								"3963,3968": "'Debug' is not a known identifier",
+								"3969,3972": "'?' does not contain a definition for 'Log'",
+								"3984,3985": "'?' does not contain a definition for 'Log'",
+								"40357,40362": "'Debug' is not a known identifier",
+								"40363,40366": "'?' does not contain a definition for 'Log'",
+								"40394,40395": "'?' does not contain a definition for 'Log'",
+								"4444,4449": "'Debug' is not a known identifier",
+								"4450,4453": "'?' does not contain a definition for 'Log'",
+								"4465,4466": "'?' does not contain a definition for 'Log'",
+								"456,460": "Unknown Resolver Error",
+								"4861,4866": "'Debug' is not a known identifier",
+								"4867,4870": "'?' does not contain a definition for 'Log'",
+								"488,501": "'MonoBehaviour' is not a known identifier",
+								"4882,4883": "'?' does not contain a definition for 'Log'",
+								"5186,5191": "'Debug' is not a known identifier",
+								"5192,5195": "'?' does not contain a definition for 'Log'",
+								"5207,5208": "'?' does not contain a definition for 'Log'",
+								"5476,5481": "'Debug' is not a known identifier",
+								"5482,5485": "'?' does not contain a definition for 'Log'",
+								"5497,5498": "'?' does not contain a definition for 'Log'",
+								"5768,5773": "'Debug' is not a known identifier",
+								"5774,5777": "'?' does not contain a definition for 'Log'",
+								"5789,5790": "'?' does not contain a definition for 'Log'",
+								"6195,6200": "'Mathf' is not a known identifier",
+								"6201,6204": "'?' does not contain a definition for 'Max'",
+								"6223,6224": "Cannot convert from ? to System.Int32",
+								"6937,6955": "Cannot convert from ? to System.String[]",
+								"6956,6961": "'?' does not contain a definition for 'Match'",
+								"6967,6973": "'?' does not contain a definition for 'Cast'",
+								"6979,6997": "Unknown Resolver Error",
+								"6998,7003": "'?' does not contain a definition for 'Regex'",
+								"7004,7011": "'?' does not contain a definition for 'Matches'",
+								"7115,7133": "Unknown Resolver Error",
+								"7134,7146": "'?' does not contain a definition for 'RegexOptions'",
+								"7147,7162": "'?' does not contain a definition for 'ExplicitCapture'",
+								"7189,7195": "'?' does not contain a definition for 'Groups'",
+								"7198,7199": "Unknown Resolver Error",
+								"7199,7204": "'?' does not contain a definition for 'Select'"
+							},
+							"syntax": "Packages/Unity3D/UnityC#.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 972.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Assets/Scripts/TestScript1.cs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 887,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Unity3D/UnityC#.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 126.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.variable_get":
+	{
+		"height": 126.0
+	},
+	"pinned_build_system": "",
+	"project": "linear.sublime-project",
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
