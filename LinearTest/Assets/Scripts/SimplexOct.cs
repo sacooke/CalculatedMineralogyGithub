@@ -164,10 +164,12 @@ public class SimplexOct : MonoBehaviour
         //to a BV and the element which was a BV gets a NBV
         for (int i = 0; i < variables.Length; i++)
         {
+            Debug.Log("check if variables[" + i + "] (" + variables[i] + ") = " + pivotrow);
             if (variables[i] == pivotrow)
                 variables[i] = -1;
         }
         variables[pivotcolumn - 1] = pivotrow;
+        Debug.Log("variables[" + (pivotcolumn-1) + "] = " + pivotrow);
         //----------------------------------------------------------------
 
     }
@@ -335,6 +337,8 @@ public class SimplexOct : MonoBehaviour
         s += "\nCosts:   " + String.Format("{0,-10:0.0000}", targetfvalue) + "\n";
 
         s += "Solution:   " + solution + "\n";
+
+        System.IO.File.WriteAllText(@"F:\LinearTest\CalculatedMineralogyGithub\CalculatedMineralogyGithub\WriteText.txt", s);
 
         return s;
     }
