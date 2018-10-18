@@ -1,5 +1,5 @@
 /*************************************************************************
-ALGLIB 3.14.0 (source code generated 2018-06-16)
+ALGLIB dev (source code generated 2018-10-11)
 Copyright (c) Sergey Bochkanov (ALGLIB project).
 
 >>> SOURCE LICENSE >>>
@@ -899,6 +899,58 @@ public partial class alglib
           -- ALGLIB --
              Copyright 20.03.2009 by Bochkanov Sergey
         *************************************************************************/
+        public static void bvectorgrowto(ref bool[] x,
+            int n,
+            alglib.xparams _params)
+        {
+            bool[] oldx = new bool[0];
+            int i = 0;
+            int n2 = 0;
+
+            
+            //
+            // Enough place
+            //
+            if( alglib.ap.len(x)>=n )
+            {
+                return;
+            }
+            
+            //
+            // Choose new size
+            //
+            n = Math.Max(n, (int)Math.Round(1.8*alglib.ap.len(x)+1));
+            
+            //
+            // Grow
+            //
+            n2 = alglib.ap.len(x);
+            alglib.ap.swap(ref x, ref oldx);
+            x = new bool[n];
+            for(i=0; i<=n-1; i++)
+            {
+                if( i<n2 )
+                {
+                    x[i] = oldx[i];
+                }
+                else
+                {
+                    x[i] = false;
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        Grows X, i.e. changes its size in such a way that:
+        a) contents is preserved
+        b) new size is at least N
+        c) new size can be larger than N, so subsequent grow() calls can return
+           without reallocation
+
+          -- ALGLIB --
+             Copyright 20.03.2009 by Bochkanov Sergey
+        *************************************************************************/
         public static void ivectorgrowto(ref int[] x,
             int n,
             alglib.xparams _params)
@@ -1235,6 +1287,7 @@ public partial class alglib
         {
             bool result = new bool();
             int i = 0;
+            double v = 0;
 
             alglib.ap.assert(n>=0, "APSERVIsFiniteVector: internal error (N<0)");
             if( n==0 )
@@ -1247,15 +1300,12 @@ public partial class alglib
                 result = false;
                 return result;
             }
+            v = 0;
             for(i=0; i<=n-1; i++)
             {
-                if( !math.isfinite(x[i]) )
-                {
-                    result = false;
-                    return result;
-                }
+                v = 0.01*v+x[i];
             }
-            result = true;
+            result = math.isfinite(v);
             return result;
         }
 
@@ -2035,6 +2085,27 @@ public partial class alglib
 
 
         /*************************************************************************
+        This function returns +1 or -1 depending on sign of X.
+        x=0 results in +1 being returned.
+        *************************************************************************/
+        public static double possign(double x,
+            alglib.xparams _params)
+        {
+            double result = 0;
+
+            if( (double)(x)>=(double)(0) )
+            {
+                result = 1;
+            }
+            else
+            {
+                result = -1;
+            }
+            return result;
+        }
+
+
+        /*************************************************************************
         This function returns product of two real numbers. It is convenient when
         you have to perform typecast-and-product of two INTEGERS.
         *************************************************************************/
@@ -2295,6 +2366,55 @@ public partial class alglib
                 return result;
             }
             result = x;
+            return result;
+        }
+
+
+        /*************************************************************************
+        Returns number of non-zeros
+        *************************************************************************/
+        public static int countnz1(double[] v,
+            int n,
+            alglib.xparams _params)
+        {
+            int result = 0;
+            int i = 0;
+
+            result = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                if( !(v[i]==0) )
+                {
+                    result = result+1;
+                }
+            }
+            return result;
+        }
+
+
+        /*************************************************************************
+        Returns number of non-zeros
+        *************************************************************************/
+        public static int countnz2(double[,] v,
+            int m,
+            int n,
+            alglib.xparams _params)
+        {
+            int result = 0;
+            int i = 0;
+            int j = 0;
+
+            result = 0;
+            for(i=0; i<=m-1; i++)
+            {
+                for(j=0; j<=n-1; j++)
+                {
+                    if( !(v[i,j]==0) )
+                    {
+                        result = result+1;
+                    }
+                }
+            }
             return result;
         }
 
@@ -2571,6 +2691,28 @@ public partial class alglib
                 {
                     t = s.unserialize_double();
                     v[i,j] = t;
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        Copy boolean array
+        *************************************************************************/
+        public static void copybooleanarray(bool[] src,
+            ref bool[] dst,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            dst = new bool[0];
+
+            if( alglib.ap.len(src)>0 )
+            {
+                dst = new bool[alglib.ap.len(src)];
+                for(i=0; i<=alglib.ap.len(src)-1; i++)
+                {
+                    dst[i] = src[i];
                 }
             }
         }

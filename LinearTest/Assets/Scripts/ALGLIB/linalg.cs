@@ -1,5 +1,5 @@
 /*************************************************************************
-ALGLIB 3.14.0 (source code generated 2018-06-16)
+ALGLIB dev (source code generated 2018-10-11)
 Copyright (c) Sergey Bochkanov (ALGLIB project).
 
 >>> SOURCE LICENSE >>>
@@ -1451,6 +1451,57 @@ public partial class alglib
     {
     
         sparse.sparsetransposecrs(s.innerobj, _params);
+    }
+    
+    /*************************************************************************
+    This function performs copying with transposition of CRS matrix.
+
+    INPUT PARAMETERS
+        S0      -   sparse matrix in CRS format.
+
+    OUTPUT PARAMETERS
+        S1      -   sparse matrix, transposed
+
+      -- ALGLIB PROJECT --
+         Copyright 23.07.2018 by Bochkanov Sergey
+    *************************************************************************/
+    public static void sparsecopytransposecrs(sparsematrix s0, out sparsematrix s1)
+    {
+        s1 = new sparsematrix();
+        sparse.sparsecopytransposecrs(s0.innerobj, s1.innerobj, null);
+    }
+    
+    public static void sparsecopytransposecrs(sparsematrix s0, out sparsematrix s1, alglib.xparams _params)
+    {
+        s1 = new sparsematrix();
+        sparse.sparsecopytransposecrs(s0.innerobj, s1.innerobj, _params);
+    }
+    
+    /*************************************************************************
+    This function performs copying with transposition of CRS matrix  (buffered
+    version which reuses memory already allocated by  the  target as  much  as
+    possible).
+
+    INPUT PARAMETERS
+        S0      -   sparse matrix in CRS format.
+
+    OUTPUT PARAMETERS
+        S1      -   sparse matrix, transposed; previously allocated memory  is
+                    reused if possible.
+
+      -- ALGLIB PROJECT --
+         Copyright 23.07.2018 by Bochkanov Sergey
+    *************************************************************************/
+    public static void sparsecopytransposecrsbuf(sparsematrix s0, sparsematrix s1)
+    {
+    
+        sparse.sparsecopytransposecrsbuf(s0.innerobj, s1.innerobj, null);
+    }
+    
+    public static void sparsecopytransposecrsbuf(sparsematrix s0, sparsematrix s1, alglib.xparams _params)
+    {
+    
+        sparse.sparsecopytransposecrsbuf(s0.innerobj, s1.innerobj, _params);
     }
     
     /*************************************************************************
@@ -3317,6 +3368,12 @@ public partial class alglib
 public partial class alglib
 {
 
+
+
+}
+public partial class alglib
+{
+
     
     /*************************************************************************
     LU decomposition of a general real matrix with row pivoting
@@ -3727,6 +3784,58 @@ public partial class alglib
     {
     
         trfac.spdmatrixcholeskyupdatefixbuf(a, n, isupper, fix, ref bufr, _params);
+    }
+    
+    /*************************************************************************
+    Sparse LU decomposition with row pivoting (incomplete pivoting) for square
+    sparse matrix stored in CRS format.
+
+    The algorithm  computes  LU  decomposition  of  a  general  square  matrix
+    (rectangular ones are not supported). The result  of  an  algorithm  is  a
+    representation of A as A = P*L*U, where:
+    * L is lower unitriangular matrix
+    * U is upper triangular matrix
+    * P = P0*P1*...*PK, K=N-1,
+      Pi - permutation matrix for I and Pivots[I]
+
+    This function performs only partial pivoting - we rearrange  rows  but not
+    columns - thus it may return denser  decompositions  than  implementations
+    with complete pivoting.
+
+    INPUT PARAMETERS:
+        A       -   sparse NxN matrix in CRS format. An exception is generated
+                    if matrix is non-CRS or non-square.
+
+    OUTPUT PARAMETERS:
+        A       -   the result of factorization, matrices L and U stored in
+                    compact form using CRS sparse storage format:
+                    * lower unitriangular L is stored strictly under main diagonal
+                    * upper triangilar U is stored ON and ABOVE main diagonal
+        P       -   row permutation matrix in compact form, array[N]
+
+    This function always succeeds, i.e. it ALWAYS returns valid factorization,
+    but for your convenience it also returns  boolean  value  which  helps  to
+    detect symbolically degenerate matrices:
+    * function returns TRUE, if the matrix was factorized AND symbolically
+      non-degenerate
+    * function returns FALSE, if the matrix was factorized but U has strictly
+      zero elements at the diagonal (the factorization is returned anyway).
+
+
+      -- ALGLIB routine --
+         03.09.2018
+         Bochkanov Sergey
+    *************************************************************************/
+    public static bool sparseplucrs(sparsematrix a, out int[] p)
+    {
+        p = new int[0];
+        return trfac.sparseplucrs(a.innerobj, ref p, null);
+    }
+    
+    public static bool sparseplucrs(sparsematrix a, out int[] p, alglib.xparams _params)
+    {
+        p = new int[0];
+        return trfac.sparseplucrs(a.innerobj, ref p, _params);
     }
     
     /*************************************************************************
@@ -11841,6 +11950,7 @@ public partial class alglib
             int k = 0;
             double v = 0;
             double vd = 0;
+            double v0 = 0;
             int j0 = 0;
             int j1 = 0;
             int ri = 0;
@@ -11872,6 +11982,7 @@ public partial class alglib
                     //
                     // S*x=y with upper or lower triangular S.
                     //
+                    v0 = 0;
                     if( isupper )
                     {
                         fst = n-1;
@@ -11925,15 +12036,16 @@ public partial class alglib
                         {
                             vd = 1.0;
                         }
-                        k = apserv.saferdiv(x[i]-v, vd, ref v, _params);
-                        alglib.ap.assert(k<=0, "SparseTRSV: near-overflow or division by exact zero");
+                        v = (x[i]-v)/vd;
                         x[i] = v;
+                        v0 = 0.25*v0+v;
                         
                         //
                         // Next I
                         //
                         i = i+stp;
                     }
+                    alglib.ap.assert(math.isfinite(v0), "SparseTRSV: overflow or division by exact zero");
                     return;
                 }
                 if( optype==1 )
@@ -11957,56 +12069,60 @@ public partial class alglib
                         stp = -1;
                     }
                     i = fst;
+                    v0 = 0;
                     while( (stp>0 && i<=lst) || (stp<0 && i>=lst) )
                     {
-                        
-                        //
-                        // X[i] already stores A[i,i]*Y[i], the only thing left
-                        // is to divide by diagonal element.
-                        //
-                        if( !isunit )
+                        v = x[i];
+                        if( v!=0.0 )
                         {
-                            if( s.didx[i]==s.uidx[i] )
+                            
+                            //
+                            // X[i] already stores A[i,i]*Y[i], the only thing left
+                            // is to divide by diagonal element.
+                            //
+                            if( !isunit )
                             {
-                                vd = 0;
+                                if( s.didx[i]==s.uidx[i] )
+                                {
+                                    vd = 0;
+                                }
+                                else
+                                {
+                                    vd = s.vals[s.didx[i]];
+                                }
                             }
                             else
                             {
-                                vd = s.vals[s.didx[i]];
+                                vd = 1.0;
                             }
-                        }
-                        else
-                        {
-                            vd = 1.0;
-                        }
-                        k = apserv.saferdiv(x[i], vd, ref v, _params);
-                        alglib.ap.assert(k<=0, "SparseTRSV: near-overflow or division by exact zero");
-                        x[i] = v;
-                        
-                        //
-                        // For upper triangular case:
-                        //     subtract X[i]*Ai from X[i+1:N-1]
-                        //
-                        // For lower triangular case:
-                        //     subtract X[i]*Ai from X[0:i-1]
-                        //
-                        // (here Ai is I-th row of original, untransposed A).
-                        //
-                        if( isupper )
-                        {
-                            j0 = s.uidx[i];
-                            j1 = s.ridx[i+1]-1;
-                        }
-                        else
-                        {
-                            j0 = s.ridx[i];
-                            j1 = s.didx[i]-1;
-                        }
-                        v = x[i];
-                        for(j=j0; j<=j1; j++)
-                        {
-                            k = s.idx[j];
-                            x[k] = x[k]-s.vals[j]*v;
+                            v = v/vd;
+                            x[i] = v;
+                            v0 = 0.25*v0+v;
+                            
+                            //
+                            // For upper triangular case:
+                            //     subtract X[i]*Ai from X[i+1:N-1]
+                            //
+                            // For lower triangular case:
+                            //     subtract X[i]*Ai from X[0:i-1]
+                            //
+                            // (here Ai is I-th row of original, untransposed A).
+                            //
+                            if( isupper )
+                            {
+                                j0 = s.uidx[i];
+                                j1 = s.ridx[i+1]-1;
+                            }
+                            else
+                            {
+                                j0 = s.ridx[i];
+                                j1 = s.didx[i]-1;
+                            }
+                            for(j=j0; j<=j1; j++)
+                            {
+                                k = s.idx[j];
+                                x[k] = x[k]-s.vals[j]*v;
+                            }
                         }
                         
                         //
@@ -12014,6 +12130,7 @@ public partial class alglib
                         //
                         i = i+stp;
                     }
+                    alglib.ap.assert(math.isfinite(v0), "SparseTRSV: overflow or division by exact zero");
                     return;
                 }
                 alglib.ap.assert(false, "SparseTRSV: internal error");
@@ -12031,6 +12148,7 @@ public partial class alglib
                     //
                     // Lower triangular op(S) (matrix itself can be upper triangular).
                     //
+                    v0 = 0;
                     for(i=0; i<=n-1; i++)
                     {
                         
@@ -12070,10 +12188,11 @@ public partial class alglib
                         {
                             vd = s.vals[ri+d];
                         }
-                        k = apserv.saferdiv(x[i]-v, vd, ref v, _params);
-                        alglib.ap.assert(k<=0, "SparseTRSV: near-overflow or division by exact zero");
+                        v = (x[i]-v)/vd;
                         x[i] = v;
+                        v0 = 0.25*v0+v;
                     }
+                    alglib.ap.assert(math.isfinite(v0), "SparseTRSV: overflow or division by exact zero");
                     return;
                 }
                 if( (optype==1 && !isupper) || (optype==0 && isupper) )
@@ -12082,6 +12201,7 @@ public partial class alglib
                     //
                     // Upper triangular op(S) (matrix itself can be lower triangular).
                     //
+                    v0 = 0;
                     for(i=n-1; i>=0; i--)
                     {
                         ri = s.ridx[i];
@@ -12101,9 +12221,9 @@ public partial class alglib
                         {
                             vd = s.vals[ri+d];
                         }
-                        k = apserv.saferdiv(x[i], vd, ref v, _params);
-                        alglib.ap.assert(k<=0, "SparseTRSV: near-overflow or division by exact zero");
+                        v = x[i]/vd;
                         x[i] = v;
+                        v0 = 0.25*v0+v;
                         
                         //
                         // Subtract product of X[i] and I-th column of "effective" A from
@@ -12127,6 +12247,7 @@ public partial class alglib
                             x[lt+j] = x[lt+j]-v*s.vals[lt1+j];
                         }
                     }
+                    alglib.ap.assert(math.isfinite(v0), "SparseTRSV: overflow or division by exact zero");
                     return;
                 }
                 alglib.ap.assert(false, "SparseTRSV: internal error");
@@ -12189,6 +12310,57 @@ public partial class alglib
                 if( tidx[2*i]>=0 )
                 {
                     sparseset(s, tidx[2*i], tidx[2*i+1], tvals[i], _params);
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        Procedure for initialization 'S.DIdx' and 'S.UIdx'
+
+
+          -- ALGLIB PROJECT --
+             Copyright 14.10.2011 by Bochkanov Sergey
+        *************************************************************************/
+        public static void sparseinitduidx(sparsematrix s,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int j = 0;
+            int lt = 0;
+            int rt = 0;
+
+            alglib.ap.assert(s.matrixtype==1, "SparseInitDUIdx: internal error, incorrect matrix type");
+            apserv.ivectorsetlengthatleast(ref s.didx, s.m, _params);
+            apserv.ivectorsetlengthatleast(ref s.uidx, s.m, _params);
+            for(i=0; i<=s.m-1; i++)
+            {
+                s.uidx[i] = -1;
+                s.didx[i] = -1;
+                lt = s.ridx[i];
+                rt = s.ridx[i+1];
+                for(j=lt; j<=rt-1; j++)
+                {
+                    if( i<s.idx[j] && s.uidx[i]==-1 )
+                    {
+                        s.uidx[i] = j;
+                        break;
+                    }
+                    else
+                    {
+                        if( i==s.idx[j] )
+                        {
+                            s.didx[i] = j;
+                        }
+                    }
+                }
+                if( s.uidx[i]==-1 )
+                {
+                    s.uidx[i] = s.ridx[i+1];
+                }
+                if( s.didx[i]==-1 )
+                {
+                    s.didx[i] = s.uidx[i];
                 }
             }
         }
@@ -13063,6 +13235,132 @@ public partial class alglib
             // Initialization 'S.UIdx' and 'S.DIdx'
             //
             sparseinitduidx(s, _params);
+        }
+
+
+        /*************************************************************************
+        This function performs copying with transposition of CRS matrix.
+
+        INPUT PARAMETERS
+            S0      -   sparse matrix in CRS format.
+
+        OUTPUT PARAMETERS
+            S1      -   sparse matrix, transposed
+
+          -- ALGLIB PROJECT --
+             Copyright 23.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void sparsecopytransposecrs(sparsematrix s0,
+            sparsematrix s1,
+            alglib.xparams _params)
+        {
+            sparsecopytransposecrsbuf(s0, s1, _params);
+        }
+
+
+        /*************************************************************************
+        This function performs copying with transposition of CRS matrix  (buffered
+        version which reuses memory already allocated by  the  target as  much  as
+        possible).
+
+        INPUT PARAMETERS
+            S0      -   sparse matrix in CRS format.
+
+        OUTPUT PARAMETERS
+            S1      -   sparse matrix, transposed; previously allocated memory  is
+                        reused if possible.
+
+          -- ALGLIB PROJECT --
+             Copyright 23.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void sparsecopytransposecrsbuf(sparsematrix s0,
+            sparsematrix s1,
+            alglib.xparams _params)
+        {
+            int oldn = 0;
+            int oldm = 0;
+            int newn = 0;
+            int newm = 0;
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            int nonne = 0;
+            int[] counts = new int[0];
+
+            alglib.ap.assert(s0.matrixtype==1, "SparseCopyTransposeCRSBuf: only CRS matrices are supported");
+            oldn = s0.n;
+            oldm = s0.m;
+            newn = oldm;
+            newm = oldn;
+            
+            //
+            // Update matrix size
+            //
+            s1.matrixtype = 1;
+            s1.n = newn;
+            s1.m = newm;
+            
+            //
+            // Fill RIdx by number of elements per row:
+            // RIdx[I+1] stores number of elements in I-th row.
+            //
+            // Convert RIdx from row sizes to row offsets.
+            // Set NInitialized
+            //
+            nonne = 0;
+            apserv.ivectorsetlengthatleast(ref s1.ridx, newm+1, _params);
+            for(i=0; i<=newm; i++)
+            {
+                s1.ridx[i] = 0;
+            }
+            for(i=0; i<=oldm-1; i++)
+            {
+                for(j=s0.ridx[i]; j<=s0.ridx[i+1]-1; j++)
+                {
+                    k = s0.idx[j]+1;
+                    s1.ridx[k] = s1.ridx[k]+1;
+                    nonne = nonne+1;
+                }
+            }
+            for(i=0; i<=newm-1; i++)
+            {
+                s1.ridx[i+1] = s1.ridx[i+1]+s1.ridx[i];
+            }
+            s1.ninitialized = s1.ridx[newm];
+            
+            //
+            // Allocate memory and move elements to Vals/Idx.
+            // Initially, elements are sorted by rows, but unsorted within row.
+            // After initial insertion we sort elements within row.
+            //
+            counts = new int[newm];
+            for(i=0; i<=newm-1; i++)
+            {
+                counts[i] = 0;
+            }
+            apserv.rvectorsetlengthatleast(ref s1.vals, nonne, _params);
+            apserv.ivectorsetlengthatleast(ref s1.idx, nonne, _params);
+            for(i=0; i<=oldm-1; i++)
+            {
+                for(j=s0.ridx[i]; j<=s0.ridx[i+1]-1; j++)
+                {
+                    k = s0.idx[j];
+                    k = s1.ridx[k]+counts[k];
+                    s1.idx[k] = i;
+                    s1.vals[k] = s0.vals[j];
+                    k = s0.idx[j];
+                    counts[k] = counts[k]+1;
+                }
+            }
+            for(i=0; i<=newm-1; i++)
+            {
+                tsort.tagsortmiddleir(ref s1.idx, ref s1.vals, s1.ridx[i], s1.ridx[i+1]-s1.ridx[i], _params);
+            }
+            
+            //
+            // Initialization 'S.UIdx' and 'S.DIdx'
+            //
+            sparseinitduidx(s1, _params);
         }
 
 
@@ -14457,57 +14755,6 @@ public partial class alglib
             }
             alglib.ap.assert(false, "SparseGetUpperCount: internal error");
             return result;
-        }
-
-
-        /*************************************************************************
-        Procedure for initialization 'S.DIdx' and 'S.UIdx'
-
-
-          -- ALGLIB PROJECT --
-             Copyright 14.10.2011 by Bochkanov Sergey
-        *************************************************************************/
-        private static void sparseinitduidx(sparsematrix s,
-            alglib.xparams _params)
-        {
-            int i = 0;
-            int j = 0;
-            int lt = 0;
-            int rt = 0;
-
-            alglib.ap.assert(s.matrixtype==1, "SparseInitDUIdx: internal error, incorrect matrix type");
-            apserv.ivectorsetlengthatleast(ref s.didx, s.m, _params);
-            apserv.ivectorsetlengthatleast(ref s.uidx, s.m, _params);
-            for(i=0; i<=s.m-1; i++)
-            {
-                s.uidx[i] = -1;
-                s.didx[i] = -1;
-                lt = s.ridx[i];
-                rt = s.ridx[i+1];
-                for(j=lt; j<=rt-1; j++)
-                {
-                    if( i<s.idx[j] && s.uidx[i]==-1 )
-                    {
-                        s.uidx[i] = j;
-                        break;
-                    }
-                    else
-                    {
-                        if( i==s.idx[j] )
-                        {
-                            s.didx[i] = j;
-                        }
-                    }
-                }
-                if( s.uidx[i]==-1 )
-                {
-                    s.uidx[i] = s.ridx[i+1];
-                }
-                if( s.didx[i]==-1 )
-                {
-                    s.didx[i] = s.uidx[i];
-                }
-            }
         }
 
 
@@ -20247,6 +20494,805 @@ public partial class alglib
 
 
     }
+    public class sptrf
+    {
+        /*************************************************************************
+        This structure stores columnwise lower unitriangular factor for LU decomposition
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        public class sptrflowerunitriangularfactor : apobject
+        {
+            public int n;
+            public int allocated;
+            public int used;
+            public int[] idxlist;
+            public double[] vals;
+            public int[] s0;
+            public sptrflowerunitriangularfactor()
+            {
+                init();
+            }
+            public override void init()
+            {
+                idxlist = new int[0];
+                vals = new double[0];
+                s0 = new int[0];
+            }
+            public override alglib.apobject make_copy()
+            {
+                sptrflowerunitriangularfactor _result = new sptrflowerunitriangularfactor();
+                _result.n = n;
+                _result.allocated = allocated;
+                _result.used = used;
+                _result.idxlist = (int[])idxlist.Clone();
+                _result.vals = (double[])vals.Clone();
+                _result.s0 = (int[])s0.Clone();
+                return _result;
+            }
+        };
+
+
+        /*************************************************************************
+        This structure stores trailing rectangular matrix for LU decomposition
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        public class sptrftrailingmatrix : apobject
+        {
+            public int n0;
+            public int nrows;
+            public int ncols;
+            public int[] rawidx;
+            public int[] pividx;
+            public bool[] pivotedout;
+            public int[] idx;
+            public int[] ridx;
+            public int[] rowsizes;
+            public double[] vals;
+            public int allocated;
+            public int pendingremoval;
+            public int[] rowptr;
+            public int[] rowlist;
+            public double[] buf;
+            public sptrftrailingmatrix()
+            {
+                init();
+            }
+            public override void init()
+            {
+                rawidx = new int[0];
+                pividx = new int[0];
+                pivotedout = new bool[0];
+                idx = new int[0];
+                ridx = new int[0];
+                rowsizes = new int[0];
+                vals = new double[0];
+                rowptr = new int[0];
+                rowlist = new int[0];
+                buf = new double[0];
+            }
+            public override alglib.apobject make_copy()
+            {
+                sptrftrailingmatrix _result = new sptrftrailingmatrix();
+                _result.n0 = n0;
+                _result.nrows = nrows;
+                _result.ncols = ncols;
+                _result.rawidx = (int[])rawidx.Clone();
+                _result.pividx = (int[])pividx.Clone();
+                _result.pivotedout = (bool[])pivotedout.Clone();
+                _result.idx = (int[])idx.Clone();
+                _result.ridx = (int[])ridx.Clone();
+                _result.rowsizes = (int[])rowsizes.Clone();
+                _result.vals = (double[])vals.Clone();
+                _result.allocated = allocated;
+                _result.pendingremoval = pendingremoval;
+                _result.rowptr = (int[])rowptr.Clone();
+                _result.rowlist = (int[])rowlist.Clone();
+                _result.buf = (double[])buf.Clone();
+                return _result;
+            }
+        };
+
+
+        /*************************************************************************
+        This structure stores permutation information
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        public class sptrfpermutation : apobject
+        {
+            public int[] rawidx;
+            public int[] pividx;
+            public sptrfpermutation()
+            {
+                init();
+            }
+            public override void init()
+            {
+                rawidx = new int[0];
+                pividx = new int[0];
+            }
+            public override alglib.apobject make_copy()
+            {
+                sptrfpermutation _result = new sptrfpermutation();
+                _result.rawidx = (int[])rawidx.Clone();
+                _result.pividx = (int[])pividx.Clone();
+                return _result;
+            }
+        };
+
+
+        /*************************************************************************
+        This structure stores temporary buffers for sparse LU factorization
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        public class slubuffer : apobject
+        {
+            public sptrfpermutation colperm;
+            public sptrfpermutation rowperm;
+            public sptrflowerunitriangularfactor factor;
+            public sptrftrailingmatrix trail;
+            public sparse.sparsematrix at;
+            public sparse.sparsematrix sl;
+            public sparse.sparsematrix sut;
+            public slubuffer()
+            {
+                init();
+            }
+            public override void init()
+            {
+                colperm = new sptrfpermutation();
+                rowperm = new sptrfpermutation();
+                factor = new sptrflowerunitriangularfactor();
+                trail = new sptrftrailingmatrix();
+                at = new sparse.sparsematrix();
+                sl = new sparse.sparsematrix();
+                sut = new sparse.sparsematrix();
+            }
+            public override alglib.apobject make_copy()
+            {
+                slubuffer _result = new slubuffer();
+                _result.colperm = (sptrfpermutation)colperm.make_copy();
+                _result.rowperm = (sptrfpermutation)rowperm.make_copy();
+                _result.factor = (sptrflowerunitriangularfactor)factor.make_copy();
+                _result.trail = (sptrftrailingmatrix)trail.make_copy();
+                _result.at = (sparse.sparsematrix)at.make_copy();
+                _result.sl = (sparse.sparsematrix)sl.make_copy();
+                _result.sut = (sparse.sparsematrix)sut.make_copy();
+                return _result;
+            }
+        };
+
+
+
+
+        /*************************************************************************
+        Sparse LU decomposition with row pivoting (incomplete pivoting) for square
+        sparse matrix stored in CRS format.
+
+        The algorithm  computes  LU  decomposition  of  a  general  square  matrix
+        (rectangular ones are not supported). The result  of  an  algorithm  is  a
+        representation of A as A = P*L*U, where:
+        * L is lower unitriangular matrix
+        * U is upper triangular matrix
+        * P = P0*P1*...*PK, K=N-1,
+          Pi - permutation matrix for I and Pivots[I]
+
+        This function performs only partial pivoting - we rearrange  rows  but not
+        columns - thus it may return denser  decompositions  than  implementations
+        with complete pivoting.
+
+        INPUT PARAMETERS:
+            A       -   sparse NxN matrix in CRS format. An exception is generated
+                        if matrix is non-CRS or non-square.
+            Buf     -   buffer structure; memory allocated during previous calls
+                        will be reused as much as possible
+            PivotType-  pivoting type:
+                        * 1 - row-only pivoting
+                        * 2 - pivot rows to choose largest element, pivot columns
+                              to choose most sparse column of ORIGINAL matrix
+
+        OUTPUT PARAMETERS:
+            A       -   the result of factorization, matrices L and U stored in
+                        compact form using CRS sparse storage format:
+                        * lower unitriangular L is stored strictly under main diagonal
+                        * upper triangilar U is stored ON and ABOVE main diagonal
+            PR      -   row permutation matrix in compact form, array[N]
+            PC      -   column permutation matrix in compact form, array[N]
+            Buf     -   following fields of Buf are set:
+                        * Buf.ColPerm - contains column permutation (identity)
+                        * Buf.RowPerm - contains row permutation, in particular:
+                          * RowPerm.RawIdx[I]=J means that J-th row of the original
+                            input matrix was moved to I-th position of the output
+                            factorization
+                          * RowPerm.PivIdx[I]=J means that I-th row of the original
+                            input matrix was moved to J-th position of the output
+                            factorization
+            
+        This function always succeeds, i.e. it ALWAYS returns valid factorization,
+        but for your convenience it also returns  boolean  value  which  helps  to
+        detect symbolically degenerate matrices:
+        * function returns TRUE, if the matrix was factorized AND symbolically
+          non-degenerate
+        * function returns FALSE, if the matrix was factorized but U has strictly
+          zero elements at the diagonal (the factorization is returned anyway).
+
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        public static bool sptrfplu(sparse.sparsematrix a,
+            int pivottype,
+            ref int[] pr,
+            ref int[] pc,
+            slubuffer buf,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            int n = 0;
+            double v = 0;
+            double vv = 0;
+            double[] zq = new double[0];
+            double[] y = new double[0];
+            int[] nrs = new int[0];
+            int[] roffs = new int[0];
+            int[] cs = new int[0];
+            int[] ci = new int[0];
+            int q = 0;
+            double vpivot = 0;
+            int kpivot = 0;
+            int j0 = 0;
+            int j1 = 0;
+            int k1 = 0;
+            int nz = 0;
+            int allocl = 0;
+            int allocu = 0;
+
+            alglib.ap.assert(sparse.sparseiscrs(a, _params), "SparsePLUCRS: A is not stored in CRS format");
+            alglib.ap.assert(sparse.sparsegetnrows(a, _params)==sparse.sparsegetncols(a, _params), "SparsePLUCRS: non-square A");
+            result = true;
+            n = sparse.sparsegetnrows(a, _params);
+            apserv.ivectorsetlengthatleast(ref buf.rowperm.rawidx, n, _params);
+            apserv.ivectorsetlengthatleast(ref buf.rowperm.pividx, n, _params);
+            apserv.ivectorsetlengthatleast(ref buf.colperm.rawidx, n, _params);
+            apserv.ivectorsetlengthatleast(ref buf.colperm.pividx, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                buf.rowperm.rawidx[i] = i;
+                buf.rowperm.pividx[i] = i;
+                buf.colperm.rawidx[i] = i;
+                buf.colperm.pividx[i] = i;
+            }
+            sparse.sparsecopytransposecrsbuf(a, buf.at, _params);
+            allocl = 0;
+            allocu = 0;
+            apserv.ivectorsetlengthatleast(ref buf.sl.ridx, n+1, _params);
+            apserv.ivectorsetlengthatleast(ref buf.sut.ridx, n+1, _params);
+            buf.sl.ridx[0] = 0;
+            buf.sut.ridx[0] = 0;
+            apserv.ivectorsetlengthatleast(ref nrs, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                nrs[i] = 0;
+            }
+            apserv.ivectorsetlengthatleast(ref cs, n, _params);
+            apserv.ivectorsetlengthatleast(ref ci, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                cs[i] = buf.at.ridx[i+1]-buf.at.ridx[i];
+                ci[i] = i;
+            }
+            apserv.rvectorsetlengthatleast(ref zq, n, _params);
+            apserv.rvectorsetlengthatleast(ref y, n, _params);
+            apserv.ivectorsetlengthatleast(ref pr, n, _params);
+            apserv.ivectorsetlengthatleast(ref pc, n, _params);
+            lutfinit(buf.factor, _params);
+            tminit(buf.trail, n, _params);
+            for(q=0; q<=n-1; q++)
+            {
+                for(i=0; i<=n-1; i++)
+                {
+                    zq[i] = 0;
+                }
+                if( pivottype==1 )
+                {
+                    k = q;
+                    pc[q] = q;
+                }
+                else
+                {
+                    if( pivottype==2 )
+                    {
+                        k = -1;
+                        j = n+1;
+                        for(i=q; i<=n-1; i++)
+                        {
+                            if( cs[i]<j )
+                            {
+                                k = i;
+                                j = cs[i];
+                            }
+                        }
+                        alglib.ap.assert(k>=0, "SPTRF: integrity check failed");
+                        j = cs[q];
+                        cs[q] = cs[k];
+                        cs[k] = j;
+                        j = ci[q];
+                        ci[q] = ci[k];
+                        ci[k] = j;
+                        pc[q] = k;
+                        k = ci[q];
+                    }
+                    else
+                    {
+                        alglib.ap.assert(false, "SPTRF: integrity check failed");
+                    }
+                }
+                j0 = buf.at.ridx[k];
+                j1 = buf.at.ridx[k+1]-1;
+                for(j=j0; j<=j1; j++)
+                {
+                    k = buf.at.idx[j];
+                    v = buf.at.vals[j];
+                    zq[buf.rowperm.pividx[k]] = v;
+                }
+                if( q>0 )
+                {
+                    lutfsolve(buf.factor, zq, _params);
+                    tmapplyupdate(buf.trail, q, zq, zq, _params);
+                }
+                kpivot = q;
+                vpivot = Math.Abs(zq[q]);
+                for(i=q+1; i<=n-1; i++)
+                {
+                    vv = Math.Abs(zq[i]);
+                    if( vv>vpivot )
+                    {
+                        vpivot = vv;
+                        kpivot = i;
+                    }
+                }
+                vpivot = zq[kpivot];
+                if( vpivot==0 )
+                {
+                    result = false;
+                }
+                if( kpivot!=q )
+                {
+                    v = zq[q];
+                    zq[q] = zq[kpivot];
+                    zq[kpivot] = v;
+                }
+                pr[q] = kpivot;
+                nz = 0;
+                for(j=0; j<=q; j++)
+                {
+                    if( zq[j]!=0 )
+                    {
+                        nz = nz+1;
+                    }
+                }
+                if( allocu<buf.sut.ridx[q]+nz )
+                {
+                    allocu = (int)Math.Round(1+1.8*(buf.sut.ridx[q]+nz));
+                    apserv.rvectorgrowto(ref buf.sut.vals, allocu, _params);
+                    apserv.ivectorgrowto(ref buf.sut.idx, allocu, _params);
+                }
+                k = buf.sut.ridx[q];
+                for(j=0; j<=q; j++)
+                {
+                    v = zq[j];
+                    if( v!=0 )
+                    {
+                        buf.sut.idx[k] = j;
+                        buf.sut.vals[k] = v;
+                        nrs[j] = nrs[j]+1;
+                        k = k+1;
+                    }
+                }
+                buf.sut.ridx[q+1] = k;
+                if( !(vpivot==0.0) )
+                {
+                    v = 1/vpivot;
+                    for(i=q+1; i<=n-1; i++)
+                    {
+                        zq[i] = zq[i]*v;
+                    }
+                }
+                tmpivotoutmergein(buf.trail, q, kpivot, zq, y, _params);
+                lutfaddcol(buf.factor, _params);
+                nz = 0;
+                for(j=0; j<=q-1; j++)
+                {
+                    if( y[j]!=0 )
+                    {
+                        nz = nz+1;
+                    }
+                }
+                if( allocl<buf.sl.ridx[q]+nz )
+                {
+                    allocl = (int)Math.Round(1+1.8*(buf.sl.ridx[q]+nz));
+                    apserv.rvectorgrowto(ref buf.sl.vals, allocl, _params);
+                    apserv.ivectorgrowto(ref buf.sl.idx, allocl, _params);
+                }
+                k = buf.sl.ridx[q];
+                for(j=0; j<=q-1; j++)
+                {
+                    v = y[j];
+                    if( !(v==0.0) )
+                    {
+                        lutfappend(buf.factor, q, j, v, _params);
+                        buf.sl.idx[k] = j;
+                        buf.sl.vals[k] = v;
+                        k = k+1;
+                    }
+                }
+                buf.sl.ridx[q+1] = k;
+                nrs[q] = nrs[q]+(buf.sl.ridx[q+1]-buf.sl.ridx[q]);
+                i = buf.rowperm.rawidx[q];
+                buf.rowperm.rawidx[q] = buf.rowperm.rawidx[kpivot];
+                buf.rowperm.rawidx[kpivot] = i;
+                buf.rowperm.pividx[buf.rowperm.rawidx[q]] = q;
+                buf.rowperm.pividx[buf.rowperm.rawidx[kpivot]] = kpivot;
+            }
+            apserv.ivectorsetlengthatleast(ref roffs, n+1, _params);
+            roffs[0] = 0;
+            for(i=1; i<=n; i++)
+            {
+                roffs[i] = roffs[i-1]+nrs[i-1];
+            }
+            alglib.ap.assert(roffs[n]==buf.sl.ridx[n]+buf.sut.ridx[n], "SPTRFPLU: integrity check failed");
+            apserv.ivectorsetlengthatleast(ref a.ridx, n+1, _params);
+            apserv.rvectorsetlengthatleast(ref a.vals, buf.sl.ridx[n]+buf.sut.ridx[n], _params);
+            apserv.ivectorsetlengthatleast(ref a.idx, buf.sl.ridx[n]+buf.sut.ridx[n], _params);
+            apserv.ivectorsetlengthatleast(ref a.didx, n, _params);
+            apserv.ivectorsetlengthatleast(ref a.uidx, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                j0 = buf.sl.ridx[i];
+                j1 = buf.sl.ridx[i+1]-1;
+                k = roffs[i];
+                for(j=j0; j<=j1; j++)
+                {
+                    a.idx[k] = buf.sl.idx[j];
+                    a.vals[k] = buf.sl.vals[j];
+                    k = k+1;
+                }
+                roffs[i] = k;
+                j0 = buf.sut.ridx[i];
+                j1 = buf.sut.ridx[i+1]-1;
+                for(j=j0; j<=j1; j++)
+                {
+                    k1 = buf.sut.idx[j];
+                    k = roffs[k1];
+                    a.idx[k] = i;
+                    a.vals[k] = buf.sut.vals[j];
+                    roffs[k1] = k+1;
+                }
+            }
+            alglib.ap.assert(roffs[n-1]==roffs[n], "SPTRFPLU: integrity check failed");
+            a.ridx[0] = 0;
+            for(i=1; i<=n; i++)
+            {
+                a.ridx[i] = roffs[i-1];
+            }
+            a.ninitialized = a.ridx[n];
+            a.m = n;
+            a.n = n;
+            a.matrixtype = 1;
+            sparse.sparseinitduidx(a, _params);
+            return result;
+        }
+
+
+        /*************************************************************************
+        This function initialized triangular factor structure by empty matrix.
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        private static void lutfinit(sptrflowerunitriangularfactor a,
+            alglib.xparams _params)
+        {
+            a.n = 0;
+            a.allocated = 0;
+            a.used = 0;
+        }
+
+
+        /*************************************************************************
+        This function adds empty column to the lower triangular factor
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        private static void lutfaddcol(sptrflowerunitriangularfactor a,
+            alglib.xparams _params)
+        {
+            a.n = a.n+1;
+            apserv.ivectorgrowto(ref a.s0, a.n, _params);
+            a.s0[a.n-1] = -1;
+        }
+
+
+        /*************************************************************************
+        This function appends non-zero element A(I,J)=V, with I>J
+
+        You can not insert element into middle of the J-th column, only append it
+        after the last non-zero. However, we do not perform explicit integrity
+        check due to performance constraints. Just keep it in mind.
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        private static void lutfappend(sptrflowerunitriangularfactor a,
+            int i,
+            int j,
+            double v,
+            alglib.xparams _params)
+        {
+            int k = 0;
+
+            if( a.used==a.allocated )
+            {
+                a.allocated = 1+(int)Math.Round(1.8*a.allocated);
+                apserv.ivectorgrowto(ref a.idxlist, 2*a.allocated, _params);
+                apserv.rvectorgrowto(ref a.vals, a.allocated, _params);
+            }
+            k = a.used;
+            a.vals[k] = v;
+            a.idxlist[2*k+0] = i;
+            a.idxlist[2*k+1] = a.s0[j];
+            a.s0[j] = k;
+            a.used = k+1;
+        }
+
+
+        /*************************************************************************
+        This function performs lower unitriangular solve.
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        private static void lutfsolve(sptrflowerunitriangularfactor a,
+            double[] x,
+            alglib.xparams _params)
+        {
+            int n = 0;
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            double v = 0;
+
+            n = a.n;
+            for(i=0; i<=n-1; i++)
+            {
+                v = x[i];
+                if( v==0.0 )
+                {
+                    continue;
+                }
+                k = a.s0[i];
+                while( k>=0 )
+                {
+                    j = a.idxlist[2*k+0];
+                    x[j] = x[j]-v*a.vals[k];
+                    k = a.idxlist[2*k+1];
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        This function initialized trailing matrix structure by Nx0 matrix
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        private static void tminit(sptrftrailingmatrix a,
+            int n,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            a.n0 = n;
+            a.nrows = n;
+            a.ncols = 0;
+            apserv.ivectorsetlengthatleast(ref a.rawidx, n, _params);
+            apserv.ivectorsetlengthatleast(ref a.pividx, n, _params);
+            apserv.bvectorsetlengthatleast(ref a.pivotedout, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                a.rawidx[i] = i;
+                a.pividx[i] = i;
+                a.pivotedout[i] = false;
+            }
+            apserv.ivectorsetlengthatleast(ref a.ridx, n+1, _params);
+            a.ridx[0] = 0;
+            apserv.ivectorsetlengthatleast(ref a.rowsizes, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                a.rowsizes[i] = 0;
+            }
+            a.allocated = 0;
+            a.pendingremoval = 0;
+            apserv.ivectorsetlengthatleast(ref a.rowptr, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                a.rowptr[i] = -1;
+            }
+            apserv.rvectorsetlengthatleast(ref a.buf, n, _params);
+        }
+
+
+        /*************************************************************************
+        This function applies update z:=z-A*w to the entering column Z[Q:N-1].
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        private static void tmapplyupdate(sptrftrailingmatrix a,
+            int q,
+            double[] w,
+            double[] z,
+            alglib.xparams _params)
+        {
+            int n = 0;
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            int j0 = 0;
+            int j1 = 0;
+            double v = 0;
+
+            alglib.ap.assert(q<a.n0, "TMApplyUpdate: integrity check failed");
+            alglib.ap.assert(a.nrows==a.n0-q, "TMApplyUpdate: integrity check failed");
+            alglib.ap.assert(a.ncols==q, "TMApplyUpdate: integrity check failed");
+            n = a.n0;
+            if( q==0 )
+            {
+                return;
+            }
+            for(i=0; i<=n-1; i++)
+            {
+                a.buf[i] = 0;
+            }
+            for(i=q; i<=n-1; i++)
+            {
+                a.buf[a.rawidx[i]] = z[i];
+            }
+            for(i=0; i<=q-1; i++)
+            {
+                v = w[i];
+                if( v==0 )
+                {
+                    continue;
+                }
+                j0 = a.ridx[i];
+                j1 = a.ridx[i+1]-1;
+                for(j=j0; j<=j1; j++)
+                {
+                    k = a.idx[j];
+                    a.buf[k] = a.buf[k]-v*a.vals[j];
+                }
+            }
+            for(i=q; i<=n-1; i++)
+            {
+                z[i] = a.buf[a.rawidx[i]];
+            }
+        }
+
+
+        /*************************************************************************
+        This function pivots out K-th row (it is returned in Y[0:Q-1]) and appends
+        column Z to the trailing matrix.
+
+        Row count is decreased by 1 (first one is swapped out), column count is
+        increased by 1, matrix size becomes (N-Q-1)x(Q+1)
+
+        NOTE: ZP contains column after pivoting was performed, elements ZP[Q+1:N-1] are used
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        private static void tmpivotoutmergein(sptrftrailingmatrix a,
+            int q,
+            int kpivot,
+            double[] zp,
+            double[] y,
+            alglib.xparams _params)
+        {
+            int n = 0;
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            double v = 0;
+            int nnz = 0;
+
+            alglib.ap.assert(q<a.n0, "TMPivotOutMergeIn: integrity check failed");
+            alglib.ap.assert(a.nrows==a.n0-q, "TMPivotOutMergeIn: integrity check failed");
+            alglib.ap.assert(a.ncols==q, "TMPivotOutMergeIn: integrity check failed");
+            alglib.ap.assert(kpivot>=q, "TMPivotOutMergeIn: integrity check failed");
+            n = a.n0;
+            i = a.rawidx[q];
+            a.rawidx[q] = a.rawidx[kpivot];
+            a.rawidx[kpivot] = i;
+            a.pividx[a.rawidx[q]] = q;
+            a.pividx[a.rawidx[kpivot]] = kpivot;
+            nnz = 0;
+            for(i=q+1; i<=n-1; i++)
+            {
+                if( zp[i]!=0 )
+                {
+                    nnz = nnz+1;
+                }
+            }
+            if( a.ridx[q]+nnz>a.allocated )
+            {
+                a.allocated = 1+(int)Math.Round(1.8*(a.ridx[q]+nnz));
+                apserv.ivectorgrowto(ref a.idx, a.allocated, _params);
+                apserv.rvectorgrowto(ref a.vals, a.allocated, _params);
+                apserv.ivectorgrowto(ref a.rowlist, 2*a.allocated, _params);
+            }
+            k = a.ridx[q];
+            for(i=q+1; i<=n-1; i++)
+            {
+                v = zp[i];
+                if( v!=0 )
+                {
+                    j = a.rawidx[i];
+                    a.idx[k] = j;
+                    a.vals[k] = v;
+                    a.rowsizes[j] = a.rowsizes[j]+1;
+                    a.rowlist[2*k+0] = q;
+                    a.rowlist[2*k+1] = a.rowptr[j];
+                    a.rowptr[j] = k;
+                    k = k+1;
+                }
+            }
+            a.ridx[q+1] = k;
+            for(j=0; j<=q-1; j++)
+            {
+                y[j] = 0;
+            }
+            i = a.rawidx[q];
+            k = a.rowptr[i];
+            while( k>=0 )
+            {
+                y[a.rowlist[2*k+0]] = a.vals[k];
+                a.vals[k] = 0;
+                k = a.rowlist[2*k+1];
+            }
+            alglib.ap.assert(!a.pivotedout[i], "TMPivotOutMergeIn: integrity check failed");
+            a.pivotedout[i] = true;
+            a.pendingremoval = a.pendingremoval+a.rowsizes[i];
+            a.nrows = a.nrows-1;
+            a.ncols = a.ncols+1;
+        }
+
+
+    }
     public class trfac
     {
         /*************************************************************************
@@ -21012,6 +22058,63 @@ public partial class alglib
                     }
                 }
             }
+        }
+
+
+        /*************************************************************************
+        Sparse LU decomposition with row pivoting (incomplete pivoting) for square
+        sparse matrix stored in CRS format.
+
+        The algorithm  computes  LU  decomposition  of  a  general  square  matrix
+        (rectangular ones are not supported). The result  of  an  algorithm  is  a
+        representation of A as A = P*L*U, where:
+        * L is lower unitriangular matrix
+        * U is upper triangular matrix
+        * P = P0*P1*...*PK, K=N-1,
+          Pi - permutation matrix for I and Pivots[I]
+
+        This function performs only partial pivoting - we rearrange  rows  but not
+        columns - thus it may return denser  decompositions  than  implementations
+        with complete pivoting.
+
+        INPUT PARAMETERS:
+            A       -   sparse NxN matrix in CRS format. An exception is generated
+                        if matrix is non-CRS or non-square.
+
+        OUTPUT PARAMETERS:
+            A       -   the result of factorization, matrices L and U stored in
+                        compact form using CRS sparse storage format:
+                        * lower unitriangular L is stored strictly under main diagonal
+                        * upper triangilar U is stored ON and ABOVE main diagonal
+            P       -   row permutation matrix in compact form, array[N]
+            
+        This function always succeeds, i.e. it ALWAYS returns valid factorization,
+        but for your convenience it also returns  boolean  value  which  helps  to
+        detect symbolically degenerate matrices:
+        * function returns TRUE, if the matrix was factorized AND symbolically
+          non-degenerate
+        * function returns FALSE, if the matrix was factorized but U has strictly
+          zero elements at the diagonal (the factorization is returned anyway).
+
+
+          -- ALGLIB routine --
+             03.09.2018
+             Bochkanov Sergey
+        *************************************************************************/
+        public static bool sparseplucrs(sparse.sparsematrix a,
+            ref int[] p,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            sptrf.slubuffer buf = new sptrf.slubuffer();
+            int[] pc = new int[0];
+
+            p = new int[0];
+
+            alglib.ap.assert(sparse.sparseiscrs(a, _params), "SparsePLUCRS: A is not stored in CRS format");
+            alglib.ap.assert(sparse.sparsegetnrows(a, _params)==sparse.sparsegetncols(a, _params), "SparsePLUCRS: non-square A");
+            result = sptrf.sptrfplu(a, 1, ref p, ref pc, buf, _params);
+            return result;
         }
 
 

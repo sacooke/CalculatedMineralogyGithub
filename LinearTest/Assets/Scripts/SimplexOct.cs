@@ -164,12 +164,12 @@ public class SimplexOct : MonoBehaviour
         //to a BV and the element which was a BV gets a NBV
         for (int i = 0; i < variables.Length; i++)
         {
-            Debug.Log("check if variables[" + i + "] (" + variables[i] + ") = " + pivotrow);
+            //Debug.Log("check if variables[" + i + "] (" + variables[i] + ") = " + pivotrow);
             if (variables[i] == pivotrow)
                 variables[i] = -1;
         }
         variables[pivotcolumn - 1] = pivotrow;
-        Debug.Log("variables[" + (pivotcolumn-1) + "] = " + pivotrow);
+        //Debug.Log("variables[" + (pivotcolumn-1) + "] = " + pivotrow);
         //----------------------------------------------------------------
 
     }
@@ -305,7 +305,7 @@ public class SimplexOct : MonoBehaviour
         return variables;
     }
 
-    public string AllTableausToString()
+    public string AllTableausToString(int f, string id)
     {
         string s = "";
         int tabcount = 0;
@@ -338,7 +338,9 @@ public class SimplexOct : MonoBehaviour
 
         s += "Solution:   " + solution + "\n";
 
-        System.IO.File.WriteAllText(@"F:\LinearTest\CalculatedMineralogyGithub\CalculatedMineralogyGithub\WriteText.txt", s);
+        string dateTime = System.DateTime.Now.ToString("dd-MM-yyyy") + "_" + System.DateTime.Now.ToString("hh-mmtt");
+
+        System.IO.File.WriteAllText(@"F:\LinearTest\CalculatedMineralogyGithub\CalculatedMineralogyGithub\WriteText" + dateTime + "_" + f + "_" + id + ".txt", s);
 
         return s;
     }

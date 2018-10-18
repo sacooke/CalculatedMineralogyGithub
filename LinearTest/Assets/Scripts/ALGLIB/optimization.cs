@@ -1,5 +1,5 @@
 /*************************************************************************
-ALGLIB 3.14.0 (source code generated 2018-06-16)
+ALGLIB dev (source code generated 2018-10-11)
 Copyright (c) Sergey Bochkanov (ALGLIB project).
 
 >>> SOURCE LICENSE >>>
@@ -2133,9 +2133,9 @@ public partial class alglib
                     * last element corresponds to the right part.
                     All elements of C (including right part) must be finite.
         CT      -   type of constraints, array[K]:
-                    * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-                    * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-                    * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+                    * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n]
+                    * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n]
+                    * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n]
         K       -   number of equality/inequality constraints, K>=0:
                     * if given, only leading K elements of C/CT are used
                     * if not given, automatically determined from sizes of C/CT
@@ -3848,40 +3848,40 @@ public partial class alglib
 {
 
 
+
+}
+public partial class alglib
+{
+
+
     /*************************************************************************
-    This object stores nonlinear optimizer state.
-    You should use functions provided by MinBC subpackage to work with this
+    This object stores linear solver state.
+    You should use functions provided by MinLP subpackage to work with this
     object
     *************************************************************************/
-    public class minbcstate : alglibobject
+    public class minlpstate : alglibobject
     {
         //
         // Public declarations
         //
-        public bool needf { get { return _innerobj.needf; } set { _innerobj.needf = value; } }
-        public bool needfg { get { return _innerobj.needfg; } set { _innerobj.needfg = value; } }
-        public bool xupdated { get { return _innerobj.xupdated; } set { _innerobj.xupdated = value; } }
-        public double f { get { return _innerobj.f; } set { _innerobj.f = value; } }
-        public double[] g { get { return _innerobj.g; } }
-        public double[] x { get { return _innerobj.x; } }
     
-        public minbcstate()
+        public minlpstate()
         {
-            _innerobj = new minbc.minbcstate();
+            _innerobj = new minlp.minlpstate();
         }
         
         public override alglib.alglibobject make_copy()
         {
-            return new minbcstate((minbc.minbcstate)_innerobj.make_copy());
+            return new minlpstate((minlp.minlpstate)_innerobj.make_copy());
         }
     
         //
         // Although some of declarations below are public, you should not use them
         // They are intended for internal use only
         //
-        private minbc.minbcstate _innerobj;
-        public minbc.minbcstate innerobj { get { return _innerobj; } }
-        public minbcstate(minbc.minbcstate obj)
+        private minlp.minlpstate _innerobj;
+        public minlp.minlpstate innerobj { get { return _innerobj; } }
+        public minlpstate(minlp.minlpstate obj)
         {
             _innerobj = obj;
         }
@@ -3890,350 +3890,142 @@ public partial class alglib
 
     /*************************************************************************
     This structure stores optimization report:
-    * IterationsCount           number of iterations
-    * NFEV                      number of gradient evaluations
-    * TerminationType           termination type (see below)
+    * f                         target function value
+    * y                         dual variables
+    * stats                     array[N+M], statuses of box (N) and linear (M)
+                                constraints:
+                                * stats[i]>0  =>  constraint at upper bound
+                                                  (also used for free non-basic
+                                                  variables set to zero)
+                                * stats[i]<0  =>  constraint at lower bound
+                                * stats[i]=0  =>  constraint is inactive, basic
+                                                  variable
+    * primalerror               primal feasibility error
+    * dualerror                 dual feasibility error
+    * iterationscount           iteration count
+    * terminationtype           completion code (see below)
 
-    TERMINATION CODES
-
-    TerminationType field contains completion code, which can be:
-      -8    internal integrity control detected  infinite  or  NAN  values  in
-            function/gradient. Abnormal termination signalled.
-      -7    gradient verification failed.
-            See MinBCSetGradientCheck() for more information.
-      -3    inconsistent constraints.
-       1    relative function improvement is no more than EpsF.
-       2    relative step is no more than EpsX.
-       4    gradient norm is no more than EpsG
-       5    MaxIts steps was taken
-       7    stopping conditions are too stringent,
+    Completion codes:
+    * -4    LP problem is primal unbounded (dual infeasible)
+    * -3    LP problem is primal infeasible (dual unbounded)
+    *  1..4 successful completion
+    *  5    MaxIts steps was taken
+    *  7    stopping conditions are too stringent,
             further improvement is impossible,
             X contains best point found so far.
-       8    terminated by user who called minbcrequesttermination(). X contains
-            point which was "current accepted" when  termination  request  was
-            submitted.
-
-    ADDITIONAL FIELDS
-
-    There are additional fields which can be used for debugging:
-    * DebugEqErr                error in the equality constraints (2-norm)
-    * DebugFS                   f, calculated at projection of initial point
-                                to the feasible set
-    * DebugFF                   f, calculated at the final point
-    * DebugDX                   |X_start-X_final|
     *************************************************************************/
-    public class minbcreport : alglibobject
+    public class minlpreport : alglibobject
     {
         //
         // Public declarations
         //
+        public double f { get { return _innerobj.f; } set { _innerobj.f = value; } }
+        public double[] y { get { return _innerobj.y; } set { _innerobj.y = value; } }
+        public int[] stats { get { return _innerobj.stats; } set { _innerobj.stats = value; } }
+        public double primalerror { get { return _innerobj.primalerror; } set { _innerobj.primalerror = value; } }
+        public double dualerror { get { return _innerobj.dualerror; } set { _innerobj.dualerror = value; } }
         public int iterationscount { get { return _innerobj.iterationscount; } set { _innerobj.iterationscount = value; } }
-        public int nfev { get { return _innerobj.nfev; } set { _innerobj.nfev = value; } }
-        public int varidx { get { return _innerobj.varidx; } set { _innerobj.varidx = value; } }
         public int terminationtype { get { return _innerobj.terminationtype; } set { _innerobj.terminationtype = value; } }
     
-        public minbcreport()
+        public minlpreport()
         {
-            _innerobj = new minbc.minbcreport();
+            _innerobj = new minlp.minlpreport();
         }
         
         public override alglib.alglibobject make_copy()
         {
-            return new minbcreport((minbc.minbcreport)_innerobj.make_copy());
+            return new minlpreport((minlp.minlpreport)_innerobj.make_copy());
         }
     
         //
         // Although some of declarations below are public, you should not use them
         // They are intended for internal use only
         //
-        private minbc.minbcreport _innerobj;
-        public minbc.minbcreport innerobj { get { return _innerobj; } }
-        public minbcreport(minbc.minbcreport obj)
+        private minlp.minlpreport _innerobj;
+        public minlp.minlpreport innerobj { get { return _innerobj; } }
+        public minlpreport(minlp.minlpreport obj)
         {
             _innerobj = obj;
         }
     }
     
     /*************************************************************************
-                         BOX CONSTRAINED OPTIMIZATION
-              WITH FAST ACTIVATION OF MULTIPLE BOX CONSTRAINTS
+                                LINEAR PROGRAMMING
 
-    DESCRIPTION:
-    The  subroutine  minimizes  function   F(x) of N arguments subject  to box
-    constraints (with some of box constraints actually being equality ones).
+    The subroutine creates LP  solver.  After  initial  creation  it  contains
+    default optimization problem with zero cost vector and all variables being
+    fixed to zero values and no constraints.
 
-    This optimizer uses algorithm similar to that of MinBLEIC (optimizer  with
-    general linear constraints), but presence of box-only  constraints  allows
-    us to use faster constraint activation strategies. On large-scale problems,
-    with multiple constraints active at the solution, this  optimizer  can  be
-    several times faster than BLEIC.
+    In order to actually solve something you should:
+    * set cost vector with minlpsetcost()
+    * set variable bounds with minlpsetbc() or minlpsetbcall()
+    * specify constraint matrix with one of the following functions:
+      [*] minlpsetlc1()       for dense one-sided constraints
+      [*] minlpsetlc2()       for dense two-sided constraints
+      [*] minlpsetlc2sparse() for sparse two-sided constraints
+      [*] minlpaddlc2()       to add one dense row to constraint matrix
+      [*] minlpaddlc2compr()  to add one row to constraint matrix (compressed format)
+    * call minlpoptimize() to run the solver and  minlpresults()  to  get  the
+      solution vector and additional information.
 
-    REQUIREMENTS:
-    * user must provide function value and gradient
-    * starting point X0 must be feasible or
-      not too far away from the feasible set
-    * grad(f) must be Lipschitz continuous on a level set:
-      L = { x : f(x)<=f(x0) }
-    * function must be defined everywhere on the feasible set F
-
-    USAGE:
-
-    Constrained optimization if far more complex than the unconstrained one.
-    Here we give very brief outline of the BC optimizer. We strongly recommend
-    you to read examples in the ALGLIB Reference Manual and to read ALGLIB User Guide
-    on optimization, which is available at http://www.alglib.net/optimization/
-
-    1. User initializes algorithm state with MinBCCreate() call
-
-    2. USer adds box constraints by calling MinBCSetBC() function.
-
-    3. User sets stopping conditions with MinBCSetCond().
-
-    4. User calls MinBCOptimize() function which takes algorithm  state and
-       pointer (delegate, etc.) to callback function which calculates F/G.
-
-    5. User calls MinBCResults() to get solution
-
-    6. Optionally user may call MinBCRestartFrom() to solve another problem
-       with same N but another starting point.
-       MinBCRestartFrom() allows to reuse already initialized structure.
-
+    Presently  this  optimizer  supports  only  revised  simplex   method   as
+    underlying solver. Future releases of ALGLIB may introduce other solvers.
 
     INPUT PARAMETERS:
-        N       -   problem dimension, N>0:
-                    * if given, only leading N elements of X are used
-                    * if not given, automatically determined from size ofX
-        X       -   starting point, array[N]:
-                    * it is better to set X to a feasible point
-                    * but X can be infeasible, in which case algorithm will try
-                      to find feasible point first, using X as initial
-                      approximation.
+        N       -   problem size
 
     OUTPUT PARAMETERS:
-        State   -   structure stores algorithm state
+        State   -   optimizer in the default state
 
       -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbccreate(int n, double[] x, out minbcstate state)
+    public static void minlpcreate(int n, out minlpstate state)
     {
-        state = new minbcstate();
-        minbc.minbccreate(n, x, state.innerobj, null);
+        state = new minlpstate();
+        minlp.minlpcreate(n, state.innerobj, null);
     }
     
-    public static void minbccreate(int n, double[] x, out minbcstate state, alglib.xparams _params)
+    public static void minlpcreate(int n, out minlpstate state, alglib.xparams _params)
     {
-        state = new minbcstate();
-        minbc.minbccreate(n, x, state.innerobj, _params);
-    }
-            
-    public static void minbccreate(double[] x, out minbcstate state)
-    {
-        int n;
-    
-        state = new minbcstate();
-        n = ap.len(x);
-        minbc.minbccreate(n, x, state.innerobj, null);
-    
-        return;
-    }
-            
-    public static void minbccreate(double[] x, out minbcstate state, alglib.xparams _params)
-    {
-        int n;
-    
-        state = new minbcstate();
-        n = ap.len(x);
-        minbc.minbccreate(n, x, state.innerobj, _params);
-    
-        return;
+        state = new minlpstate();
+        minlp.minlpcreate(n, state.innerobj, _params);
     }
     
     /*************************************************************************
-    The subroutine is finite difference variant of MinBCCreate().  It  uses
-    finite differences in order to differentiate target function.
+    This function sets cost term for LP solver.
 
-    Description below contains information which is specific to  this function
-    only. We recommend to read comments on MinBCCreate() in  order  to  get
-    more information about creation of BC optimizer.
-
-    INPUT PARAMETERS:
-        N       -   problem dimension, N>0:
-                    * if given, only leading N elements of X are used
-                    * if not given, automatically determined from size of X
-        X       -   starting point, array[0..N-1].
-        DiffStep-   differentiation step, >0
-
-    OUTPUT PARAMETERS:
-        State   -   structure which stores algorithm state
-
-    NOTES:
-    1. algorithm uses 4-point central formula for differentiation.
-    2. differentiation step along I-th axis is equal to DiffStep*S[I] where
-       S[] is scaling vector which can be set by MinBCSetScale() call.
-    3. we recommend you to use moderate values of  differentiation  step.  Too
-       large step will result in too large truncation  errors, while too small
-       step will result in too large numerical  errors.  1.0E-6  can  be  good
-       value to start with.
-    4. Numerical  differentiation  is   very   inefficient  -   one   gradient
-       calculation needs 4*N function evaluations. This function will work for
-       any N - either small (1...10), moderate (10...100) or  large  (100...).
-       However, performance penalty will be too severe for any N's except  for
-       small ones.
-       We should also say that code which relies on numerical  differentiation
-       is  less  robust and precise. CG needs exact gradient values. Imprecise
-       gradient may slow  down  convergence, especially  on  highly  nonlinear
-       problems.
-       Thus  we  recommend to use this function for fast prototyping on small-
-       dimensional problems only, and to implement analytical gradient as soon
-       as possible.
-
-      -- ALGLIB --
-         Copyright 16.05.2011 by Bochkanov Sergey
-    *************************************************************************/
-    public static void minbccreatef(int n, double[] x, double diffstep, out minbcstate state)
-    {
-        state = new minbcstate();
-        minbc.minbccreatef(n, x, diffstep, state.innerobj, null);
-    }
-    
-    public static void minbccreatef(int n, double[] x, double diffstep, out minbcstate state, alglib.xparams _params)
-    {
-        state = new minbcstate();
-        minbc.minbccreatef(n, x, diffstep, state.innerobj, _params);
-    }
-            
-    public static void minbccreatef(double[] x, double diffstep, out minbcstate state)
-    {
-        int n;
-    
-        state = new minbcstate();
-        n = ap.len(x);
-        minbc.minbccreatef(n, x, diffstep, state.innerobj, null);
-    
-        return;
-    }
-            
-    public static void minbccreatef(double[] x, double diffstep, out minbcstate state, alglib.xparams _params)
-    {
-        int n;
-    
-        state = new minbcstate();
-        n = ap.len(x);
-        minbc.minbccreatef(n, x, diffstep, state.innerobj, _params);
-    
-        return;
-    }
-    
-    /*************************************************************************
-    This function sets boundary constraints for BC optimizer.
-
-    Boundary constraints are inactive by default (after initial creation).
-    They are preserved after algorithm restart with MinBCRestartFrom().
-
-    INPUT PARAMETERS:
-        State   -   structure stores algorithm state
-        BndL    -   lower bounds, array[N].
-                    If some (all) variables are unbounded, you may specify
-                    very small number or -INF.
-        BndU    -   upper bounds, array[N].
-                    If some (all) variables are unbounded, you may specify
-                    very large number or +INF.
-
-    NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
-    variable will be "frozen" at X[i]=BndL[i]=BndU[i].
-
-    NOTE 2: this solver has following useful properties:
-    * bound constraints are always satisfied exactly
-    * function is evaluated only INSIDE area specified by  bound  constraints,
-      even  when  numerical  differentiation is used (algorithm adjusts  nodes
-      according to boundary constraints)
-
-      -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
-    *************************************************************************/
-    public static void minbcsetbc(minbcstate state, double[] bndl, double[] bndu)
-    {
-    
-        minbc.minbcsetbc(state.innerobj, bndl, bndu, null);
-    }
-    
-    public static void minbcsetbc(minbcstate state, double[] bndl, double[] bndu, alglib.xparams _params)
-    {
-    
-        minbc.minbcsetbc(state.innerobj, bndl, bndu, _params);
-    }
-    
-    /*************************************************************************
-    This function sets stopping conditions for the optimizer.
+    By default, cost term is zero.
 
     INPUT PARAMETERS:
         State   -   structure which stores algorithm state
-        EpsG    -   >=0
-                    The  subroutine  finishes  its  work   if   the  condition
-                    |v|<EpsG is satisfied, where:
-                    * |.| means Euclidian norm
-                    * v - scaled gradient vector, v[i]=g[i]*s[i]
-                    * g - gradient
-                    * s - scaling coefficients set by MinBCSetScale()
-        EpsF    -   >=0
-                    The  subroutine  finishes  its work if on k+1-th iteration
-                    the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
-                    is satisfied.
-        EpsX    -   >=0
-                    The subroutine finishes its work if  on  k+1-th  iteration
-                    the condition |v|<=EpsX is fulfilled, where:
-                    * |.| means Euclidian norm
-                    * v - scaled step vector, v[i]=dx[i]/s[i]
-                    * dx - step vector, dx=X(k+1)-X(k)
-                    * s - scaling coefficients set by MinBCSetScale()
-        MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
-                    iterations is unlimited.
-
-    Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
-    to automatic stopping criterion selection.
-
-    NOTE: when SetCond() called with non-zero MaxIts, BC solver may perform
-          slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
-          limit on iterations count.
+        C       -   cost term, array[N].
 
       -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcsetcond(minbcstate state, double epsg, double epsf, double epsx, int maxits)
+    public static void minlpsetcost(minlpstate state, double[] c)
     {
     
-        minbc.minbcsetcond(state.innerobj, epsg, epsf, epsx, maxits, null);
+        minlp.minlpsetcost(state.innerobj, c, null);
     }
     
-    public static void minbcsetcond(minbcstate state, double epsg, double epsf, double epsx, int maxits, alglib.xparams _params)
+    public static void minlpsetcost(minlpstate state, double[] c, alglib.xparams _params)
     {
     
-        minbc.minbcsetcond(state.innerobj, epsg, epsf, epsx, maxits, _params);
+        minlp.minlpsetcost(state.innerobj, c, _params);
     }
     
     /*************************************************************************
-    This function sets scaling coefficients for BC optimizer.
+    This function sets scaling coefficients.
 
-    ALGLIB optimizers use scaling matrices to test stopping  conditions  (step
-    size and gradient are scaled before comparison with tolerances).  Scale of
-    the I-th variable is a translation invariant measure of:
+    ALGLIB optimizers use scaling matrices to test stopping  conditions and as
+    preconditioner.
+
+    Scale of the I-th variable is a translation invariant measure of:
     a) "how large" the variable is
-    b) how large the step should be to make significant changes in the function
-
-    Scaling is also used by finite difference variant of the optimizer  - step
-    along I-th axis is equal to DiffStep*S[I].
-
-    In  most  optimizers  (and  in  the  BC  too)  scaling is NOT a form of
-    preconditioning. It just  affects  stopping  conditions.  You  should  set
-    preconditioner  by  separate  call  to  one  of  the  MinBCSetPrec...()
-    functions.
-
-    There is a special  preconditioning  mode, however,  which  uses   scaling
-    coefficients to form diagonal preconditioning matrix. You  can  turn  this
-    mode on, if you want.   But  you should understand that scaling is not the
-    same thing as preconditioning - these are two different, although  related
-    forms of tuning solver.
+    b) how large the step should be to make significant changes in the
+       function
 
     INPUT PARAMETERS:
         State   -   structure stores algorithm state
@@ -4241,464 +4033,336 @@ public partial class alglib
                     S[i] may be negative, sign doesn't matter.
 
       -- ALGLIB --
-         Copyright 14.01.2011 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcsetscale(minbcstate state, double[] s)
+    public static void minlpsetscale(minlpstate state, double[] s)
     {
     
-        minbc.minbcsetscale(state.innerobj, s, null);
+        minlp.minlpsetscale(state.innerobj, s, null);
     }
     
-    public static void minbcsetscale(minbcstate state, double[] s, alglib.xparams _params)
+    public static void minlpsetscale(minlpstate state, double[] s, alglib.xparams _params)
     {
     
-        minbc.minbcsetscale(state.innerobj, s, _params);
+        minlp.minlpsetscale(state.innerobj, s, _params);
     }
     
     /*************************************************************************
-    Modification of the preconditioner: preconditioning is turned off.
+    This function sets box constraints for LP solver (all variables  at  once,
+    different constraints for different variables).
+
+    The default state of constraints is to have all variables fixed  at  zero.
+    You have to overwrite it by your own constraint vector. Constraint  status
+    is preserved until constraints are  explicitly  overwritten  with  another
+    minlpsetbc() call or partially overwritten with minlpsetbcall().
+
+    Following types of constraints are supported:
+
+        DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
+        fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
+        lower bound         BndL[i]<=x[i]           BndU[i]=+INF
+        upper bound         x[i]<=BndU[i]           BndL[i]=-INF
+        range               BndL[i]<=x[i]<=BndU[i]  ...
+        free variable       -                       BndL[I]=-INF, BndU[I]+INF
 
     INPUT PARAMETERS:
-        State   -   structure which stores algorithm state
+        State   -   structure stores algorithm state
+        BndL    -   lower bounds, array[N].
+        BndU    -   upper bounds, array[N].
+
+    NOTE: infinite values can be specified by means of Double.PositiveInfinity
+          and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
+          alglib::fp_neginf (in C++).
+
+    NOTE: you may replace infinities by very small/very large values,  but  it
+          is not recommended because large numbers may introduce large numerical
+          errors in the algorithm.
+
+    NOTE: if constraints for all variables are same you may use minlpsetbcall()
+          which allows to specify constraints without using arrays.
+
+    NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
 
       -- ALGLIB --
-         Copyright 13.10.2010 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcsetprecdefault(minbcstate state)
+    public static void minlpsetbc(minlpstate state, double[] bndl, double[] bndu)
     {
     
-        minbc.minbcsetprecdefault(state.innerobj, null);
+        minlp.minlpsetbc(state.innerobj, bndl, bndu, null);
     }
     
-    public static void minbcsetprecdefault(minbcstate state, alglib.xparams _params)
+    public static void minlpsetbc(minlpstate state, double[] bndl, double[] bndu, alglib.xparams _params)
     {
     
-        minbc.minbcsetprecdefault(state.innerobj, _params);
+        minlp.minlpsetbc(state.innerobj, bndl, bndu, _params);
     }
     
     /*************************************************************************
-    Modification  of  the  preconditioner:  diagonal of approximate Hessian is
-    used.
+    This function sets box constraints for LP solver (all variables  at  once,
+    same constraints for all variables)
+
+    The default state of constraints is to have all variables fixed  at  zero.
+    You have to overwrite it by your own constraint vector. Constraint  status
+    is preserved until constraints are  explicitly  overwritten  with  another
+    minlpsetbc() call or partially overwritten with minlpsetbcall().
+
+    Following types of constraints are supported:
+
+        DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
+        fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
+        lower bound         BndL[i]<=x[i]           BndU[i]=+INF
+        upper bound         x[i]<=BndU[i]           BndL[i]=-INF
+        range               BndL[i]<=x[i]<=BndU[i]  ...
+        free variable       -                       BndL[I]=-INF, BndU[I]+INF
 
     INPUT PARAMETERS:
-        State   -   structure which stores algorithm state
-        D       -   diagonal of the approximate Hessian, array[0..N-1],
-                    (if larger, only leading N elements are used).
+        State   -   structure stores algorithm state
+        BndL    -   lower bound, same for all variables
+        BndU    -   upper bound, same for all variables
 
-    NOTE 1: D[i] should be positive. Exception will be thrown otherwise.
+    NOTE: infinite values can be specified by means of Double.PositiveInfinity
+          and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
+          alglib::fp_neginf (in C++).
 
-    NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
+    NOTE: you may replace infinities by very small/very large values,  but  it
+          is not recommended because large numbers may introduce large numerical
+          errors in the algorithm.
+
+    NOTE: minlpsetbc() can  be  used  to  specify  different  constraints  for
+          different variables.
+
+    NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
 
       -- ALGLIB --
-         Copyright 13.10.2010 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcsetprecdiag(minbcstate state, double[] d)
+    public static void minlpsetbcall(minlpstate state, double bndl, double bndu)
     {
     
-        minbc.minbcsetprecdiag(state.innerobj, d, null);
+        minlp.minlpsetbcall(state.innerobj, bndl, bndu, null);
     }
     
-    public static void minbcsetprecdiag(minbcstate state, double[] d, alglib.xparams _params)
+    public static void minlpsetbcall(minlpstate state, double bndl, double bndu, alglib.xparams _params)
     {
     
-        minbc.minbcsetprecdiag(state.innerobj, d, _params);
+        minlp.minlpsetbcall(state.innerobj, bndl, bndu, _params);
     }
     
     /*************************************************************************
-    Modification of the preconditioner: scale-based diagonal preconditioning.
+    This function sets one-sided linear constraints A*x ~ AU, where "~" can be
+    a mix of "<=", "=" and ">=".
 
-    This preconditioning mode can be useful when you  don't  have  approximate
-    diagonal of Hessian, but you know that your  variables  are  badly  scaled
-    (for  example,  one  variable is in [1,10], and another in [1000,100000]),
-    and most part of the ill-conditioning comes from different scales of vars.
-
-    In this case simple  scale-based  preconditioner,  with H[i] = 1/(s[i]^2),
-    can greatly improve convergence.
-
-    IMPRTANT: you should set scale of your variables  with  MinBCSetScale()
-    call  (before  or after MinBCSetPrecScale() call). Without knowledge of
-    the scale of your variables scale-based preconditioner will be  just  unit
-    matrix.
+    IMPORTANT: this function is provided here for compatibility with the  rest
+               of ALGLIB optimizers which accept constraints  in  format  like
+               this one. Many real-life problem feature two-sided  constraints
+               like a0 <= a*x <= a1. It is really inefficient to add  them  as
+               pair of one-sided constraints. Use minlpsetlc2() or minlpaddlc2()
+               wherever possible.
 
     INPUT PARAMETERS:
-        State   -   structure which stores algorithm state
+        State   -   structure previously allocated with minlpcreate() call.
+        A       -   linear constraints, array[K,N+1]. Each row of A represents
+                    one constraint, with first N elements being linear coefficients,
+                    and last element being right side.
+        CT      -   constraint types, array[K]:
+                    * if CT[i]>0, then I-th constraint is A[i,*]*x >= A[i,n]
+                    * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
+                    * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]
+        K       -   number of equality/inequality constraints,  K>=0;  if  not
+                    given, inferred from sizes of A and CT.
 
       -- ALGLIB --
-         Copyright 13.10.2010 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcsetprecscale(minbcstate state)
+    public static void minlpsetlc1(minlpstate state, double[,] a, int[] ct, int k)
     {
     
-        minbc.minbcsetprecscale(state.innerobj, null);
+        minlp.minlpsetlc1(state.innerobj, a, ct, k, null);
     }
     
-    public static void minbcsetprecscale(minbcstate state, alglib.xparams _params)
+    public static void minlpsetlc1(minlpstate state, double[,] a, int[] ct, int k, alglib.xparams _params)
     {
     
-        minbc.minbcsetprecscale(state.innerobj, _params);
+        minlp.minlpsetlc1(state.innerobj, a, ct, k, _params);
+    }
+            
+    public static void minlpsetlc1(minlpstate state, double[,] a, int[] ct)
+    {
+        int k;
+        if( (ap.rows(a)!=ap.len(ct)))
+            throw new alglibexception("Error while calling 'minlpsetlc1': looks like one of arguments has wrong size");
+    
+        k = ap.rows(a);
+        minlp.minlpsetlc1(state.innerobj, a, ct, k, null);
+    
+        return;
+    }
+            
+    public static void minlpsetlc1(minlpstate state, double[,] a, int[] ct, alglib.xparams _params)
+    {
+        int k;
+        if( (ap.rows(a)!=ap.len(ct)))
+            throw new alglibexception("Error while calling 'minlpsetlc1': looks like one of arguments has wrong size");
+    
+        k = ap.rows(a);
+        minlp.minlpsetlc1(state.innerobj, a, ct, k, _params);
+    
+        return;
     }
     
     /*************************************************************************
-    This function turns on/off reporting.
+    This function sets two-sided linear constraints AL <= A*x <= AU.
+
+    This version accepts dense matrix as  input;  internally  LP  solver  uses
+    sparse storage  anyway  (most  LP  problems  are  sparse),  but  for  your
+    convenience it may accept dense inputs. This  function  overwrites  linear
+    constraints set by previous calls (if such calls were made).
+
+    NOTE: there also exist several versions of this function:
+          * one-sided dense version which  accepts  constraints  in  the  same
+            format as one used by QP and  NLP solvers
+          * two-sided sparse version which accepts sparse matrix
+          * two-sided dense  version which allows you to add constraints row by row
+          * two-sided sparse version which allows you to add constraints row by row
 
     INPUT PARAMETERS:
-        State   -   structure which stores algorithm state
-        NeedXRep-   whether iteration reports are needed or not
-
-    If NeedXRep is True, algorithm will call rep() callback function if  it is
-    provided to MinBCOptimize().
+        State   -   structure previously allocated with minlpcreate() call.
+        A       -   linear constraints, array[K,N]. Each row of  A  represents
+                    one  constraint. One-sided  inequality   constraints, two-
+                    sided inequality  constraints,  equality  constraints  are
+                    supported (see below)
+        AL, AU  -   lower and upper bounds, array[K];
+                    * AL[i]=AU[i] => equality constraint Ai*x
+                    * AL[i]<AU[i] => two-sided constraint AL[i]<=Ai*x<=AU[i]
+                    * AL[i]=-INF  => one-sided constraint Ai*x<=AU[i]
+                    * AU[i]=+INF  => one-sided constraint AL[i]<=Ai*x
+                    * AL[i]=-INF, AU[i]=+INF => constraint is ignored
+        K       -   number of equality/inequality constraints,  K>=0;  if  not
+                    given, inferred from sizes of A, AL, AU.
 
       -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcsetxrep(minbcstate state, bool needxrep)
+    public static void minlpsetlc2(minlpstate state, double[,] a, double[] al, double[] au, int k)
     {
     
-        minbc.minbcsetxrep(state.innerobj, needxrep, null);
+        minlp.minlpsetlc2(state.innerobj, a, al, au, k, null);
     }
     
-    public static void minbcsetxrep(minbcstate state, bool needxrep, alglib.xparams _params)
+    public static void minlpsetlc2(minlpstate state, double[,] a, double[] al, double[] au, int k, alglib.xparams _params)
     {
     
-        minbc.minbcsetxrep(state.innerobj, needxrep, _params);
+        minlp.minlpsetlc2(state.innerobj, a, al, au, k, _params);
+    }
+            
+    public static void minlpsetlc2(minlpstate state, double[,] a, double[] al, double[] au)
+    {
+        int k;
+        if( (ap.rows(a)!=ap.len(al)) || (ap.rows(a)!=ap.len(au)))
+            throw new alglibexception("Error while calling 'minlpsetlc2': looks like one of arguments has wrong size");
+    
+        k = ap.rows(a);
+        minlp.minlpsetlc2(state.innerobj, a, al, au, k, null);
+    
+        return;
+    }
+            
+    public static void minlpsetlc2(minlpstate state, double[,] a, double[] al, double[] au, alglib.xparams _params)
+    {
+        int k;
+        if( (ap.rows(a)!=ap.len(al)) || (ap.rows(a)!=ap.len(au)))
+            throw new alglibexception("Error while calling 'minlpsetlc2': looks like one of arguments has wrong size");
+    
+        k = ap.rows(a);
+        minlp.minlpsetlc2(state.innerobj, a, al, au, k, _params);
+    
+        return;
     }
     
     /*************************************************************************
-    This function sets maximum step length
+    This function solves LP problem.
 
     INPUT PARAMETERS:
-        State   -   structure which stores algorithm state
-        StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
-                    want to limit step length.
+        State   -   algorithm state
 
-    Use this subroutine when you optimize target function which contains exp()
-    or  other  fast  growing  functions,  and optimization algorithm makes too
-    large  steps  which  lead   to overflow. This function allows us to reject
-    steps  that  are  too  large  (and  therefore  expose  us  to the possible
-    overflow) without actually calculating function value at the x+stp*d.
+    You should use minlpresults() function to access results  after  calls  to
+    this function.
 
       -- ALGLIB --
-         Copyright 02.04.2010 by Bochkanov Sergey
+         Copyright 19.07.2018 by Bochkanov Sergey.
     *************************************************************************/
-    public static void minbcsetstpmax(minbcstate state, double stpmax)
+    public static void minlpoptimize(minlpstate state)
     {
     
-        minbc.minbcsetstpmax(state.innerobj, stpmax, null);
+        minlp.minlpoptimize(state.innerobj, null);
     }
     
-    public static void minbcsetstpmax(minbcstate state, double stpmax, alglib.xparams _params)
+    public static void minlpoptimize(minlpstate state, alglib.xparams _params)
     {
     
-        minbc.minbcsetstpmax(state.innerobj, stpmax, _params);
+        minlp.minlpoptimize(state.innerobj, _params);
     }
     
     /*************************************************************************
-    This function provides reverse communication interface
-    Reverse communication interface is not documented or recommended to use.
-    See below for functions which provide better documented API
-    *************************************************************************/
-    public static bool minbciteration(minbcstate state)
-    {
-    
-        return minbc.minbciteration(state.innerobj, null);
-    }
-    
-    public static bool minbciteration(minbcstate state, alglib.xparams _params)
-    {
-    
-        return minbc.minbciteration(state.innerobj, _params);
-    }
-    /*************************************************************************
-    This family of functions is used to launcn iterations of nonlinear optimizer
-
-    These functions accept following parameters:
-        func    -   callback which calculates function (or merit function)
-                    value func at given point x
-        grad    -   callback which calculates function (or merit function)
-                    value func and gradient grad at given point x
-        rep     -   optional callback which is called after each iteration
-                    can be null
-        obj     -   optional object which is passed to func/grad/hess/jac/rep
-                    can be null
-
-    NOTES:
-
-    1. This function has two different implementations: one which  uses  exact
-       (analytical) user-supplied gradient,  and one which uses function value
-       only  and  numerically  differentiates  function  in  order  to  obtain
-       gradient.
-
-       Depending  on  the  specific  function  used to create optimizer object
-       (either  MinBCCreate() for analytical gradient or  MinBCCreateF()
-       for numerical differentiation) you should choose appropriate variant of
-       MinBCOptimize() - one  which  accepts  function  AND gradient or one
-       which accepts function ONLY.
-
-       Be careful to choose variant of MinBCOptimize() which corresponds to
-       your optimization scheme! Table below lists different  combinations  of
-       callback (function/gradient) passed to MinBCOptimize()  and specific
-       function used to create optimizer.
-
-
-                         |         USER PASSED TO MinBCOptimize()
-       CREATED WITH      |  function only   |  function and gradient
-       ------------------------------------------------------------
-       MinBCCreateF()    |     works               FAILS
-       MinBCCreate()     |     FAILS               works
-
-       Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
-       function  and  MinBCOptimize()  version.   Attemps   to   use   such
-       combination (for  example,  to  create optimizer with MinBCCreateF()
-       and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
-       exception being thrown. Either  you  did  not pass gradient when it WAS
-       needed or you passed gradient when it was NOT needed.
-
-      -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
-
-    *************************************************************************/
-    public static void minbcoptimize(minbcstate state, ndimensional_func func, ndimensional_rep rep, object obj)
-    {
-        minbcoptimize(state, func, rep, obj, null);
-    }
-    
-    public static void minbcoptimize(minbcstate state, ndimensional_func func, ndimensional_rep rep, object obj, alglib.xparams _params)
-    {
-        if( func==null )
-            throw new alglibexception("ALGLIB: error in 'minbcoptimize()' (func is null)");
-        while( alglib.minbciteration(state, _params) )
-        {
-            if( state.needf )
-            {
-                func(state.x, ref state.innerobj.f, obj);
-                continue;
-            }
-            if( state.innerobj.xupdated )
-            {
-                if( rep!=null )
-                    rep(state.innerobj.x, state.innerobj.f, obj);
-                continue;
-            }
-            throw new alglibexception("ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)");
-        }
-    }
-
-
-    public static void minbcoptimize(minbcstate state, ndimensional_grad grad, ndimensional_rep rep, object obj)
-    {
-        minbcoptimize(state, grad, rep, obj, null);
-    }
-    
-    public static void minbcoptimize(minbcstate state, ndimensional_grad grad, ndimensional_rep rep, object obj, alglib.xparams _params)
-    {
-        if( grad==null )
-            throw new alglibexception("ALGLIB: error in 'minbcoptimize()' (grad is null)");
-        while( alglib.minbciteration(state, _params) )
-        {
-            if( state.needfg )
-            {
-                grad(state.x, ref state.innerobj.f, state.innerobj.g, obj);
-                continue;
-            }
-            if( state.innerobj.xupdated )
-            {
-                if( rep!=null )
-                    rep(state.innerobj.x, state.innerobj.f, obj);
-                continue;
-            }
-            throw new alglibexception("ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)");
-        }
-    }
-
-
-    
-    /*************************************************************************
-    BC results
+    LP solver results
 
     INPUT PARAMETERS:
         State   -   algorithm state
 
     OUTPUT PARAMETERS:
-        X       -   array[0..N-1], solution
-        Rep     -   optimization report. You should check Rep.TerminationType
-                    in  order  to  distinguish  successful  termination  from
-                    unsuccessful one:
-                    * -8    internal integrity control  detected  infinite or
-                            NAN   values   in   function/gradient.   Abnormal
-                            termination signalled.
-                    * -7   gradient verification failed.
-                           See MinBCSetGradientCheck() for more information.
-                    * -3   inconsistent constraints.
-                    *  1   relative function improvement is no more than EpsF.
-                    *  2   scaled step is no more than EpsX.
-                    *  4   scaled gradient norm is no more than EpsG.
-                    *  5   MaxIts steps was taken
-                    *  8   terminated by user who called minbcrequesttermination().
-                           X contains point which was "current accepted"  when
-                           termination request was submitted.
-                    More information about fields of this  structure  can  be
-                    found in the comments on MinBCReport datatype.
+        X       -   array[N], solution. Filled by zeros on failure.
+        Rep     -   optimization report. You should check Rep.TerminationType,
+                    which contains completion code, and you may check  another
+                    fields which contain another information  about  algorithm
+                    functioning.
+
+                    Failure codes returned by algorithm are:
+                    * -4    LP problem is primal unbounded (dual infeasible)
+                    * -3    LP problem is primal infeasible (dual unbounded)
+
+                    Success codes:
+                    *  1..4 successful completion
+                    *  5    MaxIts steps was taken
 
       -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
+         Copyright 11.01.2011 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcresults(minbcstate state, out double[] x, out minbcreport rep)
+    public static void minlpresults(minlpstate state, out double[] x, out minlpreport rep)
     {
         x = new double[0];
-        rep = new minbcreport();
-        minbc.minbcresults(state.innerobj, ref x, rep.innerobj, null);
+        rep = new minlpreport();
+        minlp.minlpresults(state.innerobj, ref x, rep.innerobj, null);
     }
     
-    public static void minbcresults(minbcstate state, out double[] x, out minbcreport rep, alglib.xparams _params)
+    public static void minlpresults(minlpstate state, out double[] x, out minlpreport rep, alglib.xparams _params)
     {
         x = new double[0];
-        rep = new minbcreport();
-        minbc.minbcresults(state.innerobj, ref x, rep.innerobj, _params);
+        rep = new minlpreport();
+        minlp.minlpresults(state.innerobj, ref x, rep.innerobj, _params);
     }
     
     /*************************************************************************
-    BC results
+    LP results
 
-    Buffered implementation of MinBCResults() which uses pre-allocated buffer
+    Buffered implementation of MinLPResults() which uses pre-allocated  buffer
     to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
     intended to be used in the inner cycles of performance critical algorithms
     where array reallocation penalty is too large to be ignored.
 
       -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
+         Copyright 11.01.2011 by Bochkanov Sergey
     *************************************************************************/
-    public static void minbcresultsbuf(minbcstate state, ref double[] x, minbcreport rep)
+    public static void minlpresultsbuf(minlpstate state, ref double[] x, minlpreport rep)
     {
     
-        minbc.minbcresultsbuf(state.innerobj, ref x, rep.innerobj, null);
+        minlp.minlpresultsbuf(state.innerobj, ref x, rep.innerobj, null);
     }
     
-    public static void minbcresultsbuf(minbcstate state, ref double[] x, minbcreport rep, alglib.xparams _params)
+    public static void minlpresultsbuf(minlpstate state, ref double[] x, minlpreport rep, alglib.xparams _params)
     {
     
-        minbc.minbcresultsbuf(state.innerobj, ref x, rep.innerobj, _params);
-    }
-    
-    /*************************************************************************
-    This subroutine restarts algorithm from new point.
-    All optimization parameters (including constraints) are left unchanged.
-
-    This  function  allows  to  solve multiple  optimization  problems  (which
-    must have  same number of dimensions) without object reallocation penalty.
-
-    INPUT PARAMETERS:
-        State   -   structure previously allocated with MinBCCreate call.
-        X       -   new starting point.
-
-      -- ALGLIB --
-         Copyright 28.11.2010 by Bochkanov Sergey
-    *************************************************************************/
-    public static void minbcrestartfrom(minbcstate state, double[] x)
-    {
-    
-        minbc.minbcrestartfrom(state.innerobj, x, null);
-    }
-    
-    public static void minbcrestartfrom(minbcstate state, double[] x, alglib.xparams _params)
-    {
-    
-        minbc.minbcrestartfrom(state.innerobj, x, _params);
-    }
-    
-    /*************************************************************************
-    This subroutine submits request for termination of running  optimizer.  It
-    should be called from user-supplied callback when user decides that it  is
-    time to "smoothly" terminate optimization process.  As  result,  optimizer
-    stops at point which was "current accepted" when termination  request  was
-    submitted and returns error code 8 (successful termination).
-
-    INPUT PARAMETERS:
-        State   -   optimizer structure
-
-    NOTE: after  request  for  termination  optimizer  may   perform   several
-          additional calls to user-supplied callbacks. It does  NOT  guarantee
-          to stop immediately - it just guarantees that these additional calls
-          will be discarded later.
-
-    NOTE: calling this function on optimizer which is NOT running will have no
-          effect.
-
-    NOTE: multiple calls to this function are possible. First call is counted,
-          subsequent calls are silently ignored.
-
-      -- ALGLIB --
-         Copyright 08.10.2014 by Bochkanov Sergey
-    *************************************************************************/
-    public static void minbcrequesttermination(minbcstate state)
-    {
-    
-        minbc.minbcrequesttermination(state.innerobj, null);
-    }
-    
-    public static void minbcrequesttermination(minbcstate state, alglib.xparams _params)
-    {
-    
-        minbc.minbcrequesttermination(state.innerobj, _params);
-    }
-    
-    /*************************************************************************
-    This  subroutine  turns  on  verification  of  the  user-supplied analytic
-    gradient:
-    * user calls this subroutine before optimization begins
-    * MinBCOptimize() is called
-    * prior to  actual  optimization, for each component  of  parameters being
-      optimized X[i] algorithm performs following steps:
-      * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
-        where X[i] is i-th component of the initial point and S[i] is a  scale
-        of i-th parameter
-      * if needed, steps are bounded with respect to constraints on X[]
-      * F(X) is evaluated at these trial points
-      * we perform one more evaluation in the middle point of the interval
-      * we  build  cubic  model using function values and derivatives at trial
-        points and we compare its prediction with actual value in  the  middle
-        point
-      * in case difference between prediction and actual value is higher  than
-        some predetermined threshold, algorithm stops with completion code -7;
-        Rep.VarIdx is set to index of the parameter with incorrect derivative.
-    * after verification is over, algorithm proceeds to the actual optimization.
-
-    NOTE 1: verification  needs  N (parameters count) gradient evaluations. It
-            is very costly and you should use  it  only  for  low  dimensional
-            problems,  when  you  want  to  be  sure  that  you've   correctly
-            calculated  analytic  derivatives.  You  should  not use it in the
-            production code (unless you want to check derivatives provided  by
-            some third party).
-
-    NOTE 2: you  should  carefully  choose  TestStep. Value which is too large
-            (so large that function behaviour is significantly non-cubic) will
-            lead to false alarms. You may use  different  step  for  different
-            parameters by means of setting scale with MinBCSetScale().
-
-    NOTE 3: this function may lead to false positives. In case it reports that
-            I-th  derivative was calculated incorrectly, you may decrease test
-            step  and  try  one  more  time  - maybe your function changes too
-            sharply  and  your  step  is  too  large for such rapidly chanding
-            function.
-
-    INPUT PARAMETERS:
-        State       -   structure used to store algorithm state
-        TestStep    -   verification step:
-                        * TestStep=0 turns verification off
-                        * TestStep>0 activates verification
-
-      -- ALGLIB --
-         Copyright 15.06.2012 by Bochkanov Sergey
-    *************************************************************************/
-    public static void minbcsetgradientcheck(minbcstate state, double teststep)
-    {
-    
-        minbc.minbcsetgradientcheck(state.innerobj, teststep, null);
-    }
-    
-    public static void minbcsetgradientcheck(minbcstate state, double teststep, alglib.xparams _params)
-    {
-    
-        minbc.minbcsetgradientcheck(state.innerobj, teststep, _params);
+        minlp.minlpresultsbuf(state.innerobj, ref x, rep.innerobj, _params);
     }
 
 }
@@ -6023,6 +5687,864 @@ public partial class alglib
     {
     
         minnlc.minnlcsetgradientcheck(state.innerobj, teststep, _params);
+    }
+
+}
+public partial class alglib
+{
+
+
+    /*************************************************************************
+    This object stores nonlinear optimizer state.
+    You should use functions provided by MinBC subpackage to work with this
+    object
+    *************************************************************************/
+    public class minbcstate : alglibobject
+    {
+        //
+        // Public declarations
+        //
+        public bool needf { get { return _innerobj.needf; } set { _innerobj.needf = value; } }
+        public bool needfg { get { return _innerobj.needfg; } set { _innerobj.needfg = value; } }
+        public bool xupdated { get { return _innerobj.xupdated; } set { _innerobj.xupdated = value; } }
+        public double f { get { return _innerobj.f; } set { _innerobj.f = value; } }
+        public double[] g { get { return _innerobj.g; } }
+        public double[] x { get { return _innerobj.x; } }
+    
+        public minbcstate()
+        {
+            _innerobj = new minbc.minbcstate();
+        }
+        
+        public override alglib.alglibobject make_copy()
+        {
+            return new minbcstate((minbc.minbcstate)_innerobj.make_copy());
+        }
+    
+        //
+        // Although some of declarations below are public, you should not use them
+        // They are intended for internal use only
+        //
+        private minbc.minbcstate _innerobj;
+        public minbc.minbcstate innerobj { get { return _innerobj; } }
+        public minbcstate(minbc.minbcstate obj)
+        {
+            _innerobj = obj;
+        }
+    }
+
+
+    /*************************************************************************
+    This structure stores optimization report:
+    * IterationsCount           number of iterations
+    * NFEV                      number of gradient evaluations
+    * TerminationType           termination type (see below)
+
+    TERMINATION CODES
+
+    TerminationType field contains completion code, which can be:
+      -8    internal integrity control detected  infinite  or  NAN  values  in
+            function/gradient. Abnormal termination signalled.
+      -7    gradient verification failed.
+            See MinBCSetGradientCheck() for more information.
+      -3    inconsistent constraints.
+       1    relative function improvement is no more than EpsF.
+       2    relative step is no more than EpsX.
+       4    gradient norm is no more than EpsG
+       5    MaxIts steps was taken
+       7    stopping conditions are too stringent,
+            further improvement is impossible,
+            X contains best point found so far.
+       8    terminated by user who called minbcrequesttermination(). X contains
+            point which was "current accepted" when  termination  request  was
+            submitted.
+
+    ADDITIONAL FIELDS
+
+    There are additional fields which can be used for debugging:
+    * DebugEqErr                error in the equality constraints (2-norm)
+    * DebugFS                   f, calculated at projection of initial point
+                                to the feasible set
+    * DebugFF                   f, calculated at the final point
+    * DebugDX                   |X_start-X_final|
+    *************************************************************************/
+    public class minbcreport : alglibobject
+    {
+        //
+        // Public declarations
+        //
+        public int iterationscount { get { return _innerobj.iterationscount; } set { _innerobj.iterationscount = value; } }
+        public int nfev { get { return _innerobj.nfev; } set { _innerobj.nfev = value; } }
+        public int varidx { get { return _innerobj.varidx; } set { _innerobj.varidx = value; } }
+        public int terminationtype { get { return _innerobj.terminationtype; } set { _innerobj.terminationtype = value; } }
+    
+        public minbcreport()
+        {
+            _innerobj = new minbc.minbcreport();
+        }
+        
+        public override alglib.alglibobject make_copy()
+        {
+            return new minbcreport((minbc.minbcreport)_innerobj.make_copy());
+        }
+    
+        //
+        // Although some of declarations below are public, you should not use them
+        // They are intended for internal use only
+        //
+        private minbc.minbcreport _innerobj;
+        public minbc.minbcreport innerobj { get { return _innerobj; } }
+        public minbcreport(minbc.minbcreport obj)
+        {
+            _innerobj = obj;
+        }
+    }
+    
+    /*************************************************************************
+                         BOX CONSTRAINED OPTIMIZATION
+              WITH FAST ACTIVATION OF MULTIPLE BOX CONSTRAINTS
+
+    DESCRIPTION:
+    The  subroutine  minimizes  function   F(x) of N arguments subject  to box
+    constraints (with some of box constraints actually being equality ones).
+
+    This optimizer uses algorithm similar to that of MinBLEIC (optimizer  with
+    general linear constraints), but presence of box-only  constraints  allows
+    us to use faster constraint activation strategies. On large-scale problems,
+    with multiple constraints active at the solution, this  optimizer  can  be
+    several times faster than BLEIC.
+
+    REQUIREMENTS:
+    * user must provide function value and gradient
+    * starting point X0 must be feasible or
+      not too far away from the feasible set
+    * grad(f) must be Lipschitz continuous on a level set:
+      L = { x : f(x)<=f(x0) }
+    * function must be defined everywhere on the feasible set F
+
+    USAGE:
+
+    Constrained optimization if far more complex than the unconstrained one.
+    Here we give very brief outline of the BC optimizer. We strongly recommend
+    you to read examples in the ALGLIB Reference Manual and to read ALGLIB User Guide
+    on optimization, which is available at http://www.alglib.net/optimization/
+
+    1. User initializes algorithm state with MinBCCreate() call
+
+    2. USer adds box constraints by calling MinBCSetBC() function.
+
+    3. User sets stopping conditions with MinBCSetCond().
+
+    4. User calls MinBCOptimize() function which takes algorithm  state and
+       pointer (delegate, etc.) to callback function which calculates F/G.
+
+    5. User calls MinBCResults() to get solution
+
+    6. Optionally user may call MinBCRestartFrom() to solve another problem
+       with same N but another starting point.
+       MinBCRestartFrom() allows to reuse already initialized structure.
+
+
+    INPUT PARAMETERS:
+        N       -   problem dimension, N>0:
+                    * if given, only leading N elements of X are used
+                    * if not given, automatically determined from size ofX
+        X       -   starting point, array[N]:
+                    * it is better to set X to a feasible point
+                    * but X can be infeasible, in which case algorithm will try
+                      to find feasible point first, using X as initial
+                      approximation.
+
+    OUTPUT PARAMETERS:
+        State   -   structure stores algorithm state
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbccreate(int n, double[] x, out minbcstate state)
+    {
+        state = new minbcstate();
+        minbc.minbccreate(n, x, state.innerobj, null);
+    }
+    
+    public static void minbccreate(int n, double[] x, out minbcstate state, alglib.xparams _params)
+    {
+        state = new minbcstate();
+        minbc.minbccreate(n, x, state.innerobj, _params);
+    }
+            
+    public static void minbccreate(double[] x, out minbcstate state)
+    {
+        int n;
+    
+        state = new minbcstate();
+        n = ap.len(x);
+        minbc.minbccreate(n, x, state.innerobj, null);
+    
+        return;
+    }
+            
+    public static void minbccreate(double[] x, out minbcstate state, alglib.xparams _params)
+    {
+        int n;
+    
+        state = new minbcstate();
+        n = ap.len(x);
+        minbc.minbccreate(n, x, state.innerobj, _params);
+    
+        return;
+    }
+    
+    /*************************************************************************
+    The subroutine is finite difference variant of MinBCCreate().  It  uses
+    finite differences in order to differentiate target function.
+
+    Description below contains information which is specific to  this function
+    only. We recommend to read comments on MinBCCreate() in  order  to  get
+    more information about creation of BC optimizer.
+
+    INPUT PARAMETERS:
+        N       -   problem dimension, N>0:
+                    * if given, only leading N elements of X are used
+                    * if not given, automatically determined from size of X
+        X       -   starting point, array[0..N-1].
+        DiffStep-   differentiation step, >0
+
+    OUTPUT PARAMETERS:
+        State   -   structure which stores algorithm state
+
+    NOTES:
+    1. algorithm uses 4-point central formula for differentiation.
+    2. differentiation step along I-th axis is equal to DiffStep*S[I] where
+       S[] is scaling vector which can be set by MinBCSetScale() call.
+    3. we recommend you to use moderate values of  differentiation  step.  Too
+       large step will result in too large truncation  errors, while too small
+       step will result in too large numerical  errors.  1.0E-6  can  be  good
+       value to start with.
+    4. Numerical  differentiation  is   very   inefficient  -   one   gradient
+       calculation needs 4*N function evaluations. This function will work for
+       any N - either small (1...10), moderate (10...100) or  large  (100...).
+       However, performance penalty will be too severe for any N's except  for
+       small ones.
+       We should also say that code which relies on numerical  differentiation
+       is  less  robust and precise. CG needs exact gradient values. Imprecise
+       gradient may slow  down  convergence, especially  on  highly  nonlinear
+       problems.
+       Thus  we  recommend to use this function for fast prototyping on small-
+       dimensional problems only, and to implement analytical gradient as soon
+       as possible.
+
+      -- ALGLIB --
+         Copyright 16.05.2011 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbccreatef(int n, double[] x, double diffstep, out minbcstate state)
+    {
+        state = new minbcstate();
+        minbc.minbccreatef(n, x, diffstep, state.innerobj, null);
+    }
+    
+    public static void minbccreatef(int n, double[] x, double diffstep, out minbcstate state, alglib.xparams _params)
+    {
+        state = new minbcstate();
+        minbc.minbccreatef(n, x, diffstep, state.innerobj, _params);
+    }
+            
+    public static void minbccreatef(double[] x, double diffstep, out minbcstate state)
+    {
+        int n;
+    
+        state = new minbcstate();
+        n = ap.len(x);
+        minbc.minbccreatef(n, x, diffstep, state.innerobj, null);
+    
+        return;
+    }
+            
+    public static void minbccreatef(double[] x, double diffstep, out minbcstate state, alglib.xparams _params)
+    {
+        int n;
+    
+        state = new minbcstate();
+        n = ap.len(x);
+        minbc.minbccreatef(n, x, diffstep, state.innerobj, _params);
+    
+        return;
+    }
+    
+    /*************************************************************************
+    This function sets boundary constraints for BC optimizer.
+
+    Boundary constraints are inactive by default (after initial creation).
+    They are preserved after algorithm restart with MinBCRestartFrom().
+
+    INPUT PARAMETERS:
+        State   -   structure stores algorithm state
+        BndL    -   lower bounds, array[N].
+                    If some (all) variables are unbounded, you may specify
+                    very small number or -INF.
+        BndU    -   upper bounds, array[N].
+                    If some (all) variables are unbounded, you may specify
+                    very large number or +INF.
+
+    NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
+    variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+
+    NOTE 2: this solver has following useful properties:
+    * bound constraints are always satisfied exactly
+    * function is evaluated only INSIDE area specified by  bound  constraints,
+      even  when  numerical  differentiation is used (algorithm adjusts  nodes
+      according to boundary constraints)
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetbc(minbcstate state, double[] bndl, double[] bndu)
+    {
+    
+        minbc.minbcsetbc(state.innerobj, bndl, bndu, null);
+    }
+    
+    public static void minbcsetbc(minbcstate state, double[] bndl, double[] bndu, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetbc(state.innerobj, bndl, bndu, _params);
+    }
+    
+    /*************************************************************************
+    This function sets stopping conditions for the optimizer.
+
+    INPUT PARAMETERS:
+        State   -   structure which stores algorithm state
+        EpsG    -   >=0
+                    The  subroutine  finishes  its  work   if   the  condition
+                    |v|<EpsG is satisfied, where:
+                    * |.| means Euclidian norm
+                    * v - scaled gradient vector, v[i]=g[i]*s[i]
+                    * g - gradient
+                    * s - scaling coefficients set by MinBCSetScale()
+        EpsF    -   >=0
+                    The  subroutine  finishes  its work if on k+1-th iteration
+                    the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
+                    is satisfied.
+        EpsX    -   >=0
+                    The subroutine finishes its work if  on  k+1-th  iteration
+                    the condition |v|<=EpsX is fulfilled, where:
+                    * |.| means Euclidian norm
+                    * v - scaled step vector, v[i]=dx[i]/s[i]
+                    * dx - step vector, dx=X(k+1)-X(k)
+                    * s - scaling coefficients set by MinBCSetScale()
+        MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+                    iterations is unlimited.
+
+    Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
+    to automatic stopping criterion selection.
+
+    NOTE: when SetCond() called with non-zero MaxIts, BC solver may perform
+          slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
+          limit on iterations count.
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetcond(minbcstate state, double epsg, double epsf, double epsx, int maxits)
+    {
+    
+        minbc.minbcsetcond(state.innerobj, epsg, epsf, epsx, maxits, null);
+    }
+    
+    public static void minbcsetcond(minbcstate state, double epsg, double epsf, double epsx, int maxits, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetcond(state.innerobj, epsg, epsf, epsx, maxits, _params);
+    }
+    
+    /*************************************************************************
+    This function sets scaling coefficients for BC optimizer.
+
+    ALGLIB optimizers use scaling matrices to test stopping  conditions  (step
+    size and gradient are scaled before comparison with tolerances).  Scale of
+    the I-th variable is a translation invariant measure of:
+    a) "how large" the variable is
+    b) how large the step should be to make significant changes in the function
+
+    Scaling is also used by finite difference variant of the optimizer  - step
+    along I-th axis is equal to DiffStep*S[I].
+
+    In  most  optimizers  (and  in  the  BC  too)  scaling is NOT a form of
+    preconditioning. It just  affects  stopping  conditions.  You  should  set
+    preconditioner  by  separate  call  to  one  of  the  MinBCSetPrec...()
+    functions.
+
+    There is a special  preconditioning  mode, however,  which  uses   scaling
+    coefficients to form diagonal preconditioning matrix. You  can  turn  this
+    mode on, if you want.   But  you should understand that scaling is not the
+    same thing as preconditioning - these are two different, although  related
+    forms of tuning solver.
+
+    INPUT PARAMETERS:
+        State   -   structure stores algorithm state
+        S       -   array[N], non-zero scaling coefficients
+                    S[i] may be negative, sign doesn't matter.
+
+      -- ALGLIB --
+         Copyright 14.01.2011 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetscale(minbcstate state, double[] s)
+    {
+    
+        minbc.minbcsetscale(state.innerobj, s, null);
+    }
+    
+    public static void minbcsetscale(minbcstate state, double[] s, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetscale(state.innerobj, s, _params);
+    }
+    
+    /*************************************************************************
+    Modification of the preconditioner: preconditioning is turned off.
+
+    INPUT PARAMETERS:
+        State   -   structure which stores algorithm state
+
+      -- ALGLIB --
+         Copyright 13.10.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetprecdefault(minbcstate state)
+    {
+    
+        minbc.minbcsetprecdefault(state.innerobj, null);
+    }
+    
+    public static void minbcsetprecdefault(minbcstate state, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetprecdefault(state.innerobj, _params);
+    }
+    
+    /*************************************************************************
+    Modification  of  the  preconditioner:  diagonal of approximate Hessian is
+    used.
+
+    INPUT PARAMETERS:
+        State   -   structure which stores algorithm state
+        D       -   diagonal of the approximate Hessian, array[0..N-1],
+                    (if larger, only leading N elements are used).
+
+    NOTE 1: D[i] should be positive. Exception will be thrown otherwise.
+
+    NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
+
+      -- ALGLIB --
+         Copyright 13.10.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetprecdiag(minbcstate state, double[] d)
+    {
+    
+        minbc.minbcsetprecdiag(state.innerobj, d, null);
+    }
+    
+    public static void minbcsetprecdiag(minbcstate state, double[] d, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetprecdiag(state.innerobj, d, _params);
+    }
+    
+    /*************************************************************************
+    Modification of the preconditioner: scale-based diagonal preconditioning.
+
+    This preconditioning mode can be useful when you  don't  have  approximate
+    diagonal of Hessian, but you know that your  variables  are  badly  scaled
+    (for  example,  one  variable is in [1,10], and another in [1000,100000]),
+    and most part of the ill-conditioning comes from different scales of vars.
+
+    In this case simple  scale-based  preconditioner,  with H[i] = 1/(s[i]^2),
+    can greatly improve convergence.
+
+    IMPRTANT: you should set scale of your variables  with  MinBCSetScale()
+    call  (before  or after MinBCSetPrecScale() call). Without knowledge of
+    the scale of your variables scale-based preconditioner will be  just  unit
+    matrix.
+
+    INPUT PARAMETERS:
+        State   -   structure which stores algorithm state
+
+      -- ALGLIB --
+         Copyright 13.10.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetprecscale(minbcstate state)
+    {
+    
+        minbc.minbcsetprecscale(state.innerobj, null);
+    }
+    
+    public static void minbcsetprecscale(minbcstate state, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetprecscale(state.innerobj, _params);
+    }
+    
+    /*************************************************************************
+    This function turns on/off reporting.
+
+    INPUT PARAMETERS:
+        State   -   structure which stores algorithm state
+        NeedXRep-   whether iteration reports are needed or not
+
+    If NeedXRep is True, algorithm will call rep() callback function if  it is
+    provided to MinBCOptimize().
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetxrep(minbcstate state, bool needxrep)
+    {
+    
+        minbc.minbcsetxrep(state.innerobj, needxrep, null);
+    }
+    
+    public static void minbcsetxrep(minbcstate state, bool needxrep, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetxrep(state.innerobj, needxrep, _params);
+    }
+    
+    /*************************************************************************
+    This function sets maximum step length
+
+    INPUT PARAMETERS:
+        State   -   structure which stores algorithm state
+        StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+                    want to limit step length.
+
+    Use this subroutine when you optimize target function which contains exp()
+    or  other  fast  growing  functions,  and optimization algorithm makes too
+    large  steps  which  lead   to overflow. This function allows us to reject
+    steps  that  are  too  large  (and  therefore  expose  us  to the possible
+    overflow) without actually calculating function value at the x+stp*d.
+
+      -- ALGLIB --
+         Copyright 02.04.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetstpmax(minbcstate state, double stpmax)
+    {
+    
+        minbc.minbcsetstpmax(state.innerobj, stpmax, null);
+    }
+    
+    public static void minbcsetstpmax(minbcstate state, double stpmax, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetstpmax(state.innerobj, stpmax, _params);
+    }
+    
+    /*************************************************************************
+    This function provides reverse communication interface
+    Reverse communication interface is not documented or recommended to use.
+    See below for functions which provide better documented API
+    *************************************************************************/
+    public static bool minbciteration(minbcstate state)
+    {
+    
+        return minbc.minbciteration(state.innerobj, null);
+    }
+    
+    public static bool minbciteration(minbcstate state, alglib.xparams _params)
+    {
+    
+        return minbc.minbciteration(state.innerobj, _params);
+    }
+    /*************************************************************************
+    This family of functions is used to launcn iterations of nonlinear optimizer
+
+    These functions accept following parameters:
+        func    -   callback which calculates function (or merit function)
+                    value func at given point x
+        grad    -   callback which calculates function (or merit function)
+                    value func and gradient grad at given point x
+        rep     -   optional callback which is called after each iteration
+                    can be null
+        obj     -   optional object which is passed to func/grad/hess/jac/rep
+                    can be null
+
+    NOTES:
+
+    1. This function has two different implementations: one which  uses  exact
+       (analytical) user-supplied gradient,  and one which uses function value
+       only  and  numerically  differentiates  function  in  order  to  obtain
+       gradient.
+
+       Depending  on  the  specific  function  used to create optimizer object
+       (either  MinBCCreate() for analytical gradient or  MinBCCreateF()
+       for numerical differentiation) you should choose appropriate variant of
+       MinBCOptimize() - one  which  accepts  function  AND gradient or one
+       which accepts function ONLY.
+
+       Be careful to choose variant of MinBCOptimize() which corresponds to
+       your optimization scheme! Table below lists different  combinations  of
+       callback (function/gradient) passed to MinBCOptimize()  and specific
+       function used to create optimizer.
+
+
+                         |         USER PASSED TO MinBCOptimize()
+       CREATED WITH      |  function only   |  function and gradient
+       ------------------------------------------------------------
+       MinBCCreateF()    |     works               FAILS
+       MinBCCreate()     |     FAILS               works
+
+       Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
+       function  and  MinBCOptimize()  version.   Attemps   to   use   such
+       combination (for  example,  to  create optimizer with MinBCCreateF()
+       and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
+       exception being thrown. Either  you  did  not pass gradient when it WAS
+       needed or you passed gradient when it was NOT needed.
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+
+    *************************************************************************/
+    public static void minbcoptimize(minbcstate state, ndimensional_func func, ndimensional_rep rep, object obj)
+    {
+        minbcoptimize(state, func, rep, obj, null);
+    }
+    
+    public static void minbcoptimize(minbcstate state, ndimensional_func func, ndimensional_rep rep, object obj, alglib.xparams _params)
+    {
+        if( func==null )
+            throw new alglibexception("ALGLIB: error in 'minbcoptimize()' (func is null)");
+        while( alglib.minbciteration(state, _params) )
+        {
+            if( state.needf )
+            {
+                func(state.x, ref state.innerobj.f, obj);
+                continue;
+            }
+            if( state.innerobj.xupdated )
+            {
+                if( rep!=null )
+                    rep(state.innerobj.x, state.innerobj.f, obj);
+                continue;
+            }
+            throw new alglibexception("ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)");
+        }
+    }
+
+
+    public static void minbcoptimize(minbcstate state, ndimensional_grad grad, ndimensional_rep rep, object obj)
+    {
+        minbcoptimize(state, grad, rep, obj, null);
+    }
+    
+    public static void minbcoptimize(minbcstate state, ndimensional_grad grad, ndimensional_rep rep, object obj, alglib.xparams _params)
+    {
+        if( grad==null )
+            throw new alglibexception("ALGLIB: error in 'minbcoptimize()' (grad is null)");
+        while( alglib.minbciteration(state, _params) )
+        {
+            if( state.needfg )
+            {
+                grad(state.x, ref state.innerobj.f, state.innerobj.g, obj);
+                continue;
+            }
+            if( state.innerobj.xupdated )
+            {
+                if( rep!=null )
+                    rep(state.innerobj.x, state.innerobj.f, obj);
+                continue;
+            }
+            throw new alglibexception("ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)");
+        }
+    }
+
+
+    
+    /*************************************************************************
+    BC results
+
+    INPUT PARAMETERS:
+        State   -   algorithm state
+
+    OUTPUT PARAMETERS:
+        X       -   array[0..N-1], solution
+        Rep     -   optimization report. You should check Rep.TerminationType
+                    in  order  to  distinguish  successful  termination  from
+                    unsuccessful one:
+                    * -8    internal integrity control  detected  infinite or
+                            NAN   values   in   function/gradient.   Abnormal
+                            termination signalled.
+                    * -7   gradient verification failed.
+                           See MinBCSetGradientCheck() for more information.
+                    * -3   inconsistent constraints.
+                    *  1   relative function improvement is no more than EpsF.
+                    *  2   scaled step is no more than EpsX.
+                    *  4   scaled gradient norm is no more than EpsG.
+                    *  5   MaxIts steps was taken
+                    *  8   terminated by user who called minbcrequesttermination().
+                           X contains point which was "current accepted"  when
+                           termination request was submitted.
+                    More information about fields of this  structure  can  be
+                    found in the comments on MinBCReport datatype.
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcresults(minbcstate state, out double[] x, out minbcreport rep)
+    {
+        x = new double[0];
+        rep = new minbcreport();
+        minbc.minbcresults(state.innerobj, ref x, rep.innerobj, null);
+    }
+    
+    public static void minbcresults(minbcstate state, out double[] x, out minbcreport rep, alglib.xparams _params)
+    {
+        x = new double[0];
+        rep = new minbcreport();
+        minbc.minbcresults(state.innerobj, ref x, rep.innerobj, _params);
+    }
+    
+    /*************************************************************************
+    BC results
+
+    Buffered implementation of MinBCResults() which uses pre-allocated buffer
+    to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
+    intended to be used in the inner cycles of performance critical algorithms
+    where array reallocation penalty is too large to be ignored.
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcresultsbuf(minbcstate state, ref double[] x, minbcreport rep)
+    {
+    
+        minbc.minbcresultsbuf(state.innerobj, ref x, rep.innerobj, null);
+    }
+    
+    public static void minbcresultsbuf(minbcstate state, ref double[] x, minbcreport rep, alglib.xparams _params)
+    {
+    
+        minbc.minbcresultsbuf(state.innerobj, ref x, rep.innerobj, _params);
+    }
+    
+    /*************************************************************************
+    This subroutine restarts algorithm from new point.
+    All optimization parameters (including constraints) are left unchanged.
+
+    This  function  allows  to  solve multiple  optimization  problems  (which
+    must have  same number of dimensions) without object reallocation penalty.
+
+    INPUT PARAMETERS:
+        State   -   structure previously allocated with MinBCCreate call.
+        X       -   new starting point.
+
+      -- ALGLIB --
+         Copyright 28.11.2010 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcrestartfrom(minbcstate state, double[] x)
+    {
+    
+        minbc.minbcrestartfrom(state.innerobj, x, null);
+    }
+    
+    public static void minbcrestartfrom(minbcstate state, double[] x, alglib.xparams _params)
+    {
+    
+        minbc.minbcrestartfrom(state.innerobj, x, _params);
+    }
+    
+    /*************************************************************************
+    This subroutine submits request for termination of running  optimizer.  It
+    should be called from user-supplied callback when user decides that it  is
+    time to "smoothly" terminate optimization process.  As  result,  optimizer
+    stops at point which was "current accepted" when termination  request  was
+    submitted and returns error code 8 (successful termination).
+
+    INPUT PARAMETERS:
+        State   -   optimizer structure
+
+    NOTE: after  request  for  termination  optimizer  may   perform   several
+          additional calls to user-supplied callbacks. It does  NOT  guarantee
+          to stop immediately - it just guarantees that these additional calls
+          will be discarded later.
+
+    NOTE: calling this function on optimizer which is NOT running will have no
+          effect.
+
+    NOTE: multiple calls to this function are possible. First call is counted,
+          subsequent calls are silently ignored.
+
+      -- ALGLIB --
+         Copyright 08.10.2014 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcrequesttermination(minbcstate state)
+    {
+    
+        minbc.minbcrequesttermination(state.innerobj, null);
+    }
+    
+    public static void minbcrequesttermination(minbcstate state, alglib.xparams _params)
+    {
+    
+        minbc.minbcrequesttermination(state.innerobj, _params);
+    }
+    
+    /*************************************************************************
+    This  subroutine  turns  on  verification  of  the  user-supplied analytic
+    gradient:
+    * user calls this subroutine before optimization begins
+    * MinBCOptimize() is called
+    * prior to  actual  optimization, for each component  of  parameters being
+      optimized X[i] algorithm performs following steps:
+      * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
+        where X[i] is i-th component of the initial point and S[i] is a  scale
+        of i-th parameter
+      * if needed, steps are bounded with respect to constraints on X[]
+      * F(X) is evaluated at these trial points
+      * we perform one more evaluation in the middle point of the interval
+      * we  build  cubic  model using function values and derivatives at trial
+        points and we compare its prediction with actual value in  the  middle
+        point
+      * in case difference between prediction and actual value is higher  than
+        some predetermined threshold, algorithm stops with completion code -7;
+        Rep.VarIdx is set to index of the parameter with incorrect derivative.
+    * after verification is over, algorithm proceeds to the actual optimization.
+
+    NOTE 1: verification  needs  N (parameters count) gradient evaluations. It
+            is very costly and you should use  it  only  for  low  dimensional
+            problems,  when  you  want  to  be  sure  that  you've   correctly
+            calculated  analytic  derivatives.  You  should  not use it in the
+            production code (unless you want to check derivatives provided  by
+            some third party).
+
+    NOTE 2: you  should  carefully  choose  TestStep. Value which is too large
+            (so large that function behaviour is significantly non-cubic) will
+            lead to false alarms. You may use  different  step  for  different
+            parameters by means of setting scale with MinBCSetScale().
+
+    NOTE 3: this function may lead to false positives. In case it reports that
+            I-th  derivative was calculated incorrectly, you may decrease test
+            step  and  try  one  more  time  - maybe your function changes too
+            sharply  and  your  step  is  too  large for such rapidly chanding
+            function.
+
+    INPUT PARAMETERS:
+        State       -   structure used to store algorithm state
+        TestStep    -   verification step:
+                        * TestStep=0 turns verification off
+                        * TestStep>0 activates verification
+
+      -- ALGLIB --
+         Copyright 15.06.2012 by Bochkanov Sergey
+    *************************************************************************/
+    public static void minbcsetgradientcheck(minbcstate state, double teststep)
+    {
+    
+        minbc.minbcsetgradientcheck(state.innerobj, teststep, null);
+    }
+    
+    public static void minbcsetgradientcheck(minbcstate state, double teststep, alglib.xparams _params)
+    {
+    
+        minbc.minbcsetgradientcheck(state.innerobj, teststep, _params);
     }
 
 }
@@ -24921,9 +25443,9 @@ public partial class alglib
                         * last element corresponds to the right part.
                         All elements of C (including right part) must be finite.
             CT      -   type of constraints, array[K]:
-                        * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
-                        * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-                        * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+                        * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n]
+                        * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n]
+                        * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n]
             K       -   number of equality/inequality constraints, K>=0:
                         * if given, only leading K elements of C/CT are used
                         * if not given, automatically determined from sizes of C/CT
@@ -29565,181 +30087,5104 @@ public partial class alglib
 
 
     }
-    public class minbc
+    public class reviseddualsimplex
     {
         /*************************************************************************
-        This object stores nonlinear optimizer state.
-        You should use functions provided by MinBC subpackage to work with this
-        object
+        This object stores settings for dual simplex solver
         *************************************************************************/
-        public class minbcstate : apobject
+        public class dualsimplexsettings : apobject
         {
-            public int nmain;
-            public double epsg;
-            public double epsf;
-            public double epsx;
-            public int maxits;
-            public bool xrep;
-            public double stpmax;
-            public double diffstep;
+            public double pivottol;
+            public double perturbmag;
+            public int maxtrfage;
+            public int trftype;
+            public int ratiotest;
+            public int pricing;
+            public int shifting;
+            public dualsimplexsettings()
+            {
+                init();
+            }
+            public override void init()
+            {
+            }
+            public override alglib.apobject make_copy()
+            {
+                dualsimplexsettings _result = new dualsimplexsettings();
+                _result.pivottol = pivottol;
+                _result.perturbmag = perturbmag;
+                _result.maxtrfage = maxtrfage;
+                _result.trftype = trftype;
+                _result.ratiotest = ratiotest;
+                _result.pricing = pricing;
+                _result.shifting = shifting;
+                return _result;
+            }
+        };
+
+
+        /*************************************************************************
+        This object stores basis and its triangular factorization for DualSimplexState
+        *************************************************************************/
+        public class dualsimplexbasis : apobject
+        {
+            public int ns;
+            public int m;
+            public int[] idx;
+            public int[] nidx;
+            public bool[] isbasic;
+            public int trftype;
+            public bool isvalidtrf;
+            public int trfage;
+            public double[,] denselu;
+            public sparse.sparsematrix sparsel;
+            public sparse.sparsematrix sparseu;
+            public int[] rowpermpiv;
+            public int[] rowpermfwd;
+            public int[] rowpermbwd;
+            public int[] densepright;
+            public double[] densepfieta;
+            public double[] densemu;
+            public int[] rk;
+            public int[] dk;
+            public double[] dseweights;
+            public bool dsevalid;
+            public double[] wtmp0;
+            public double[] wtmp1;
+            public int[] nrs;
+            public int[] tridx;
+            public int[] tcidx;
+            public int[] tcinvidx;
+            public int[] trinvidx;
+            public double[,] denselu2;
+            public int[] densep2;
+            public int[] densep2c;
+            public sparse.sparsematrix sparselu1;
+            public sparse.sparsematrix sparselu2;
+            public sptrf.slubuffer lubuf;
+            public double[] utmp0;
+            public int[] utmpi;
+            public dualsimplexbasis()
+            {
+                init();
+            }
+            public override void init()
+            {
+                idx = new int[0];
+                nidx = new int[0];
+                isbasic = new bool[0];
+                denselu = new double[0,0];
+                sparsel = new sparse.sparsematrix();
+                sparseu = new sparse.sparsematrix();
+                rowpermpiv = new int[0];
+                rowpermfwd = new int[0];
+                rowpermbwd = new int[0];
+                densepright = new int[0];
+                densepfieta = new double[0];
+                densemu = new double[0];
+                rk = new int[0];
+                dk = new int[0];
+                dseweights = new double[0];
+                wtmp0 = new double[0];
+                wtmp1 = new double[0];
+                nrs = new int[0];
+                tridx = new int[0];
+                tcidx = new int[0];
+                tcinvidx = new int[0];
+                trinvidx = new int[0];
+                denselu2 = new double[0,0];
+                densep2 = new int[0];
+                densep2c = new int[0];
+                sparselu1 = new sparse.sparsematrix();
+                sparselu2 = new sparse.sparsematrix();
+                lubuf = new sptrf.slubuffer();
+                utmp0 = new double[0];
+                utmpi = new int[0];
+            }
+            public override alglib.apobject make_copy()
+            {
+                dualsimplexbasis _result = new dualsimplexbasis();
+                _result.ns = ns;
+                _result.m = m;
+                _result.idx = (int[])idx.Clone();
+                _result.nidx = (int[])nidx.Clone();
+                _result.isbasic = (bool[])isbasic.Clone();
+                _result.trftype = trftype;
+                _result.isvalidtrf = isvalidtrf;
+                _result.trfage = trfage;
+                _result.denselu = (double[,])denselu.Clone();
+                _result.sparsel = (sparse.sparsematrix)sparsel.make_copy();
+                _result.sparseu = (sparse.sparsematrix)sparseu.make_copy();
+                _result.rowpermpiv = (int[])rowpermpiv.Clone();
+                _result.rowpermfwd = (int[])rowpermfwd.Clone();
+                _result.rowpermbwd = (int[])rowpermbwd.Clone();
+                _result.densepright = (int[])densepright.Clone();
+                _result.densepfieta = (double[])densepfieta.Clone();
+                _result.densemu = (double[])densemu.Clone();
+                _result.rk = (int[])rk.Clone();
+                _result.dk = (int[])dk.Clone();
+                _result.dseweights = (double[])dseweights.Clone();
+                _result.dsevalid = dsevalid;
+                _result.wtmp0 = (double[])wtmp0.Clone();
+                _result.wtmp1 = (double[])wtmp1.Clone();
+                _result.nrs = (int[])nrs.Clone();
+                _result.tridx = (int[])tridx.Clone();
+                _result.tcidx = (int[])tcidx.Clone();
+                _result.tcinvidx = (int[])tcinvidx.Clone();
+                _result.trinvidx = (int[])trinvidx.Clone();
+                _result.denselu2 = (double[,])denselu2.Clone();
+                _result.densep2 = (int[])densep2.Clone();
+                _result.densep2c = (int[])densep2c.Clone();
+                _result.sparselu1 = (sparse.sparsematrix)sparselu1.make_copy();
+                _result.sparselu2 = (sparse.sparsematrix)sparselu2.make_copy();
+                _result.lubuf = (sptrf.slubuffer)lubuf.make_copy();
+                _result.utmp0 = (double[])utmp0.Clone();
+                _result.utmpi = (int[])utmpi.Clone();
+                return _result;
+            }
+        };
+
+
+        /*************************************************************************
+        This object stores subproblem for DualSimplexState object
+        *************************************************************************/
+        public class dualsimplexsubproblem : apobject
+        {
+            public int ns;
+            public int m;
             public double[] s;
-            public int prectype;
-            public double[] diagh;
-            public double[] x;
-            public double f;
-            public double[] g;
-            public bool needf;
-            public bool needfg;
-            public bool xupdated;
-            public bool userterminationneeded;
-            public double teststep;
-            public rcommstate rstate;
-            public double[] xc;
-            public double[] ugc;
-            public double[] cgc;
-            public double[] xn;
-            public double[] ugn;
-            public double[] cgn;
-            public double[] xp;
-            public double fc;
-            public double fn;
-            public double fp;
-            public double[] d;
-            public double lastscaledgoodstep;
-            public bool[] hasbndl;
-            public bool[] hasbndu;
+            public double[] rawc;
             public double[] bndl;
             public double[] bndu;
-            public int repiterationscount;
-            public int repnfev;
-            public int repvaridx;
-            public int repterminationtype;
-            public double[] xstart;
-            public double fbase;
-            public double fm2;
-            public double fm1;
-            public double fp1;
-            public double fp2;
-            public double xm1;
-            public double xp1;
-            public double gm1;
-            public double gp1;
-            public double[] tmpprec;
-            public double[] tmp0;
-            public int nfev;
-            public int mcstage;
-            public double stp;
-            public double curstpmax;
-            public double[] work;
-            public linmin.linminstate lstate;
-            public double trimthreshold;
-            public int nonmonotoniccnt;
-            public double[,] bufyk;
-            public double[,] bufsk;
-            public double[] bufrho;
-            public double[] buftheta;
-            public int bufsize;
-            public minbcstate()
+            public int[] bndt;
+            public double[] x;
+            public double[] d;
+            public double z;
+            public int state;
+            public int stateage;
+            public double[] effc;
+            public double[] colscales;
+            public dualsimplexsubproblem()
             {
                 init();
             }
             public override void init()
             {
                 s = new double[0];
-                diagh = new double[0];
-                x = new double[0];
-                g = new double[0];
-                rstate = new rcommstate();
-                xc = new double[0];
-                ugc = new double[0];
-                cgc = new double[0];
-                xn = new double[0];
-                ugn = new double[0];
-                cgn = new double[0];
-                xp = new double[0];
-                d = new double[0];
-                hasbndl = new bool[0];
-                hasbndu = new bool[0];
+                rawc = new double[0];
                 bndl = new double[0];
                 bndu = new double[0];
-                xstart = new double[0];
-                tmpprec = new double[0];
-                tmp0 = new double[0];
-                work = new double[0];
-                lstate = new linmin.linminstate();
-                bufyk = new double[0,0];
-                bufsk = new double[0,0];
-                bufrho = new double[0];
-                buftheta = new double[0];
+                bndt = new int[0];
+                x = new double[0];
+                d = new double[0];
+                effc = new double[0];
+                colscales = new double[0];
             }
             public override alglib.apobject make_copy()
             {
-                minbcstate _result = new minbcstate();
-                _result.nmain = nmain;
-                _result.epsg = epsg;
-                _result.epsf = epsf;
-                _result.epsx = epsx;
-                _result.maxits = maxits;
-                _result.xrep = xrep;
-                _result.stpmax = stpmax;
-                _result.diffstep = diffstep;
+                dualsimplexsubproblem _result = new dualsimplexsubproblem();
+                _result.ns = ns;
+                _result.m = m;
                 _result.s = (double[])s.Clone();
-                _result.prectype = prectype;
-                _result.diagh = (double[])diagh.Clone();
-                _result.x = (double[])x.Clone();
-                _result.f = f;
-                _result.g = (double[])g.Clone();
-                _result.needf = needf;
-                _result.needfg = needfg;
-                _result.xupdated = xupdated;
-                _result.userterminationneeded = userterminationneeded;
-                _result.teststep = teststep;
-                _result.rstate = (rcommstate)rstate.make_copy();
-                _result.xc = (double[])xc.Clone();
-                _result.ugc = (double[])ugc.Clone();
-                _result.cgc = (double[])cgc.Clone();
-                _result.xn = (double[])xn.Clone();
-                _result.ugn = (double[])ugn.Clone();
-                _result.cgn = (double[])cgn.Clone();
-                _result.xp = (double[])xp.Clone();
-                _result.fc = fc;
-                _result.fn = fn;
-                _result.fp = fp;
-                _result.d = (double[])d.Clone();
-                _result.lastscaledgoodstep = lastscaledgoodstep;
-                _result.hasbndl = (bool[])hasbndl.Clone();
-                _result.hasbndu = (bool[])hasbndu.Clone();
+                _result.rawc = (double[])rawc.Clone();
                 _result.bndl = (double[])bndl.Clone();
                 _result.bndu = (double[])bndu.Clone();
-                _result.repiterationscount = repiterationscount;
-                _result.repnfev = repnfev;
-                _result.repvaridx = repvaridx;
+                _result.bndt = (int[])bndt.Clone();
+                _result.x = (double[])x.Clone();
+                _result.d = (double[])d.Clone();
+                _result.z = z;
+                _result.state = state;
+                _result.stateage = stateage;
+                _result.effc = (double[])effc.Clone();
+                _result.colscales = (double[])colscales.Clone();
+                return _result;
+            }
+        };
+
+
+        /*************************************************************************
+        This object stores state of the DSS solver.
+        MUST be initialized with DSSInit().
+        *************************************************************************/
+        public class dualsimplexstate : apobject
+        {
+            public sparse.sparsematrix at;
+            public dualsimplexbasis basis;
+            public dualsimplexsubproblem primary;
+            public dualsimplexsubproblem phase1;
+            public dualsimplexsubproblem phase3;
+            public double[] repx;
+            public double[] repy;
+            public int[] repstats;
+            public double repf;
+            public double repprimalerror;
+            public double repdualerror;
+            public int repterminationtype;
+            public int repiterationscount;
+            public int repiterationscount1;
+            public int repiterationscount2;
+            public int repiterationscount3;
+            public int[] possibleflips;
+            public int possibleflipscnt;
+            public double[] dfctmp0;
+            public double[] dfctmp1;
+            public int[] ustmpi;
+            public double[] tmp0;
+            public double[] tmp1;
+            public double[] alphar;
+            public double[] rhor;
+            public double[] tau;
+            public double[] alphaq;
+            public double[] alphaqim;
+            public int[] eligibleset;
+            public int[] harrisset;
+            public dualsimplexstate()
+            {
+                init();
+            }
+            public override void init()
+            {
+                at = new sparse.sparsematrix();
+                basis = new dualsimplexbasis();
+                primary = new dualsimplexsubproblem();
+                phase1 = new dualsimplexsubproblem();
+                phase3 = new dualsimplexsubproblem();
+                repx = new double[0];
+                repy = new double[0];
+                repstats = new int[0];
+                possibleflips = new int[0];
+                dfctmp0 = new double[0];
+                dfctmp1 = new double[0];
+                ustmpi = new int[0];
+                tmp0 = new double[0];
+                tmp1 = new double[0];
+                alphar = new double[0];
+                rhor = new double[0];
+                tau = new double[0];
+                alphaq = new double[0];
+                alphaqim = new double[0];
+                eligibleset = new int[0];
+                harrisset = new int[0];
+            }
+            public override alglib.apobject make_copy()
+            {
+                dualsimplexstate _result = new dualsimplexstate();
+                _result.at = (sparse.sparsematrix)at.make_copy();
+                _result.basis = (dualsimplexbasis)basis.make_copy();
+                _result.primary = (dualsimplexsubproblem)primary.make_copy();
+                _result.phase1 = (dualsimplexsubproblem)phase1.make_copy();
+                _result.phase3 = (dualsimplexsubproblem)phase3.make_copy();
+                _result.repx = (double[])repx.Clone();
+                _result.repy = (double[])repy.Clone();
+                _result.repstats = (int[])repstats.Clone();
+                _result.repf = repf;
+                _result.repprimalerror = repprimalerror;
+                _result.repdualerror = repdualerror;
                 _result.repterminationtype = repterminationtype;
-                _result.xstart = (double[])xstart.Clone();
-                _result.fbase = fbase;
-                _result.fm2 = fm2;
-                _result.fm1 = fm1;
-                _result.fp1 = fp1;
-                _result.fp2 = fp2;
-                _result.xm1 = xm1;
-                _result.xp1 = xp1;
-                _result.gm1 = gm1;
-                _result.gp1 = gp1;
-                _result.tmpprec = (double[])tmpprec.Clone();
+                _result.repiterationscount = repiterationscount;
+                _result.repiterationscount1 = repiterationscount1;
+                _result.repiterationscount2 = repiterationscount2;
+                _result.repiterationscount3 = repiterationscount3;
+                _result.possibleflips = (int[])possibleflips.Clone();
+                _result.possibleflipscnt = possibleflipscnt;
+                _result.dfctmp0 = (double[])dfctmp0.Clone();
+                _result.dfctmp1 = (double[])dfctmp1.Clone();
+                _result.ustmpi = (int[])ustmpi.Clone();
                 _result.tmp0 = (double[])tmp0.Clone();
-                _result.nfev = nfev;
-                _result.mcstage = mcstage;
-                _result.stp = stp;
-                _result.curstpmax = curstpmax;
-                _result.work = (double[])work.Clone();
-                _result.lstate = (linmin.linminstate)lstate.make_copy();
-                _result.trimthreshold = trimthreshold;
-                _result.nonmonotoniccnt = nonmonotoniccnt;
-                _result.bufyk = (double[,])bufyk.Clone();
-                _result.bufsk = (double[,])bufsk.Clone();
-                _result.bufrho = (double[])bufrho.Clone();
-                _result.buftheta = (double[])buftheta.Clone();
-                _result.bufsize = bufsize;
+                _result.tmp1 = (double[])tmp1.Clone();
+                _result.alphar = (double[])alphar.Clone();
+                _result.rhor = (double[])rhor.Clone();
+                _result.tau = (double[])tau.Clone();
+                _result.alphaq = (double[])alphaq.Clone();
+                _result.alphaqim = (double[])alphaqim.Clone();
+                _result.eligibleset = (int[])eligibleset.Clone();
+                _result.harrisset = (int[])harrisset.Clone();
+                return _result;
+            }
+        };
+
+
+
+
+        public const int safetrfage = 5;
+        public const int defaultmaxtrfage = 50;
+        public const double minbeta = 1.0E-4;
+        public const double shiftlen = 1.0E-12;
+        public const double dtol = 1.0E-6;
+        public const double xtol = 1.0E-9;
+        public const double alphatrigger = 1.0E8*math.machineepsilon;
+        public const double alphatrigger2 = 0.001;
+        public const int ssinvalid = 0;
+        public const int ssvalidxn = 1;
+        public const int ssvalid = 2;
+        public const int ccfixed = 0;
+        public const int cclower = 1;
+        public const int ccupper = 2;
+        public const int ccrange = 3;
+        public const int ccfree = 4;
+        public const int ccinfeasible = 5;
+
+
+        public static void dsssettingsinit(dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            settings.pivottol = 10*Math.Sqrt(math.machineepsilon);
+            settings.perturbmag = 10*settings.pivottol;
+            settings.maxtrfage = defaultmaxtrfage;
+            settings.trftype = 3;
+            settings.ratiotest = 1;
+            settings.pricing = 1;
+            settings.shifting = 2;
+        }
+
+
+        /*************************************************************************
+        This function initializes DSS structure. Previously  allocated  memory  is
+        reused as much as possible.
+
+        Default state of the problem is zero cost vector, all variables are  fixed
+        at zero.
+
+          -- ALGLIB --
+             Copyright 01.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dssinit(int n,
+            dualsimplexstate s,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            alglib.ap.assert(n>0, "DSSInit: N<=0");
+            subprobleminit(n, s.primary, _params);
+            basisinit(n, 0, s.basis, _params);
+            apserv.rvectorsetlengthatleast(ref s.repx, n, _params);
+            apserv.ivectorsetlengthatleast(ref s.repstats, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                s.repx[i] = 0.0;
+                s.repstats[i] = 0;
+            }
+        }
+
+
+        /*************************************************************************
+        This function sets cost term for LP solver.
+
+        By default, cost term is zero.
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+            C       -   cost term, array[N].
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dsssetcost(dualsimplexstate state,
+            double[] c,
+            alglib.xparams _params)
+        {
+            subproblemsetcost(state.primary, c, _params);
+        }
+
+
+        /*************************************************************************
+        This function sets variable scales for LP solver.
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+            SV      -   scales, array[N].
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dsssetscale(dualsimplexstate state,
+            double[] sv,
+            alglib.xparams _params)
+        {
+            subproblemsetscale(state.primary, sv, _params);
+        }
+
+
+        /*************************************************************************
+        This function sets box constraints.
+
+        INPUT PARAMETERS:
+            State   -   structure stores algorithm state
+            BndL    -   lower bounds, array[N].
+            BndU    -   upper bounds, array[N].
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dsssetbc(dualsimplexstate state,
+            double[] bndl,
+            double[] bndu,
+            alglib.xparams _params)
+        {
+            subproblemsetbc(state.primary, bndl, bndu, _params);
+        }
+
+
+        /*************************************************************************
+        This function sets two-sided linear constraints AL <= A*x <= AU.
+
+        INPUT PARAMETERS:
+            State   -   structure previously allocated with minlpcreate() call.
+            DenseA  -   dense array[K,N], 
+            SparseA -   linear constraints, sparsematrix[K,N] in CRS format
+            AKind   -   type of A: 0 for dense, 1 for sparse
+            AL, AU  -   lower and upper bounds, array[K]
+            K       -   number of equality/inequality constraints, K>=0.
+            ProposedBasis- basis to import from (if BasisType=2)
+            BasisInitType-  what to do with basis:
+                        * 0 - set new basis to all-logicals
+                        * 1 - try to reuse previous basis as much as possible
+                        * 2 - try to import basis from ProposedBasis
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dsssetlcx(dualsimplexstate state,
+            double[,] densea,
+            sparse.sparsematrix sparsea,
+            int akind,
+            double[] al,
+            double[] au,
+            int k,
+            dualsimplexbasis proposedbasis,
+            int basisinittype,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int j = 0;
+            int offs = 0;
+            int ns = 0;
+            bool processed = new bool();
+            int nnz = 0;
+            int rnnz = 0;
+            int newm = 0;
+            int oldm = 0;
+            bool basisinitialized = new bool();
+
+            ns = state.primary.ns;
+            oldm = state.primary.m;
+            newm = k;
+            
+            //
+            // Integrity checks
+            //
+            alglib.ap.assert(akind==0 || akind==1, "SubproblemSetLC: incorrect AKind");
+            alglib.ap.assert((basisinittype==0 || basisinittype==1) || basisinittype==2, "SubproblemSetLC: incorrect BasisInitType");
+            alglib.ap.assert(k>=0, "SubproblemSetLC: K<0");
+            if( k>0 && akind==1 )
+            {
+                alglib.ap.assert(sparsea.m==k, "SubproblemSetLC: rows(A)<>K");
+                alglib.ap.assert(sparsea.n==ns, "SubproblemSetLC: cols(A)<>N");
+            }
+            
+            //
+            // Quick exit
+            //
+            if( k==0 )
+            {
+                state.primary.m = 0;
+                basisinit(state.primary.ns, state.primary.m, state.basis, _params);
+                return;
+            }
+            
+            //
+            // Extend A with structural terms and transpose it:
+            // * allocate place for A^T extended with logical part.
+            // * copy with transposition
+            // * perform integrity check for array sizes
+            // * manually append new items
+            // * update DIdx/UIdx
+            //
+            processed = false;
+            state.primary.m = k;
+            if( akind==0 )
+            {
+                nnz = 0;
+                for(i=0; i<=k-1; i++)
+                {
+                    for(j=0; j<=ns-1; j++)
+                    {
+                        if( densea[i,j]!=0 )
+                        {
+                            nnz = nnz+1;
+                        }
+                    }
+                }
+                apserv.ivectorsetlengthatleast(ref state.at.ridx, ns+k+1, _params);
+                apserv.rvectorsetlengthatleast(ref state.at.vals, nnz+k, _params);
+                apserv.ivectorsetlengthatleast(ref state.at.idx, nnz+k, _params);
+                apserv.ivectorsetlengthatleast(ref state.at.didx, ns+k, _params);
+                apserv.ivectorsetlengthatleast(ref state.at.uidx, ns+k, _params);
+                offs = 0;
+                state.at.ridx[0] = 0;
+                for(j=0; j<=ns-1; j++)
+                {
+                    rnnz = 0;
+                    for(i=0; i<=k-1; i++)
+                    {
+                        if( densea[i,j]!=0 )
+                        {
+                            state.at.vals[offs] = densea[i,j];
+                            state.at.idx[offs] = i;
+                            offs = offs+1;
+                            rnnz = rnnz+1;
+                        }
+                    }
+                    state.at.ridx[j+1] = state.at.ridx[j]+rnnz;
+                }
+                for(j=0; j<=k-1; j++)
+                {
+                    state.at.vals[offs] = -1.0;
+                    state.at.idx[offs] = j;
+                    state.at.ridx[ns+j+1] = state.at.ridx[ns+j]+1;
+                    offs = offs+1;
+                }
+                alglib.ap.assert(state.at.ridx[ns]==nnz, "SubproblemSetLC: integrity check failed");
+                alglib.ap.assert(state.at.ridx[ns+k]==nnz+k, "SubproblemSetLC: integrity check failed");
+                alglib.ap.assert(state.at.ridx[ns+k]==offs, "SubproblemSetLC: integrity check failed");
+                state.at.ninitialized = nnz+k;
+                state.at.m = ns+k;
+                state.at.n = k;
+                state.at.matrixtype = 1;
+                sparse.sparseinitduidx(state.at, _params);
+                processed = true;
+            }
+            if( akind==1 )
+            {
+                apserv.rvectorsetlengthatleast(ref state.at.vals, sparsea.ridx[k]+k, _params);
+                apserv.ivectorsetlengthatleast(ref state.at.idx, sparsea.ridx[k]+k, _params);
+                apserv.ivectorsetlengthatleast(ref state.at.ridx, ns+k+1, _params);
+                apserv.ivectorsetlengthatleast(ref state.at.didx, ns+k, _params);
+                apserv.ivectorsetlengthatleast(ref state.at.uidx, ns+k, _params);
+                sparse.sparsecopytransposecrsbuf(sparsea, state.at, _params);
+                alglib.ap.assert(alglib.ap.len(state.at.vals)>=sparsea.ridx[k]+k, "SubproblemSetLC: integrity check failed");
+                alglib.ap.assert(alglib.ap.len(state.at.idx)>=sparsea.ridx[k]+k, "SubproblemSetLC: integrity check failed");
+                alglib.ap.assert(alglib.ap.len(state.at.ridx)>=ns+k+1, "SubproblemSetLC: integrity check failed");
+                alglib.ap.assert(alglib.ap.len(state.at.didx)>=ns+k, "SubproblemSetLC: integrity check failed");
+                alglib.ap.assert(alglib.ap.len(state.at.uidx)>=ns+k, "SubproblemSetLC: integrity check failed");
+                offs = state.at.ridx[ns];
+                for(i=0; i<=k-1; i++)
+                {
+                    state.at.vals[offs+i] = -1.0;
+                    state.at.idx[offs+i] = i;
+                    state.at.ridx[ns+i+1] = state.at.ridx[ns+i]+1;
+                    state.at.ninitialized = state.at.ninitialized+1;
+                }
+                state.at.m = state.at.m+k;
+                sparse.sparseinitduidx(state.at, _params);
+                processed = true;
+            }
+            alglib.ap.assert(processed, "SubproblemSetLC: integrity check failed (akind)");
+            
+            //
+            // Copy AL, AU to BndL/BndT
+            //
+            apserv.rvectorgrowto(ref state.primary.bndl, ns+k, _params);
+            apserv.rvectorgrowto(ref state.primary.bndu, ns+k, _params);
+            apserv.ivectorgrowto(ref state.primary.bndt, ns+k, _params);
+            for(i=0; i<=k-1; i++)
+            {
+                alglib.ap.assert(math.isfinite(al[i]) || Double.IsNegativeInfinity(al[i]), "SubproblemSetLC: AL contains NAN or +INF");
+                alglib.ap.assert(math.isfinite(au[i]) || Double.IsPositiveInfinity(au[i]), "SubproblemSetLC: AU contains NAN or -INF");
+                state.primary.bndl[ns+i] = al[i];
+                state.primary.bndu[ns+i] = au[i];
+                
+                //
+                // Set bound type
+                //
+                if( math.isfinite(al[i]) && math.isfinite(au[i]) )
+                {
+                    if( (double)(al[i])>(double)(au[i]) )
+                    {
+                        state.primary.bndt[ns+i] = ccinfeasible;
+                    }
+                    if( (double)(al[i])<(double)(au[i]) )
+                    {
+                        state.primary.bndt[ns+i] = ccrange;
+                    }
+                    if( (double)(al[i])==(double)(au[i]) )
+                    {
+                        state.primary.bndt[ns+i] = ccfixed;
+                    }
+                    continue;
+                }
+                if( math.isfinite(al[i]) && !math.isfinite(au[i]) )
+                {
+                    state.primary.bndt[ns+i] = cclower;
+                    continue;
+                }
+                if( !math.isfinite(al[i]) && math.isfinite(au[i]) )
+                {
+                    state.primary.bndt[ns+i] = ccupper;
+                    continue;
+                }
+                alglib.ap.assert(Double.IsNegativeInfinity(al[i]) && Double.IsPositiveInfinity(au[i]), "SubproblemSetLC: integrity check faoled");
+                state.primary.bndt[ns+i] = ccfree;
+            }
+            
+            //
+            // Depending on BasisInitType either start from all-logical basis
+            // or try to reuse already existing basis.
+            //
+            // NOTE: current version does not support basis shrinkage, only
+            //       growing basis can be reused.
+            //
+            apserv.rvectorgrowto(ref state.primary.rawc, ns+k, _params);
+            apserv.rvectorgrowto(ref state.primary.effc, ns+k, _params);
+            apserv.rvectorgrowto(ref state.primary.x, ns+k, _params);
+            apserv.rvectorgrowto(ref state.primary.d, ns+k, _params);
+            apserv.rvectorgrowto(ref state.primary.s, ns+k, _params);
+            basisinitialized = false;
+            if( basisinittype==2 )
+            {
+                
+                //
+                // Import basis from one proposed by caller
+                //
+                alglib.ap.assert(proposedbasis.ns==state.primary.ns, "SubproblemSetLCX: unable to import basis, sizes do not match");
+                alglib.ap.assert(proposedbasis.m==state.primary.m, "SubproblemSetLCX: unable to import basis, sizes do not match");
+                basisimportfrom(state.basis, proposedbasis, _params);
+                downgradestate(state.primary, ssinvalid, _params);
+                basisinitialized = true;
+            }
+            if( basisinittype==1 && state.primary.m>=oldm )
+            {
+                
+                //
+                // New rows were added, try to reuse previous basis
+                //
+                for(i=oldm; i<=state.primary.m-1; i++)
+                {
+                    state.primary.rawc[ns+i] = 0.0;
+                    state.primary.effc[ns+i] = 0.0;
+                    state.primary.x[ns+i] = 0.0;
+                    state.primary.d[ns+i] = 0.0;
+                    state.primary.s[ns+i] = 1.0;
+                }
+                basisresize(state.basis, state.primary.m, _params);
+                downgradestate(state.primary, ssvalidxn, _params);
+                basisinitialized = true;
+            }
+            if( !basisinitialized )
+            {
+                
+                //
+                // Straightforward code for all-logicals basis
+                //
+                for(i=0; i<=k-1; i++)
+                {
+                    state.primary.rawc[ns+i] = 0.0;
+                    state.primary.effc[ns+i] = 0.0;
+                    state.primary.x[ns+i] = 0.0;
+                    state.primary.d[ns+i] = 0.0;
+                    state.primary.s[ns+i] = 1.0;
+                }
+                basisinit(state.primary.ns, state.primary.m, state.basis, _params);
+                downgradestate(state.primary, ssinvalid, _params);
+            }
+            apserv.rvectorgrowto(ref state.repy, state.primary.m, _params);
+            apserv.ivectorgrowto(ref state.repstats, state.primary.ns+state.primary.m, _params);
+        }
+
+
+        /*************************************************************************
+        This function exports basis from the primary (phase II) subproblem.
+
+        INPUT PARAMETERS:
+            State   -   structure
+            
+        OUTPUT PARAMETERS
+            Basis   -   current basis exported (no factorization, only set of
+                        basis/nonbasic variables)
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dssexportbasis(dualsimplexstate state,
+            dualsimplexbasis basis,
+            alglib.xparams _params)
+        {
+            basisexportto(state.basis, basis, _params);
+        }
+
+
+        /*************************************************************************
+        This function imports basis for the primary (phase II) subproblem. Size of
+        the basis being imported MUST match size of the LP problem.
+
+        Factorization is not imported, only basic/nonbasic variables.
+
+        INPUT PARAMETERS:
+            State   -   structure
+            Basis   -   basis being exported (previously imported with DSSExportBasis)
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dssimportbasis(dualsimplexstate state,
+            dualsimplexbasis basis,
+            alglib.xparams _params)
+        {
+            basisimportfrom(state.basis, basis, _params);
+        }
+
+
+        /*************************************************************************
+        This function performs actual solution.
+
+        INPUT PARAMETERS:
+            State   -   state
+            
+        Solution results can be found in fields  of  State  which  are  explicitly
+        declared as accessible by external code.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void dssoptimize(dualsimplexstate state,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int j = 0;
+            int j0 = 0;
+            int j1 = 0;
+            double v = 0;
+            int outeridx = 0;
+            hqrnd.hqrndstate rs = new hqrnd.hqrndstate();
+
+            nn = state.primary.ns;
+            nx = state.primary.ns+state.primary.m;
+            m = state.primary.m;
+            
+            //
+            // Init report fields
+            //
+            state.repf = 0;
+            state.repiterationscount = 0;
+            state.repiterationscount1 = 0;
+            state.repiterationscount2 = 0;
+            state.repiterationscount3 = 0;
+            state.repterminationtype = 1;
+            state.repprimalerror = 0;
+            state.repdualerror = 0;
+            
+            //
+            // Handle case when M=0; after this block we assume that M>0.
+            //
+            if( m==0 )
+            {
+                solveboxonly(state, _params);
+                state.repf = 0;
+                for(i=0; i<=state.primary.ns-1; i++)
+                {
+                    state.repf = state.repf+state.repx[i]*state.primary.rawc[i];
+                }
+                return;
+            }
+            
+            //
+            // Most basic check for correctness of box constraints
+            //
+            for(i=0; i<=nx-1; i++)
+            {
+                if( state.primary.bndt[i]==ccinfeasible )
+                {
+                    state.repterminationtype = -3;
+                    setzeroxystats(state, _params);
+                    return;
+                }
+            }
+            
+            //
+            // Initialization:
+            // * column scales, initial perturbed C[]
+            //
+            hqrnd.hqrndseed(7456, 2355, rs, _params);
+            apserv.rvectorsetlengthatleast(ref state.primary.colscales, nx, _params);
+            for(i=0; i<=nx-1; i++)
+            {
+                
+                //
+                // compute column scales
+                //
+                v = Math.Abs(state.primary.rawc[i]);
+                j0 = state.at.ridx[i];
+                j1 = state.at.ridx[i+1]-1;
+                for(j=j0; j<=j1; j++)
+                {
+                    v = Math.Max(v, Math.Abs(state.at.vals[j]));
+                }
+                state.primary.colscales[i] = apserv.coalesce(v, 1.0, _params);
+                
+                //
+                // apply perturbation
+                //
+                if( !isfree(state.primary, i, _params) )
+                {
+                    v = settings.perturbmag*state.primary.colscales[i]*(1+hqrnd.hqrnduniformr(rs, _params));
+                    if( hasbndu(state.primary, i, _params) )
+                    {
+                        v = -v;
+                    }
+                    state.primary.effc[i] = state.primary.rawc[i]+v;
+                }
+            }
+            
+            //
+            // Solve phase 1 subproblem, then perturbed subproblem
+            //
+            basisfreshtrf(state.basis, state.at, settings, _params);
+            if( state.primary.state==ssinvalid )
+            {
+                subprobleminferinitialxn(state, state.primary, _params);
+            }
+            if( state.primary.state==ssvalidxn )
+            {
+                subproblemhandlexnupdate(state, state.primary, _params);
+            }
+            alglib.ap.assert(state.primary.state==ssvalid, "DSS: integrity check failed (init)");
+            invokephase1(state, settings, _params);
+            if( state.repterminationtype<=0 )
+            {
+                
+                //
+                // Primal unbounded, dual infeasible
+                //
+                alglib.ap.assert(state.repterminationtype==-4, "DSS: integrity check for InvokePhase1() result failed");
+                state.repf = 0;
+                state.repprimalerror = 0;
+                state.repdualerror = 0;
+                setzeroxystats(state, _params);
+                return;
+            }
+            solvesubproblemdual(state, state.primary, false, settings, ref state.repterminationtype, _params);
+            if( state.repterminationtype<=0 )
+            {
+                
+                //
+                // Primal infeasible
+                //
+                alglib.ap.assert(state.repterminationtype==-3, "DSS: integrity check for SolveSubproblemDual() result failed");
+                state.repf = 0;
+                state.repprimalerror = 0;
+                state.repdualerror = 0;
+                setzeroxystats(state, _params);
+                return;
+            }
+            
+            //
+            // Remove perturbation from the cost vector,
+            // then use primal simplex to enforce dual feasibility
+            // after removal of the perturbation (if necessary).
+            //
+            subprobleminitphase3(state.primary, state.phase3, _params);
+            for(i=0; i<=nx-1; i++)
+            {
+                state.phase3.effc[i] = state.primary.rawc[i];
+            }
+            alglib.ap.assert(state.phase3.state>=ssvalidxn, "DSS: integrity check failed (remove perturbation)");
+            subproblemhandlexnupdate(state, state.phase3, _params);
+            solvesubproblemprimal(state, state.phase3, settings, ref state.repterminationtype, _params);
+            if( state.repterminationtype<=0 )
+            {
+                
+                //
+                // Dual infeasible, primal unbounded
+                //
+                alglib.ap.assert(state.repterminationtype==-4, "DSS: integrity check for SolveSubproblemPrimal() result failed");
+                state.repf = 0;
+                state.repprimalerror = 0;
+                state.repdualerror = 0;
+                setzeroxystats(state, _params);
+                return;
+            }
+            for(i=0; i<=nx-1; i++)
+            {
+                state.primary.x[i] = state.phase3.x[i];
+                if( hasbndl(state.primary, i, _params) )
+                {
+                    state.primary.x[i] = Math.Max(state.primary.x[i], state.primary.bndl[i]);
+                }
+                if( hasbndu(state.primary, i, _params) )
+                {
+                    state.primary.x[i] = Math.Min(state.primary.x[i], state.primary.bndu[i]);
+                }
+            }
+            
+            //
+            // Primal and dual feasible, problem solved
+            //
+            apserv.rvectorsetlengthatleast(ref state.tmp0, m, _params);
+            apserv.rvectorsetlengthatleast(ref state.tmp1, m, _params);
+            state.repf = state.primary.z;
+            state.repprimalerror = 0;
+            state.repdualerror = 0;
+            state.repterminationtype = 1;
+            for(i=0; i<=state.primary.ns-1; i++)
+            {
+                state.repx[i] = state.primary.x[i];
+            }
+            for(i=0; i<=m-1; i++)
+            {
+                state.tmp0[i] = state.primary.rawc[state.basis.idx[i]];
+            }
+            basissolvet(state.basis, state.tmp0, ref state.tmp1, _params);
+            for(i=0; i<=m-1; i++)
+            {
+                state.repy[i] = state.tmp1[i];
+            }
+            for(i=0; i<=nx-1; i++)
+            {
+                if( state.basis.isbasic[i] )
+                {
+                    state.repstats[i] = 0;
+                    continue;
+                }
+                if( hasbndl(state.primary, i, _params) && (double)(state.primary.x[i])==(double)(state.primary.bndl[i]) )
+                {
+                    state.repstats[i] = -1;
+                    continue;
+                }
+                if( hasbndu(state.primary, i, _params) && (double)(state.primary.x[i])==(double)(state.primary.bndu[i]) )
+                {
+                    state.repstats[i] = 1;
+                    continue;
+                }
+                alglib.ap.assert(!hasbndl(state.primary, i, _params) && !hasbndu(state.primary, i, _params), "DSSOptimize: integrity check failed (zetta5)");
+                state.repstats[i] = 1;
+            }
+        }
+
+
+        /*************************************************************************
+        This function initializes subproblem structure. Previously allocated memory
+        is reused as much as possible.
+
+        Default state of the problem is zero cost vector, all variables are  fixed
+        at zero, linear constraint matrix is zero.
+
+          -- ALGLIB --
+             Copyright 01.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subprobleminit(int n,
+            dualsimplexsubproblem s,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            alglib.ap.assert(n>0, "SubproblemInit: N<=0");
+            s.ns = n;
+            s.m = 0;
+            s.state = ssinvalid;
+            s.stateage = 0;
+            apserv.rvectorsetlengthatleast(ref s.x, n, _params);
+            apserv.rvectorsetlengthatleast(ref s.d, n, _params);
+            apserv.rvectorsetlengthatleast(ref s.s, n, _params);
+            apserv.rvectorsetlengthatleast(ref s.rawc, n, _params);
+            apserv.rvectorsetlengthatleast(ref s.effc, n, _params);
+            apserv.rvectorsetlengthatleast(ref s.bndl, n, _params);
+            apserv.rvectorsetlengthatleast(ref s.bndu, n, _params);
+            apserv.ivectorsetlengthatleast(ref s.bndt, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                s.s[i] = 1.0;
+                s.rawc[i] = 0;
+                s.effc[i] = 0;
+                s.bndl[i] = 0;
+                s.bndu[i] = 0;
+                s.bndt[i] = ccfixed;
+                s.x[i] = 0.0;
+                s.d[i] = 0.0;
+            }
+        }
+
+
+        /*************************************************************************
+        This function initializes phase #1 subproblem which minimizes sum of  dual
+        infeasibilities.  It is required that total count of  non-boxed  non-fixed
+        variables is at least M.
+
+          -- ALGLIB --
+             Copyright 01.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subprobleminitphase1(dualsimplexsubproblem s0,
+            dualsimplexsubproblem s1,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            s1.ns = s0.ns;
+            s1.m = s0.m;
+            apserv.copyrealarray(s0.s, ref s1.s, _params);
+            apserv.copyrealarray(s0.rawc, ref s1.rawc, _params);
+            apserv.copyrealarray(s0.effc, ref s1.effc, _params);
+            apserv.copyrealarray(s0.colscales, ref s1.colscales, _params);
+            apserv.copyrealarray(s0.bndl, ref s1.bndl, _params);
+            apserv.copyrealarray(s0.bndu, ref s1.bndu, _params);
+            apserv.copyintegerarray(s0.bndt, ref s1.bndt, _params);
+            apserv.copyrealarray(s0.x, ref s1.x, _params);
+            apserv.copyrealarray(s0.d, ref s1.d, _params);
+            s1.z = s0.z;
+            for(i=0; i<=s1.ns+s1.m-1; i++)
+            {
+                if( s1.bndt[i]==cclower )
+                {
+                    s1.bndt[i] = ccrange;
+                    s1.bndl[i] = 0;
+                    s1.bndu[i] = 1;
+                    s1.x[i] = 0;
+                    continue;
+                }
+                if( s1.bndt[i]==ccupper )
+                {
+                    s1.bndt[i] = ccrange;
+                    s1.bndl[i] = -1;
+                    s1.bndu[i] = 0;
+                    s1.x[i] = 0;
+                    continue;
+                }
+                if( s1.bndt[i]==ccfree )
+                {
+                    s1.bndt[i] = ccrange;
+                    s1.bndl[i] = -1;
+                    s1.bndu[i] = 1;
+                    if( (double)(s1.effc[i])>=(double)(0) )
+                    {
+                        s1.x[i] = -1;
+                    }
+                    else
+                    {
+                        s1.x[i] = 1;
+                    }
+                    continue;
+                }
+                s1.bndt[i] = ccfixed;
+                s1.bndl[i] = 0;
+                s1.bndu[i] = 0;
+                s1.x[i] = 0;
+            }
+            s1.state = ssvalidxn;
+            s1.stateage = 0;
+        }
+
+
+        /*************************************************************************
+        This function initializes phase #3 subproblem which applies primal simplex
+        method to the result of the phase #2.
+
+        It also performs modification of the subproblem in order to ensure that
+        initial point is primal feasible.
+
+          -- ALGLIB --
+             Copyright 01.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subprobleminitphase3(dualsimplexsubproblem s0,
+            dualsimplexsubproblem s1,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            s1.ns = s0.ns;
+            s1.m = s0.m;
+            apserv.copyrealarray(s0.s, ref s1.s, _params);
+            apserv.copyrealarray(s0.rawc, ref s1.rawc, _params);
+            apserv.copyrealarray(s0.effc, ref s1.effc, _params);
+            apserv.copyrealarray(s0.colscales, ref s1.colscales, _params);
+            apserv.copyrealarray(s0.bndl, ref s1.bndl, _params);
+            apserv.copyrealarray(s0.bndu, ref s1.bndu, _params);
+            apserv.copyintegerarray(s0.bndt, ref s1.bndt, _params);
+            apserv.copyrealarray(s0.x, ref s1.x, _params);
+            apserv.copyrealarray(s0.d, ref s1.d, _params);
+            s1.z = s0.z;
+            s1.state = ssvalidxn;
+            s1.stateage = 0;
+        }
+
+
+        /*************************************************************************
+        This function sets cost term.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subproblemsetcost(dualsimplexsubproblem s,
+            double[] c,
+            alglib.xparams _params)
+        {
+            int ns = 0;
+            int i = 0;
+
+            ns = s.ns;
+            alglib.ap.assert(alglib.ap.len(c)>=ns, "SubproblemSetCost: Length(C)<N");
+            alglib.ap.assert(apserv.isfinitevector(c, ns, _params), "SubproblemSetCost: C contains infinite or NaN elements");
+            for(i=0; i<=ns-1; i++)
+            {
+                s.rawc[i] = c[i];
+                s.effc[i] = c[i];
+            }
+            downgradestate(s, ssvalidxn, _params);
+        }
+
+
+        /*************************************************************************
+        This function sets cost term.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subproblemsetscale(dualsimplexsubproblem s,
+            double[] sv,
+            alglib.xparams _params)
+        {
+            int ns = 0;
+            int i = 0;
+
+            ns = s.ns;
+            alglib.ap.assert(alglib.ap.len(sv)>=ns, "SubproblemSetScale: Length(SV)<N");
+            alglib.ap.assert(apserv.isfinitevector(sv, ns, _params), "SubproblemSetScale: SV contains infinite or NaN elements");
+            for(i=0; i<=ns-1; i++)
+            {
+                alglib.ap.assert(sv[i]!=0, "SubproblemSetScale: SV contains zero");
+                s.s[i] = Math.Abs(sv[i]);
+            }
+        }
+
+
+        /*************************************************************************
+        This function sets box constraints.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subproblemsetbc(dualsimplexsubproblem s,
+            double[] bndl,
+            double[] bndu,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int ns = 0;
+
+            ns = s.ns;
+            alglib.ap.assert(alglib.ap.len(bndl)>=ns, "SubproblemSetBC: Length(BndL)<N");
+            alglib.ap.assert(alglib.ap.len(bndu)>=ns, "SubproblemSetBC: Length(BndU)<N");
+            for(i=0; i<=ns-1; i++)
+            {
+                alglib.ap.assert(math.isfinite(bndl[i]) || Double.IsNegativeInfinity(bndl[i]), "SubproblemSetBC: BndL contains NAN or +INF");
+                alglib.ap.assert(math.isfinite(bndu[i]) || Double.IsPositiveInfinity(bndu[i]), "SubproblemSetBC: BndU contains NAN or -INF");
+                s.bndl[i] = bndl[i];
+                s.bndu[i] = bndu[i];
+                
+                //
+                // Set bound type
+                //
+                if( math.isfinite(bndl[i]) && math.isfinite(bndu[i]) )
+                {
+                    if( (double)(bndl[i])>(double)(bndu[i]) )
+                    {
+                        s.bndt[i] = ccinfeasible;
+                    }
+                    if( (double)(bndl[i])<(double)(bndu[i]) )
+                    {
+                        s.bndt[i] = ccrange;
+                    }
+                    if( (double)(bndl[i])==(double)(bndu[i]) )
+                    {
+                        s.bndt[i] = ccfixed;
+                    }
+                    continue;
+                }
+                if( math.isfinite(bndl[i]) && !math.isfinite(bndu[i]) )
+                {
+                    s.bndt[i] = cclower;
+                    continue;
+                }
+                if( !math.isfinite(bndl[i]) && math.isfinite(bndu[i]) )
+                {
+                    s.bndt[i] = ccupper;
+                    continue;
+                }
+                alglib.ap.assert(Double.IsNegativeInfinity(bndl[i]) && Double.IsPositiveInfinity(bndu[i]), "SubproblemSetBC: integrity check failed");
+                s.bndt[i] = ccfree;
+            }
+            downgradestate(s, ssinvalid, _params);
+        }
+
+
+        /*************************************************************************
+        This function sets two-sided linear constraints  AL <= A*x <= AU,  with  A
+        being passed as sparse (recommended) or dense matrix.
+
+        Constraint types supported:
+        * AKind=0 for dense format, densea parameter
+        * AKind=1 for sparse format, sparsea parameter
+
+        Basis initialization types supported:
+        * BasisInitType=0 for all-logicals basis
+        * BasisInitType=1 means that we try to reuse previous basis (if basis size
+          grows or remains same) or fallback to all-logicals basis if basis size
+          decreases
+        * BasisInitType=2 means that we try to import basis from ProposedBasis
+
+
+        Internally A is stored in sparse storage format anyway.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subproblemsetlcx(dualsimplexsubproblem s,
+            double[,] densea,
+            sparse.sparsematrix sparsea,
+            int akind,
+            double[] al,
+            double[] au,
+            int k,
+            dualsimplexbasis proposedbasis,
+            int basisinittype,
+            alglib.xparams _params)
+        {
+        }
+
+
+        /*************************************************************************
+        This function infers nonbasic variables of X using sign of effective C[].
+
+        Only non-basic components of XN are changed; everything else is NOT updated.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subprobleminferinitialxn(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int ii = 0;
+            int bndt = 0;
+
+            for(ii=0; ii<=s.ns-1; ii++)
+            {
+                i = state.basis.nidx[ii];
+                bndt = s.bndt[i];
+                if( bndt==ccfixed || bndt==ccrange )
+                {
+                    if( s.effc[i]>=0 )
+                    {
+                        s.x[i] = s.bndl[i];
+                    }
+                    else
+                    {
+                        s.x[i] = s.bndu[i];
+                    }
+                    continue;
+                }
+                if( bndt==cclower )
+                {
+                    s.x[i] = s.bndl[i];
+                    continue;
+                }
+                if( bndt==ccupper )
+                {
+                    s.x[i] = s.bndu[i];
+                    continue;
+                }
+                if( bndt==ccfree )
+                {
+                    s.x[i] = 0.0;
+                    continue;
+                }
+                alglib.ap.assert(false, "SubproblemInferInitialXN: integrity check failed (infeasible constraint)");
+            }
+            s.state = ssvalidxn;
+            s.stateage = 0;
+        }
+
+
+        /*************************************************************************
+        This function infers basic variables of X using values of non-basic vars
+        and updates reduced cost vector D and target function Z. Sets state age
+        to zero.
+
+        D[] is allocated during computations.
+
+        Temporary vectors Tmp0 and Tmp1 are used (reallocated as needed).
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void subproblemhandlexnupdate(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int j = 0;
+            int m = 0;
+            int nx = 0;
+            int nn = 0;
+            double v = 0;
+
+            alglib.ap.assert(s.state>=ssvalidxn, "SubproblemHandleXNUpdate: integrity check failed (XN is not valid)");
+            nn = s.ns;
+            m = s.m;
+            nx = s.ns+s.m;
+            
+            //
+            // Compute nonbasic components
+            //
+            computeanxn(state, s, s.x, ref state.tmp0, _params);
+            basissolve(state.basis, state.tmp0, ref state.tmp1, _params);
+            for(i=0; i<=m-1; i++)
+            {
+                s.x[state.basis.idx[i]] = -state.tmp1[i];
+            }
+            
+            //
+            // Compute D, Z
+            //
+            for(i=0; i<=m-1; i++)
+            {
+                state.tmp0[i] = s.effc[state.basis.idx[i]];
+            }
+            basissolvet(state.basis, state.tmp0, ref state.tmp1, _params);
+            computeantv(state, s, state.tmp1, ref s.d, _params);
+            for(i=0; i<=nn-1; i++)
+            {
+                j = state.basis.nidx[i];
+                s.d[j] = s.effc[j]-s.d[j];
+            }
+            v = 0;
+            for(i=0; i<=nx-1; i++)
+            {
+                v = v+s.effc[i]*s.x[i];
+            }
+            s.z = v;
+            
+            //
+            // Update state validity/age
+            //
+            s.stateage = 0;
+            s.state = ssvalid;
+        }
+
+
+        /*************************************************************************
+        This function performs initial dual feasibility correction on the subproblem.
+        It assumes that problem state is at least ssValidXN. After call to this
+        function the problem state is set to ssValid.
+
+        This function returns dual feasibility error after dual feasibility correction.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static double initialdualfeasibilitycorrection(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            double result = 0;
+            double[] dummy = new double[0];
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int ii = 0;
+            int i = 0;
+            int j = 0;
+            bool flipped = new bool();
+            double v = 0;
+            double dj = 0;
+            double xj = 0;
+            int bndt = 0;
+
+            nn = s.ns;
+            nx = s.ns+s.m;
+            m = s.m;
+            alglib.ap.assert(s.state>=ssvalidxn, "InitialDualFeasibilityCorrection: XN is invalid");
+            
+            //
+            // Prepare
+            //
+            apserv.rvectorsetlengthatleast(ref state.dfctmp0, m, _params);
+            apserv.rvectorsetlengthatleast(ref state.dfctmp1, m, _params);
+            
+            //
+            // Recompute D[] using fresh factorization
+            //
+            basisfreshtrf(state.basis, state.at, settings, _params);
+            for(i=0; i<=m-1; i++)
+            {
+                state.dfctmp0[i] = s.effc[state.basis.idx[i]];
+            }
+            basissolvet(state.basis, state.dfctmp0, ref state.dfctmp1, _params);
+            computeantv(state, s, state.dfctmp1, ref s.d, _params);
+            for(i=0; i<=nn-1; i++)
+            {
+                j = state.basis.nidx[i];
+                s.d[j] = s.effc[j]-s.d[j];
+            }
+            
+            //
+            // Perform flips for dual-infeasible boxed variables
+            //
+            result = 0;
+            flipped = false;
+            for(ii=0; ii<=nn-1; ii++)
+            {
+                j = state.basis.nidx[ii];
+                bndt = s.bndt[j];
+                
+                //
+                // Boxed variables, perform DFC
+                //
+                if( bndt==ccrange )
+                {
+                    dj = s.d[j];
+                    xj = s.x[j];
+                    if( xj==s.bndl[j] && dj<0 )
+                    {
+                        s.x[j] = s.bndu[j];
+                        flipped = true;
+                        continue;
+                    }
+                    if( xj==s.bndu[j] && dj>0 )
+                    {
+                        s.x[j] = s.bndl[j];
+                        flipped = true;
+                        continue;
+                    }
+                    continue;
+                }
+                
+                //
+                // Non-boxed variables, compute dual feasibility error
+                //
+                if( bndt==ccfixed )
+                {
+                    continue;
+                }
+                if( bndt==cclower )
+                {
+                    v = -s.d[j];
+                    if( v>result )
+                    {
+                        result = v;
+                    }
+                    continue;
+                }
+                if( bndt==ccupper )
+                {
+                    v = s.d[j];
+                    if( v>result )
+                    {
+                        result = v;
+                    }
+                    continue;
+                }
+                if( bndt==ccfree )
+                {
+                    result = Math.Max(result, Math.Abs(s.d[j]));
+                    continue;
+                }
+            }
+            
+            //
+            // Recompute basic components of X[]
+            //
+            if( flipped || s.state<ssvalid )
+            {
+                computeanxn(state, s, s.x, ref state.dfctmp0, _params);
+                basissolve(state.basis, state.dfctmp0, ref state.dfctmp1, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    s.x[state.basis.idx[i]] = -state.dfctmp1[i];
+                }
+            }
+            
+            //
+            // Refresh Z
+            //
+            v = 0;
+            for(i=0; i<=nx-1; i++)
+            {
+                v = v+s.effc[i]*s.x[i];
+            }
+            s.z = v;
+            
+            //
+            // Update state validity/age
+            //
+            s.stateage = 0;
+            s.state = ssvalid;
+            return result;
+        }
+
+
+        /*************************************************************************
+        This function performs shifting using current algorithm  as  specified  by
+        settings.shifting.
+
+        It accepts following parameters:
+        * AlphaR - pivot row
+        * Delta - delta from pricing step
+        * Q - variable selected by ratio test
+        * ThetaD - dual step length
+
+        If no shifts are necessary, it silently returns. If shifts are  necessary,
+        it modifies ThetaD, S.D, S.EffC according to shifting algorithm.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void shifting(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            double[] alphar,
+            double delta,
+            int q,
+            ref double thetad,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int dir = 0;
+            double sft = 0;
+            int ii = 0;
+            int j = 0;
+            int bndt = 0;
+
+            
+            //
+            // No shifts
+            //
+            if( settings.shifting==0 )
+            {
+                return;
+            }
+            
+            //
+            // EXPAND with ThetaD=0
+            //
+            if( settings.shifting==1 )
+            {
+                dir = Math.Sign(delta);
+                if( (double)(thetad*dir)>=(double)(0) )
+                {
+                    return;
+                }
+                s.effc[q] = s.effc[q]-s.d[q];
+                s.d[q] = 0;
+                thetad = 0;
+                return;
+            }
+            
+            //
+            // EXPAND with ThetaD=ShiftLen
+            //
+            if( settings.shifting==2 )
+            {
+                dir = Math.Sign(delta);
+                if( (double)(thetad*dir)>(double)(0) )
+                {
+                    return;
+                }
+                
+                //
+                // Ensure that non-zero step is performed
+                //
+                thetad = dir*shiftlen;
+                
+                //
+                // Shift Q-th coefficient
+                //
+                sft = thetad*(dir*alphar[q])-s.d[q];
+                s.effc[q] = s.effc[q]+sft;
+                s.d[q] = s.d[q]+sft;
+                
+                //
+                // Shift other coefficients
+                //
+                for(ii=0; ii<=s.ns-1; ii++)
+                {
+                    j = state.basis.nidx[ii];
+                    bndt = s.bndt[j];
+                    if( (j==q || bndt==ccfixed) || bndt==ccfree )
+                    {
+                        continue;
+                    }
+                    sft = thetad*(dir*alphar[j])-s.d[j];
+                    
+                    //
+                    // Handle variables at lower bound
+                    //
+                    if( bndt==cclower || (bndt==ccrange && s.x[j]==s.bndl[j]) )
+                    {
+                        sft = sft-dtol;
+                        if( sft>0 )
+                        {
+                            s.effc[j] = s.effc[j]+sft;
+                            s.d[j] = s.d[j]+sft;
+                        }
+                        continue;
+                    }
+                    if( bndt==ccupper || (bndt==ccrange && s.x[j]==s.bndu[j]) )
+                    {
+                        sft = sft+dtol;
+                        if( sft<0 )
+                        {
+                            s.effc[j] = s.effc[j]+sft;
+                            s.d[j] = s.d[j]+sft;
+                        }
+                        continue;
+                    }
+                }
+                
+                //
+                // Done
+                //
+                return;
+            }
+            alglib.ap.assert(false, "Shifting: unexpected shifting type");
+        }
+
+
+        /*************************************************************************
+        This function performs pricing step
+
+        Additional parameters:
+        * Phase1Pricing - if True, then special Phase #1 restriction is applied to
+          leaving variables: only those are eligible which will move to zero bound
+          after basis change.
+          
+          This trick allows to accelerate and stabilize phase #1. See Robert Fourer,
+          'Notes on the dual simplex method', draft report, 1994, for more info.
+
+        Returns:
+        * leaving variable index P
+        * its index R in the basis, in [0,M) range
+        * Delta - difference between variable value and corresponding bound
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void pricingstep(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            bool phase1pricing,
+            ref int p,
+            ref int r,
+            ref double delta,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int j = 0;
+            int bi = 0;
+            double v = 0;
+            double vtarget = 0;
+
+            p = 0;
+            r = 0;
+            delta = 0;
+
+            nn = s.ns;
+            nx = s.ns+s.m;
+            m = s.m;
+            
+            //
+            // Integrity checks
+            //
+            alglib.ap.assert(s.state==ssvalid, "PricingStep: invalid X");
+            alglib.ap.assert(m>0, "PricingStep: M<=0");
+            
+            //
+            // Pricing
+            //
+            if( settings.pricing==0 )
+            {
+                
+                //
+                // "Most infeasible" pricing
+                //
+                p = -1;
+                r = -1;
+                delta = 0;
+                for(i=0; i<=m-1; i++)
+                {
+                    bi = state.basis.idx[i];
+                    if( (hasbndl(s, bi, _params) && (double)(s.x[bi])<(double)(s.bndl[bi]-xtol*s.s[bi])) && (p<0 || (double)(Math.Abs(s.x[bi]-s.bndl[bi]))>(double)(Math.Abs(delta))) )
+                    {
+                        
+                        //
+                        // Special phase 1 pricing: do not choose variables which move to non-zero bound
+                        //
+                        if( phase1pricing && !(s.bndl[bi]==0.0) )
+                        {
+                            continue;
+                        }
+                        
+                        //
+                        // Proceed as usual
+                        //
+                        p = bi;
+                        r = i;
+                        delta = s.x[bi]-s.bndl[bi];
+                        continue;
+                    }
+                    if( (hasbndu(s, bi, _params) && (double)(s.x[bi])>(double)(s.bndu[bi]+xtol*s.s[bi])) && (p<0 || (double)(Math.Abs(s.x[bi]-s.bndu[bi]))>(double)(Math.Abs(delta))) )
+                    {
+                        
+                        //
+                        // Special phase 1 pricing: do not choose variables which move to non-zero bound
+                        //
+                        if( phase1pricing && !(s.bndu[bi]==0.0) )
+                        {
+                            continue;
+                        }
+                        
+                        //
+                        // Proceed as usual
+                        //
+                        p = bi;
+                        r = i;
+                        delta = s.x[bi]-s.bndu[bi];
+                        continue;
+                    }
+                }
+                return;
+            }
+            if( settings.pricing==-1 || settings.pricing==1 )
+            {
+                
+                //
+                // Dual steepest edge pricing
+                //
+                basisrequestweights(state.basis, settings, _params);
+                p = -1;
+                r = -1;
+                delta = 0;
+                vtarget = 0;
+                for(i=0; i<=m-1; i++)
+                {
+                    bi = state.basis.idx[i];
+                    if( (hasbndl(s, bi, _params) && (double)(s.x[bi])<(double)(s.bndl[bi]-xtol*s.s[bi])) && (p<0 || (double)(math.sqr(s.x[bi]-s.bndl[bi])/state.basis.dseweights[i])>(double)(vtarget)) )
+                    {
+                        
+                        //
+                        // Special phase 1 pricing: do not choose variables which move to non-zero bound
+                        //
+                        if( phase1pricing && !(s.bndl[bi]==0.0) )
+                        {
+                            continue;
+                        }
+                        
+                        //
+                        // Proceed as usual
+                        //
+                        p = bi;
+                        r = i;
+                        delta = s.x[bi]-s.bndl[bi];
+                        vtarget = math.sqr(s.x[bi]-s.bndl[bi])/state.basis.dseweights[i];
+                        continue;
+                    }
+                    if( (hasbndu(s, bi, _params) && (double)(s.x[bi])>(double)(s.bndu[bi]+xtol*s.s[bi])) && (p<0 || (double)(math.sqr(s.x[bi]-s.bndu[bi])/state.basis.dseweights[i])>(double)(vtarget)) )
+                    {
+                        
+                        //
+                        // Special phase 1 pricing: do not choose variables which move to non-zero bound
+                        //
+                        if( phase1pricing && !(s.bndu[bi]==0.0) )
+                        {
+                            continue;
+                        }
+                        
+                        //
+                        // Proceed as usual
+                        //
+                        p = bi;
+                        r = i;
+                        delta = s.x[bi]-s.bndu[bi];
+                        vtarget = math.sqr(s.x[bi]-s.bndu[bi])/state.basis.dseweights[i];
+                        continue;
+                    }
+                }
+                return;
+            }
+            alglib.ap.assert(false, "PricingStep: unknown pricing type");
+        }
+
+
+        /*************************************************************************
+        This function performs ratio test, either simple one or BFRT.
+
+        It accepts following parameters:
+        * AlphaR - pivot row
+        * Delta - delta from pricing step
+        * P - index of leaving variable from pricing step
+
+        It returns following results:
+        * Q - non-negative value for success, negative for primal infeasible problem
+        * ThetaD - dual step length
+        * PossibleFlips[PossibleFlipsCnt] - for possible flip indexes (for BFRT
+          this set coincides with actual flips, but stabilizing BFRT is a bit more
+          complex - some variables in PossibleFlips[] may need flipping and some not)
+
+        Internally it uses following fields of State for temporaries:
+        * EligibleSet
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void ratiotest(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            double[] alphar,
+            double delta,
+            int p,
+            ref int q,
+            ref double thetad,
+            ref int[] possibleflips,
+            ref int possibleflipscnt,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int nx = 0;
+            int nn = 0;
+            int i = 0;
+            int j = 0;
+            int nj = 0;
+            int jj = 0;
+            int dir = 0;
+            double sinv = 0;
+            double vx = 0;
+            double vp = 0;
+            double vtarget = 0;
+            double vtest = 0;
+            bool eligible = new bool();
+            int eligiblecnt = 0;
+            int bndt = 0;
+            double alphawaver = 0;
+            double adelta = 0;
+            int idx = 0;
+            double vtheta = 0;
+            double thetamax = 0;
+            int harrissetsize = 0;
+            bool hasnonboxedvars = new bool();
+
+            q = 0;
+            thetad = 0;
+
+            nx = s.ns+s.m;
+            nn = s.ns;
+            alglib.ap.assert((double)(delta)!=(double)(0), "RatioTest: zero delta");
+            alglib.ap.assert(s.state==ssvalid, "RatioTest: invalid X");
+            
+            //
+            // Prepare temporaries
+            //
+            // Scaled tolerances are used to test AlphaWaveR for positivity/negativity,
+            // scale of I-th tolerance is calculated as ratio of ColScale[I] and ColScale[P].
+            //
+            dir = Math.Sign(delta);
+            sinv = 1.0/s.colscales[p];
+            apserv.ivectorsetlengthatleast(ref possibleflips, nx, _params);
+            
+            //
+            // Prepare set of eligible variables
+            //
+            // NOTE: free variables are immediately chosen at this stage
+            //
+            apserv.ivectorsetlengthatleast(ref state.eligibleset, nn, _params);
+            eligiblecnt = 0;
+            for(j=0; j<=nn-1; j++)
+            {
+                nj = state.basis.nidx[j];
+                bndt = s.bndt[nj];
+                
+                //
+                // Handle fixed and free variables: fixed ones are not eligible,
+                // free non-basic variables are always and immediately eligible
+                //
+                if( bndt==ccfixed )
+                {
+                    continue;
+                }
+                if( bndt==ccfree )
+                {
+                    q = nj;
+                    thetad = 0;
+                    return;
+                }
+                
+                //
+                // Handle lower/upper/range constraints
+                //
+                vx = s.x[nj];
+                vp = settings.pivottol*(s.colscales[nj]*sinv);
+                alphawaver = dir*alphar[nj];
+                if( bndt==cclower || (bndt==ccrange && vx==s.bndl[nj]) )
+                {
+                    if( alphawaver>vp )
+                    {
+                        state.eligibleset[eligiblecnt] = nj;
+                        eligiblecnt = eligiblecnt+1;
+                        continue;
+                    }
+                }
+                if( bndt==ccupper || (bndt==ccrange && vx==s.bndu[nj]) )
+                {
+                    if( alphawaver<-vp )
+                    {
+                        state.eligibleset[eligiblecnt] = nj;
+                        eligiblecnt = eligiblecnt+1;
+                        continue;
+                    }
+                }
+            }
+            
+            //
+            // Simple ratio test.
+            //
+            if( settings.ratiotest==0 )
+            {
+                q = -1;
+                thetad = 0;
+                vtarget = 0;
+                possibleflipscnt = 0;
+                for(j=0; j<=eligiblecnt-1; j++)
+                {
+                    nj = state.eligibleset[j];
+                    
+                    //
+                    // More general case
+                    //
+                    alphawaver = dir*alphar[nj];
+                    vtest = s.d[nj]/alphawaver;
+                    if( q<0 || vtest<vtarget )
+                    {
+                        q = nj;
+                        vtarget = vtest;
+                        thetad = s.d[nj]/alphar[nj];
+                    }
+                }
+                shifting(state, s, alphar, delta, q, ref thetad, settings, _params);
+                return;
+            }
+            
+            //
+            // Bounds flipping ratio test
+            //
+            if( settings.ratiotest==1 )
+            {
+                q = -1;
+                thetad = 0;
+                possibleflipscnt = 0;
+                adelta = Math.Abs(delta);
+                
+                //
+                // Quick exit
+                //
+                if( eligiblecnt==0 )
+                {
+                    return;
+                }
+                
+                //
+                // BFRT
+                //
+                while( eligiblecnt>0 )
+                {
+                    
+                    //
+                    // Find Q satisfying BFRT criteria
+                    //
+                    q = -1;
+                    vtarget = 0;
+                    for(j=0; j<=eligiblecnt-1; j++)
+                    {
+                        nj = state.eligibleset[j];
+                        vtheta = s.d[nj]/alphar[nj];
+                        vtest = dir*vtheta;
+                        if( q<0 || vtest<vtarget )
+                        {
+                            q = nj;
+                            vtarget = vtest;
+                            thetad = vtheta;
+                            idx = j;
+                        }
+                    }
+                    alglib.ap.assert(q>=0, "RatioTest: integrity check failed (BFRT)");
+                    
+                    //
+                    // BFRT mini-iterations will be terminated upon discovery
+                    // of non-boxed variable or upon exhausting of eligible set.
+                    //
+                    if( s.bndt[q]!=ccrange )
+                    {
+                        break;
+                    }
+                    if( eligiblecnt==1 )
+                    {
+                        break;
+                    }
+                    
+                    //
+                    // Update and test ADelta. Break BFRT mini-iterations once
+                    // we get negative slope.
+                    //
+                    adelta = adelta-(s.bndu[q]-s.bndl[q])*Math.Abs(alphar[q]);
+                    if( (double)(adelta)<=(double)(0) )
+                    {
+                        break;
+                    }
+                    
+                    //
+                    // Update eligible set, record flip
+                    //
+                    alglib.ap.assert(state.eligibleset[idx]==q, "RatioTest: unexpected failure");
+                    possibleflips[possibleflipscnt] = q;
+                    possibleflipscnt = possibleflipscnt+1;
+                    state.eligibleset[idx] = state.eligibleset[eligiblecnt-1];
+                    eligiblecnt = eligiblecnt-1;
+                }
+                alglib.ap.assert(q>=0, "RatioTest: unexpected failure");
+                thetad = s.d[q]/alphar[q];
+                shifting(state, s, alphar, delta, q, ref thetad, settings, _params);
+                return;
+            }
+            
+            //
+            // Stabilizing bounds flipping ratio test
+            //
+            if( settings.ratiotest==2 )
+            {
+                q = -1;
+                thetad = 0;
+                possibleflipscnt = 0;
+                adelta = Math.Abs(delta);
+                apserv.ivectorgrowto(ref state.harrisset, eligiblecnt, _params);
+                
+                //
+                // Quick exit
+                //
+                if( eligiblecnt==0 )
+                {
+                    return;
+                }
+                
+                //
+                // BFRT
+                //
+                while( eligiblecnt>0 )
+                {
+                    
+                    //
+                    // Determine ThetaMax according to stabilizing BFRT
+                    //
+                    thetamax = math.maxrealnumber;
+                    for(j=0; j<=eligiblecnt-1; j++)
+                    {
+                        nj = state.eligibleset[j];
+                        alphawaver = dir*alphar[nj];
+                        if( alphawaver>0 )
+                        {
+                            vtest = (s.d[nj]+dtol)/alphawaver;
+                        }
+                        else
+                        {
+                            vtest = (s.d[nj]-dtol)/alphawaver;
+                        }
+                        if( vtest<thetamax )
+                        {
+                            thetamax = vtest;
+                        }
+                    }
+                    
+                    //
+                    // Determine Harris set, entering index Q
+                    // Save flips
+                    //
+                    harrissetsize = 0;
+                    hasnonboxedvars = false;
+                    q = -1;
+                    vtarget = -1;
+                    for(j=0; j<=eligiblecnt-1; j++)
+                    {
+                        nj = state.eligibleset[j];
+                        alphawaver = dir*alphar[nj];
+                        if( s.d[nj]/alphawaver>thetamax )
+                        {
+                            continue;
+                        }
+                        state.harrisset[harrissetsize] = nj;
+                        harrissetsize = harrissetsize+1;
+                        hasnonboxedvars = hasnonboxedvars || s.bndt[nj]!=ccrange;
+                        vtest = Math.Abs(alphawaver);
+                        if( vtest>vtarget )
+                        {
+                            q = nj;
+                            vtarget = vtest;
+                        }
+                    }
+                    alglib.ap.assert(q>=0, "RatioTest: integrity check failed (Harris set selection)");
+                    if( harrissetsize==eligiblecnt )
+                    {
+                        break;
+                    }
+                    
+                    //
+                    // Remove Harris set from the eligible set
+                    //
+                    j = 0;
+                    jj = 0;
+                    for(i=0; i<=eligiblecnt-1; i++)
+                    {
+                        if( j==harrissetsize || state.eligibleset[i]!=state.harrisset[j] )
+                        {
+                            
+                            //
+                            // I-th element not present in Harris set, leave it in the eligible set
+                            //
+                            state.eligibleset[jj] = state.eligibleset[i];
+                            jj = jj+1;
+                        }
+                        else
+                        {
+                            
+                            //
+                            // I-th element is present in Harris set, skip it
+                            //
+                            j = j+1;
+                        }
+                    }
+                    eligiblecnt = eligiblecnt-harrissetsize;
+                    alglib.ap.assert(j==harrissetsize, "RatioTest: integrity check failed");
+                    alglib.ap.assert(jj==eligiblecnt, "RatioTest: integrity check failed");
+                    
+                    //
+                    // Update and test |delta|.
+                    //
+                    // Break BFRT mini-iterations once we get negative slope.
+                    //
+                    for(j=0; j<=harrissetsize-1; j++)
+                    {
+                        nj = state.harrisset[j];
+                        if( !hasnonboxedvars || s.bndt[nj]==ccrange )
+                        {
+                            adelta = adelta-(s.bndu[nj]-s.bndl[nj])*Math.Abs(alphar[nj]);
+                        }
+                        else
+                        {
+                            adelta = -1;
+                        }
+                    }
+                    if( (double)(adelta)<=(double)(0) )
+                    {
+                        break;
+                    }
+                    alglib.ap.assert(!hasnonboxedvars, "RatioTest: integrity check failed");
+                    for(j=0; j<=harrissetsize-1; j++)
+                    {
+                        possibleflips[possibleflipscnt] = state.harrisset[j];
+                        possibleflipscnt = possibleflipscnt+1;
+                    }
+                }
+                alglib.ap.assert(q>=0, "RatioTest: unexpected failure");
+                if( eligiblecnt==0 && adelta<0 )
+                {
+                    
+                    //
+                    // Eligible set exhausted, declare dual unboundedness
+                    //
+                    q = -1;
+                    thetad = 0;
+                    return;
+                }
+                thetad = s.d[q]/alphar[q];
+                shifting(state, s, alphar, delta, q, ref thetad, settings, _params);
+                return;
+            }
+            
+            //
+            // Unknown test type
+            //
+            alglib.ap.assert(false, "RatioTest: integrity check failed, unknown test type");
+        }
+
+
+        /*************************************************************************
+        This function performs update of XB, XN, D and Z during final step of revised
+        dual simplex method.
+
+        Depending on Settings.RatioTest, following operations are performed:
+        * Settings.RatioTest=0  ->  simple update is performed
+        * Settings.RatioTest=1  ->  bounds flipping ratio test update is performed
+        * Settings.RatioTest=2  ->  stabilizing bounds flipping ratio test update is performed
+
+        It accepts following parameters:
+        * P - index of leaving variable from pricing step
+        * Q - index of entering variable.
+        * R - index of leaving variable in AlphaQ
+        * Delta    - delta from pricing step
+        * ThetaP   - primal step length
+        * ThetaD   - dual step length
+        * AlphaQ   - pivot column
+        * AlphaQim - intermediate result from Ftran for AlphaQ, used for
+                     Forest-Tomlin update, not referenced when other update scheme is set
+        * AlphaR   - pivot row
+        * Tau - tau-vector for DSE pricing (ignored if simple pricing is used)
+        * PossibleFlips, PossibleFlipsCnt - outputs of the RatioTest(), information
+          about possible variable flips (however, we have to check residual costs
+          before actually flipping variables - it is possible that some variables
+          in this set actually do not need flipping)
+
+        It performs following operations:
+        * basis update
+        * update of X (basic and nonbasic components), D and Z
+        * update of pricing weights
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void updatestep(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            int p,
+            int q,
+            int r,
+            double delta,
+            double thetap,
+            double thetad,
+            double[] alphaq,
+            double[] alphaqim,
+            double[] alphar,
+            double[] tau,
+            int[] possibleflips,
+            int possibleflipscnt,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int ii = 0;
+            int j = 0;
+            int k = 0;
+            int k0 = 0;
+            int k1 = 0;
+            double deltaz = 0;
+            double bndl = 0;
+            double bndu = 0;
+            bool flipped = new bool();
+            double flip = 0;
+            double v = 0;
+            double dj = 0;
+            int dir = 0;
+            int idx = 0;
+            int actualflipscnt = 0;
+
+            nn = s.ns;
+            nx = s.ns+s.m;
+            m = s.m;
+            
+            //
+            // Integrity checks
+            //
+            alglib.ap.assert((settings.ratiotest==0 || settings.ratiotest==1) || settings.ratiotest==2, "UpdateStep: invalid X");
+            alglib.ap.assert(s.state==ssvalid, "UpdateStep: invalid X");
+            alglib.ap.assert(p>=0 && q>=0, "UpdateStep: invalid P/Q");
+            alglib.ap.assert((double)(delta)!=(double)(0), "UpdateStep: Delta=0");
+            alglib.ap.assert((double)(alphaq[r])!=(double)(0), "UpdateStep: AlphaQ[R]=0");
+            
+            //
+            // Prepare
+            //
+            dir = Math.Sign(delta);
+            deltaz = 0;
+            flip = 0;
+            apserv.rvectorsetlengthatleast(ref state.tmp0, m, _params);
+            for(k=0; k<=m-1; k++)
+            {
+                state.tmp0[k] = 0;
+            }
+            apserv.ivectorsetlengthatleast(ref state.ustmpi, nx, _params);
+            actualflipscnt = 0;
+            
+            //
+            // Evaluate and update non-basic elements of D
+            //
+            for(ii=0; ii<=nn-1; ii++)
+            {
+                j = state.basis.nidx[ii];
+                s.d[j] = s.d[j]-thetad*state.alphar[j];
+            }
+            for(ii=0; ii<=possibleflipscnt-1; ii++)
+            {
+                j = possibleflips[ii];
+                dj = s.d[j];
+                bndl = s.bndl[j];
+                bndu = s.bndu[j];
+                flipped = false;
+                if( s.x[j]==bndl && dj<0 )
+                {
+                    flip = bndu-bndl;
+                    flipped = true;
+                }
+                else
+                {
+                    if( s.x[j]==bndu && dj>0 )
+                    {
+                        flip = bndl-bndu;
+                        flipped = true;
+                    }
+                }
+                if( flipped )
+                {
+                    delta = delta-dir*(bndu-bndl)*Math.Abs(alphar[j]);
+                    state.ustmpi[actualflipscnt] = j;
+                    actualflipscnt = actualflipscnt+1;
+                    k0 = state.at.ridx[j];
+                    k1 = state.at.ridx[j+1]-1;
+                    for(k=k0; k<=k1; k++)
+                    {
+                        idx = state.at.idx[k];
+                        state.tmp0[idx] = state.tmp0[idx]+flip*state.at.vals[k];
+                    }
+                    deltaz = deltaz+flip*s.effc[j];
+                }
+            }
+            s.d[p] = -thetad;
+            s.d[q] = 0.0;
+            
+            //
+            // Apply BFRT update (aka long dual step) or simple ratio update
+            //
+            if( actualflipscnt>0 )
+            {
+                thetap = delta/state.alphaq[r];
+                k0 = state.at.ridx[q];
+                k1 = state.at.ridx[q+1]-1;
+                for(k=k0; k<=k1; k++)
+                {
+                    idx = state.at.idx[k];
+                    state.tmp0[idx] = state.tmp0[idx]+thetap*state.at.vals[k];
+                }
+                basissolve(state.basis, state.tmp0, ref state.tmp1, _params);
+                for(k=0; k<=m-1; k++)
+                {
+                    j = state.basis.idx[k];
+                    v = state.tmp1[k];
+                    s.x[j] = s.x[j]-v;
+                    deltaz = deltaz-s.effc[j]*v;
+                }
+                for(ii=0; ii<=actualflipscnt-1; ii++)
+                {
+                    j = state.ustmpi[ii];
+                    if( s.x[j]==s.bndl[j] )
+                    {
+                        s.x[j] = s.bndu[j];
+                    }
+                    else
+                    {
+                        s.x[j] = s.bndl[j];
+                    }
+                }
+                s.x[q] = s.x[q]+thetap;
+                if( dir<0 )
+                {
+                    s.x[p] = s.bndl[p];
+                }
+                else
+                {
+                    s.x[p] = s.bndu[p];
+                }
+            }
+            else
+            {
+                for(j=0; j<=m-1; j++)
+                {
+                    idx = state.basis.idx[j];
+                    s.x[idx] = s.x[idx]-thetap*state.alphaq[j];
+                }
+                s.x[q] = s.x[q]+thetap;
+                if( dir<0 )
+                {
+                    s.x[p] = s.bndl[p];
+                }
+                else
+                {
+                    s.x[p] = s.bndu[p];
+                }
+            }
+            
+            //
+            // Update basis
+            //
+            basisupdatetrf(state.basis, state.at, p, q, state.alphaq, state.alphaqim, r, tau, settings, _params);
+            
+            //
+            // Recompute Z from scratch
+            //
+            s.z = 0;
+            for(k=0; k<=nx-1; k++)
+            {
+                s.z = s.z+s.effc[k]*s.x[k];
+            }
+            
+            //
+            // Increment state age
+            //
+            apserv.inc(ref s.stateage, _params);
+        }
+
+
+        /*************************************************************************
+        This function performs actual solution of dual simplex subproblem  (either
+        primary one or phase 1 one).
+
+        A problem with following properties is expected:
+        * M>0
+        * feasible box constraints
+        * dual feasible initial basis
+        * actual initial point XC and target value Z
+        * actual reduced cost vector D
+        * pricing weights being set to 1.0 or copied from previous problem
+
+        Returns:
+            * Info = +1 for success, -3 for infeasible
+            * IterationsCount is increased by amount of iterations performed
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void solvesubproblemdual(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            bool isphase1,
+            dualsimplexsettings settings,
+            ref int info,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int j = 0;
+            int bi = 0;
+            int nj = 0;
+            int p = 0;
+            int r = 0;
+            int q = 0;
+            double thetad = 0;
+            double thetap = 0;
+            double delta = 0;
+            double v = 0;
+            int j0 = 0;
+            int j1 = 0;
+            bool needrefresh = new bool();
+            double mx = 0;
+            double mxalpha = 0;
+            double mxeta = 0;
+
+            info = 0;
+
+            nn = s.ns;
+            nx = s.ns+s.m;
+            m = s.m;
+            
+            //
+            // Integrity checks
+            //
+            alglib.ap.assert(s.state==ssvalid, "SolveSubproblemDual: X is not valid");
+            alglib.ap.assert(m>0, "SolveSubproblemDual: M<=0");
+            for(i=0; i<=nx-1; i++)
+            {
+                alglib.ap.assert(s.bndt[i]!=ccinfeasible, "SolveSubproblemDual: infeasible box constraints");
+            }
+            alglib.ap.assert(isdualfeasible(state, s, _params), "SolveSubproblemDual: dual infeasible initial basis");
+            
+            //
+            // Actual processing
+            //
+            info = 0;
+            apserv.rvectorsetlengthatleast(ref state.tmp0, m, _params);
+            while( true )
+            {
+                
+                //
+                // Pricing
+                //
+                pricingstep(state, s, isphase1, ref p, ref r, ref delta, settings, _params);
+                if( (double)(delta)==(double)(0) )
+                {
+                    
+                    //
+                    // Do we have fresh factorization and state? If not,
+                    // refresh them prior to declaring that we have solution.
+                    //
+                    if( state.basis.trfage>0 || s.stateage>0 )
+                    {
+                        basisfreshtrf(state.basis, state.at, settings, _params);
+                        subproblemhandlexnupdate(state, s, _params);
+                        continue;
+                    }
+                    
+                    //
+                    // Solved! Feasible and bounded!
+                    //
+                    info = 1;
+                    return;
+                }
+                
+                //
+                // BTran
+                //
+                for(i=0; i<=m-1; i++)
+                {
+                    state.tmp0[i] = 0;
+                }
+                state.tmp0[r] = 1;
+                basissolvet(state.basis, state.tmp0, ref state.rhor, _params);
+                
+                //
+                // Pivot row
+                //
+                computeantv(state, s, state.rhor, ref state.alphar, _params);
+                
+                //
+                // Ratio test
+                //
+                ratiotest(state, s, state.alphar, delta, p, ref q, ref thetad, ref state.possibleflips, ref state.possibleflipscnt, settings, _params);
+                if( q<0 )
+                {
+                    
+                    //
+                    // Do we have fresh factorization and state? If not,
+                    // refresh them prior to declaring that we have no solution.
+                    //
+                    if( state.basis.trfage>0 || s.stateage>0 )
+                    {
+                        basisfreshtrf(state.basis, state.at, settings, _params);
+                        subproblemhandlexnupdate(state, s, _params);
+                        continue;
+                    }
+                    
+                    //
+                    // Dual unbounded, primal infeasible
+                    //
+                    info = -3;
+                    return;
+                }
+                
+                //
+                // FTran
+                //
+                // NOTE: AlphaQim is filled by intermediate FTran result which is useful
+                //       for Forest-Tomlin update scheme. If not Forest-Tomlin update is
+                //       used, then it is not set.
+                //
+                for(i=0; i<=m-1; i++)
+                {
+                    state.tmp0[i] = 0;
+                }
+                j0 = state.at.ridx[q];
+                j1 = state.at.ridx[q+1]-1;
+                for(j=j0; j<=j1; j++)
+                {
+                    state.tmp0[state.at.idx[j]] = state.at.vals[j];
+                }
+                basissolvex(state.basis, state.tmp0, ref state.alphaq, ref state.alphaqim, true, _params);
+                
+                //
+                // Check numerical accuracy, trigger refactorization if needed
+                //
+                if( state.basis.trfage>safetrfage )
+                {
+                    needrefresh = false;
+                    
+                    //
+                    // Compare Q-th entry of the pivot row AlphaR with R-th entry of the AlphaQ;
+                    // ideally, both should match exactly. The difference is a rough estimate
+                    // of the magnitude of the numerical errors.
+                    //
+                    mx = 0.0;
+                    for(i=0; i<=m-1; i++)
+                    {
+                        mx = Math.Max(mx, Math.Abs(state.alphaq[i]));
+                    }
+                    needrefresh = needrefresh || (double)(Math.Abs(state.alphaq[r]-state.alphar[q]))>(double)(alphatrigger*(1.0+mx));
+                    needrefresh = needrefresh || (double)(Math.Abs(state.alphaq[r]-state.alphar[q]))>(double)(alphatrigger2*Math.Abs(state.alphar[q]));
+                    
+                    //
+                    // Decide on refresh
+                    //
+                    if( needrefresh )
+                    {
+                        basisfreshtrf(state.basis, state.at, settings, _params);
+                        subproblemhandlexnupdate(state, s, _params);
+                        continue;
+                    }
+                }
+                
+                //
+                // One more FTRan for DSE weights (if needed)
+                //
+                alglib.ap.assert((settings.pricing==-1 || settings.pricing==0) || settings.pricing==1, "SolveSubproblemDual: unexpected Settings.Pricing");
+                if( settings.pricing==1 )
+                {
+                    basissolve(state.basis, state.rhor, ref state.tau, _params);
+                }
+                
+                //
+                // Basis change and update
+                //
+                thetap = delta/state.alphaq[r];
+                updatestep(state, s, p, q, r, delta, thetap, thetad, state.alphaq, state.alphaqim, state.alphar, state.tau, state.possibleflips, state.possibleflipscnt, settings, _params);
+                apserv.inc(ref state.repiterationscount, _params);
+                if( isphase1 )
+                {
+                    apserv.inc(ref state.repiterationscount1, _params);
+                }
+                else
+                {
+                    apserv.inc(ref state.repiterationscount2, _params);
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        This function solves simplex subproblem using primal simplex method.
+
+        A problem with following properties is expected:
+        * M>0
+        * feasible box constraints
+        * primal feasible initial basis
+        * actual initial point XC and target value Z
+        * actual reduced cost vector D
+        * pricing weights being set to 1.0 or copied from previous problem
+
+        Returns:
+            * Info = +1 for success, -3 for infeasible
+            * IterationsCount is increased by amount of iterations performed
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void solvesubproblemprimal(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            dualsimplexsettings settings,
+            ref int info,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int j = 0;
+            double v = 0;
+            double vmax = 0;
+            int bi = 0;
+            double dj = 0;
+            int bndt = 0;
+            int q = 0;
+            int p = 0;
+            int r = 0;
+            int dir = 0;
+            double lim = 0;
+            bool haslim = new bool();
+            double thetap = 0;
+            double xbnd = 0;
+            double flip = 0;
+            int canddir = 0;
+            double candlim = 0;
+            double candflip = 0;
+            int j0 = 0;
+            int j1 = 0;
+            double alphawave = 0;
+            double vp = 0;
+            double vb = 0;
+            double vx = 0;
+            double vtest = 0;
+            double vv = 0;
+
+            info = 0;
+
+            nn = s.ns;
+            nx = s.ns+s.m;
+            m = s.m;
+            
+            //
+            // Integrity checks
+            //
+            alglib.ap.assert(s.state==ssvalid, "SolveSubproblemPrimal: X is not valid");
+            alglib.ap.assert(m>0, "SolveSubproblemPrimal: M<=0");
+            for(i=0; i<=nx-1; i++)
+            {
+                alglib.ap.assert(s.bndt[i]!=ccinfeasible, "SolveSubproblemPrimal: infeasible box constraints");
+            }
+            
+            //
+            // Actual processing
+            //
+            info = 1;
+            apserv.rvectorsetlengthatleast(ref state.tmp0, m, _params);
+            while( true )
+            {
+                
+                //
+                // Primal simplex pricing step: we implement the very basic version
+                // of the pricing step because it is expected that primal simplex method
+                // is used just to apply quick correction after removal of the perturbation.
+                //
+                q = -1;
+                vmax = 0;
+                dir = 0;
+                lim = math.maxrealnumber;
+                haslim = false;
+                flip = 0;
+                for(i=0; i<=nn-1; i++)
+                {
+                    j = state.basis.nidx[i];
+                    dj = s.d[j];
+                    bndt = s.bndt[j];
+                    if( bndt==ccfixed )
+                    {
+                        continue;
+                    }
+                    if( bndt==ccrange )
+                    {
+                        v = 0;
+                        candlim = s.bndu[j]-s.bndl[j];
+                        candflip = 0;
+                        if( s.x[j]==s.bndl[j] )
+                        {
+                            v = -dj;
+                            canddir = 1;
+                            candflip = s.bndu[j];
+                        }
+                        if( s.x[j]==s.bndu[j] )
+                        {
+                            v = dj;
+                            canddir = -1;
+                            candflip = s.bndl[j];
+                        }
+                        if( v>vmax )
+                        {
+                            vmax = v;
+                            dir = canddir;
+                            lim = candlim;
+                            haslim = true;
+                            flip = candflip;
+                            q = j;
+                        }
+                        continue;
+                    }
+                    v = 0;
+                    canddir = 0;
+                    if( bndt==cclower )
+                    {
+                        v = -dj;
+                        canddir = 1;
+                    }
+                    if( bndt==ccupper )
+                    {
+                        v = dj;
+                        canddir = -1;
+                    }
+                    if( bndt==ccfree )
+                    {
+                        v = Math.Abs(dj);
+                        canddir = -Math.Sign(dj);
+                    }
+                    if( v>vmax )
+                    {
+                        vmax = v;
+                        dir = canddir;
+                        lim = math.maxrealnumber;
+                        haslim = false;
+                        q = j;
+                    }
+                    continue;
+                }
+                if( vmax<=dtol )
+                {
+                    
+                    //
+                    // Solved: primal and dual feasible!
+                    //
+                    return;
+                }
+                alglib.ap.assert(q>=0, "SolveSubproblemPrimal: integrity check failed");
+                
+                //
+                // FTran and textbook ratio test (again, we expect primal phase to terminate quickly)
+                //
+                // NOTE: AlphaQim is filled by intermediate FTran result which is useful
+                //       for Forest-Tomlin update scheme. If not Forest-Tomlin update is
+                //       used, then it is not set.
+                //
+                for(i=0; i<=m-1; i++)
+                {
+                    state.tmp0[i] = 0;
+                }
+                j0 = state.at.ridx[q];
+                j1 = state.at.ridx[q+1]-1;
+                for(j=j0; j<=j1; j++)
+                {
+                    state.tmp0[state.at.idx[j]] = state.at.vals[j];
+                }
+                basissolvex(state.basis, state.tmp0, ref state.alphaq, ref state.alphaqim, true, _params);
+                vp = settings.pivottol;
+                p = -1;
+                r = -1;
+                thetap = 0;
+                xbnd = 0;
+                for(i=0; i<=m-1; i++)
+                {
+                    bi = state.basis.idx[i];
+                    alphawave = -(dir*state.alphaq[i]);
+                    vx = s.x[bi];
+                    if( alphawave<-vp && hasbndl(s, bi, _params) )
+                    {
+                        vb = s.bndl[bi];
+                        if( vx<=vb )
+                        {
+                            
+                            //
+                            // X[Bi] is already out of bounds due to rounding errors, perform shifting
+                            //
+                            vb = vx-shiftlen;
+                            s.bndl[bi] = vx;
+                        }
+                        vtest = (vb-vx)/alphawave;
+                        if( p<0 || vtest<thetap )
+                        {
+                            p = bi;
+                            r = i;
+                            thetap = vtest;
+                            xbnd = vb;
+                        }
+                    }
+                    if( alphawave>vp && hasbndu(s, bi, _params) )
+                    {
+                        vb = s.bndu[bi];
+                        if( vx>=vb )
+                        {
+                            
+                            //
+                            // X[Bi] is already out of bounds due to rounding errors, perform shifting
+                            //
+                            vb = vx+shiftlen;
+                            s.bndu[bi] = vb;
+                        }
+                        vtest = (vb-vx)/alphawave;
+                        if( p<0 || vtest<thetap )
+                        {
+                            p = bi;
+                            r = i;
+                            thetap = vtest;
+                            xbnd = vb;
+                        }
+                    }
+                }
+                if( p<0 && !haslim )
+                {
+                    
+                    //
+                    // Primal unbounded
+                    //
+                    info = -4;
+                    return;
+                }
+                
+                //
+                // Update step
+                //
+                if( p>=0 && (!haslim || thetap<lim) )
+                {
+                    
+                    //
+                    // One of the basic variables hit the boundary and become non-basic.
+                    //
+                    // Perform update:
+                    // * update basic elements of X[] (X[p] is explicitly set to the
+                    //   boundary value) and X[q]
+                    // * update target value Z
+                    // * update factorization
+                    // * update D[]
+                    //
+                    apserv.rvectorsetlengthatleast(ref state.tmp0, m, _params);
+                    v = 0;
+                    for(i=0; i<=m-1; i++)
+                    {
+                        bi = state.basis.idx[i];
+                        vv = thetap*(dir*state.alphaq[i]);
+                        v = v-s.effc[bi]*vv;
+                        s.x[bi] = s.x[bi]-vv;
+                    }
+                    s.x[p] = xbnd;
+                    s.x[q] = s.x[q]+dir*thetap;
+                    v = v+s.effc[q]*dir*thetap;
+                    s.z = s.z+v;
+                    for(i=0; i<=m-1; i++)
+                    {
+                        state.tmp0[i] = 0;
+                    }
+                    basisupdatetrf(state.basis, state.at, p, q, state.alphaq, state.alphaqim, r, state.tmp0, settings, _params);
+                    for(i=0; i<=m-1; i++)
+                    {
+                        state.tmp0[i] = s.effc[state.basis.idx[i]];
+                    }
+                    basissolvet(state.basis, state.tmp0, ref state.tmp1, _params);
+                    computeantv(state, s, state.tmp1, ref s.d, _params);
+                    for(i=0; i<=nn-1; i++)
+                    {
+                        j = state.basis.nidx[i];
+                        s.d[j] = s.effc[j]-s.d[j];
+                    }
+                }
+                else
+                {
+                    
+                    //
+                    // Basis does not change because Qth variable flips from one bound
+                    // to another one long before we encounter the boundary
+                    //
+                    v = s.z+(flip-s.x[q])*s.effc[q];
+                    s.x[q] = flip;
+                    for(i=0; i<=m-1; i++)
+                    {
+                        bi = state.basis.idx[i];
+                        vv = lim*(dir*state.alphaq[i]);
+                        v = v-s.effc[bi]*vv;
+                        s.x[bi] = s.x[bi]-vv;
+                    }
+                    s.z = v;
+                }
+                apserv.inc(ref s.stateage, _params);
+                apserv.inc(ref state.repiterationscount, _params);
+                apserv.inc(ref state.repiterationscount3, _params);
+            }
+        }
+
+
+        /*************************************************************************
+        This function estimates feasibility properties of the  current  basis  and
+        invokes phase 1 if necessary.
+
+        A problem with following properties is expected:
+        * M>0
+        * feasible box constraints
+        * some initial basis (can be dual infeasible) with actual factorization
+        * actual initial point XC and target value Z
+        * actual reduced cost vector D
+
+        It returns:
+        * +1 if dual feasible basis was found
+        * -4 if problem is dual infeasible
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void invokephase1(dualsimplexstate state,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int cntnonboxed = 0;
+            int j0 = 0;
+            int j1 = 0;
+
+            nn = state.primary.ns;
+            nx = state.primary.ns+state.primary.m;
+            m = state.primary.m;
+            state.repterminationtype = 0;
+            
+            //
+            // Integrity checks
+            //
+            alglib.ap.assert(state.primary.state==ssvalid, "InvokePhase1: invalid primary X");
+            alglib.ap.assert(m>0, "InvokePhase1: M<=0");
+            
+            //
+            // Is it dual feasible from the very beginning (or maybe after initial DFC)?
+            //
+            if( (double)(initialdualfeasibilitycorrection(state, state.primary, settings, _params))<=(double)(dtol) )
+            {
+                state.repterminationtype = 1;
+                return;
+            }
+            
+            //
+            // Solve phase #1 subproblem
+            //
+            subprobleminitphase1(state.primary, state.phase1, _params);
+            initialdualfeasibilitycorrection(state, state.phase1, settings, _params);
+            solvesubproblemdual(state, state.phase1, true, settings, ref state.repterminationtype, _params);
+            alglib.ap.assert(state.repterminationtype>0, "DualSimplexSolver: unexpected failure of phase #1");
+            state.repterminationtype = 1;
+            
+            //
+            // Setup initial basis for phase #2 using solution of phase #1
+            //
+            subprobleminferinitialxn(state, state.primary, _params);
+            if( (double)(initialdualfeasibilitycorrection(state, state.primary, settings, _params))>(double)(dtol) )
+            {
+                state.repterminationtype = -4;
+                return;
+            }
+            state.repterminationtype = 1;
+        }
+
+
+        /*************************************************************************
+        Box-constrained solver; sets State.RepX, State.RepStats and State.RepTerminationType,
+        does not change other fields.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void solveboxonly(dualsimplexstate state,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int ns = 0;
+
+            ns = state.primary.ns;
+            alglib.ap.assert(state.primary.m==0, "SolveBoxOnly: integrity check failed");
+            for(i=0; i<=ns-1; i++)
+            {
+                
+                //
+                // Handle infeasible variable
+                //
+                if( state.primary.bndt[i]==ccinfeasible )
+                {
+                    state.repterminationtype = -3;
+                    setzeroxystats(state, _params);
+                    return;
+                }
+                
+                //
+                // Handle fixed variable
+                //
+                if( state.primary.bndt[i]==ccfixed )
+                {
+                    state.repx[i] = state.primary.bndl[i];
+                    state.repstats[i] = -1;
+                    continue;
+                }
+                
+                //
+                // Handle non-zero cost component
+                //
+                if( (double)(state.primary.rawc[i])>(double)(0) )
+                {
+                    if( state.primary.bndt[i]!=ccrange && state.primary.bndt[i]!=cclower )
+                    {
+                        state.repterminationtype = -4;
+                        setzeroxystats(state, _params);
+                        return;
+                    }
+                    state.repx[i] = state.primary.bndl[i];
+                    state.repstats[i] = -1;
+                    continue;
+                }
+                if( (double)(state.primary.rawc[i])<(double)(0) )
+                {
+                    if( state.primary.bndt[i]!=ccrange && state.primary.bndt[i]!=ccupper )
+                    {
+                        state.repterminationtype = -4;
+                        setzeroxystats(state, _params);
+                        return;
+                    }
+                    state.repx[i] = state.primary.bndu[i];
+                    state.repstats[i] = 1;
+                    continue;
+                }
+                
+                //
+                // Handle non-free variable with zero cost component
+                //
+                if( state.primary.bndt[i]==ccupper || state.primary.bndt[i]==ccrange )
+                {
+                    state.repx[i] = state.primary.bndu[i];
+                    state.repstats[i] = 1;
+                    continue;
+                }
+                if( state.primary.bndt[i]==cclower )
+                {
+                    state.repx[i] = state.primary.bndl[i];
+                    state.repstats[i] = -1;
+                    continue;
+                }
+                
+                //
+                // Free variable, zero cost component
+                //
+                alglib.ap.assert(state.primary.bndt[i]==ccfree, "DSSOptimize: integrity check failed");
+                state.repx[i] = 0;
+                state.repstats[i] = 0;
+            }
+        }
+
+
+        /*************************************************************************
+        Zero-fill RepX, RepY, RepStats.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void setzeroxystats(dualsimplexstate state,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            for(i=0; i<=state.primary.ns-1; i++)
+            {
+                state.repx[i] = 0;
+            }
+            for(i=0; i<=state.primary.m-1; i++)
+            {
+                state.repy[i] = 0;
+            }
+            for(i=0; i<=state.primary.ns+state.primary.m-1; i++)
+            {
+                state.repstats[i] = 0;
+            }
+        }
+
+
+        /*************************************************************************
+        This function initializes basis structure; no triangular factorization is
+        prepared yet. Previously allocated memory is reused.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisinit(int ns,
+            int m,
+            dualsimplexbasis s,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            s.ns = ns;
+            s.m = m;
+            apserv.ivectorgrowto(ref s.idx, m, _params);
+            apserv.ivectorgrowto(ref s.nidx, ns, _params);
+            apserv.bvectorgrowto(ref s.isbasic, ns+m, _params);
+            for(i=0; i<=ns-1; i++)
+            {
+                s.nidx[i] = i;
+                s.isbasic[i] = false;
+            }
+            for(i=0; i<=m-1; i++)
+            {
+                s.idx[i] = ns+i;
+                s.isbasic[ns+i] = true;
+            }
+            s.trftype = 3;
+            s.trfage = 0;
+            s.isvalidtrf = false;
+            apserv.rvectorsetlengthatleast(ref s.dseweights, m, _params);
+            for(i=0; i<=m-1; i++)
+            {
+                s.dseweights[i] = 1.0;
+            }
+            s.dsevalid = false;
+        }
+
+
+        /*************************************************************************
+        This function resizes basis. It is assumed that constraint matrix is
+        completely overwritten by new one, but both matrices are similar enough
+        so we can reuse previous basis.
+
+        Dual steepest edge weights are invalidated by this function.
+
+        Following types of resize are supported:
+        * new basis size is larger than previous one => logical elements are
+          added to the new basis
+        * basis sizes match => no operation is performed
+        * new basis size is zero => basis is set to zero
+        * in all cases this function invalidates triangular factorization
+
+        IMPORTANT: if smooth resize is not possible, this function throws an
+                   exception! It is responsibility of the caller to check that
+                   smooth resize is possible
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisresize(dualsimplexbasis s,
+            int newm,
+            alglib.xparams _params)
+        {
+            int ns = 0;
+            int oldm = 0;
+            int i = 0;
+
+            ns = s.ns;
+            oldm = s.m;
+            if( newm==oldm )
+            {
+                s.isvalidtrf = false;
+                s.dsevalid = false;
+                return;
+            }
+            if( newm==0 )
+            {
+                basisinit(ns, 0, s, _params);
+                return;
+            }
+            if( newm>oldm )
+            {
+                
+                //
+                // Growth
+                //
+                s.m = newm;
+                apserv.ivectorgrowto(ref s.idx, newm, _params);
+                apserv.bvectorgrowto(ref s.isbasic, ns+newm, _params);
+                for(i=oldm; i<=newm-1; i++)
+                {
+                    s.idx[i] = ns+i;
+                    s.isbasic[ns+i] = true;
+                }
+                s.isvalidtrf = false;
+                apserv.rvectorgrowto(ref s.dseweights, newm, _params);
+                for(i=0; i<=newm-1; i++)
+                {
+                    s.dseweights[i] = 1.0;
+                }
+                s.dsevalid = false;
+                return;
+            }
+            alglib.ap.assert(false, "BasisResize: not possible to decrease basis size");
+        }
+
+
+        /*************************************************************************
+        This function copies basis and its triangular factorization to the new
+        instance (which can be unitialized).
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basiscopy(dualsimplexbasis s0,
+            dualsimplexbasis s1,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            s1.ns = s0.ns;
+            s1.m = s0.m;
+            apserv.copyintegerarray(s0.idx, ref s1.idx, _params);
+            apserv.copyintegerarray(s0.nidx, ref s1.nidx, _params);
+            apserv.copybooleanarray(s0.isbasic, ref s1.isbasic, _params);
+            s1.isvalidtrf = s0.isvalidtrf;
+            s1.trftype = s0.trftype;
+            s1.trfage = s0.trfage;
+            alglib.ap.assert(((s0.trftype==0 || s0.trftype==1) || s0.trftype==2) || s0.trftype==3, "BasisCopy: unknown TRF type");
+            sparse.sparsecopybuf(s0.sparsel, s1.sparsel, _params);
+            sparse.sparsecopybuf(s0.sparseu, s1.sparseu, _params);
+            apserv.copyrealmatrix(s0.denselu, ref s1.denselu, _params);
+            apserv.copyintegerarray(s0.rowpermpiv, ref s1.rowpermpiv, _params);
+            apserv.copyintegerarray(s0.rowpermfwd, ref s1.rowpermfwd, _params);
+            apserv.copyintegerarray(s0.rowpermbwd, ref s1.rowpermbwd, _params);
+            apserv.copyintegerarray(s0.densepright, ref s1.densepright, _params);
+            apserv.copyrealarray(s0.densepfieta, ref s1.densepfieta, _params);
+            apserv.copyintegerarray(s0.rk, ref s1.rk, _params);
+            apserv.copyintegerarray(s0.dk, ref s1.dk, _params);
+            apserv.copyrealarray(s0.dseweights, ref s1.dseweights, _params);
+            s1.dsevalid = s0.dsevalid;
+        }
+
+
+        /*************************************************************************
+        This function exports division of variables into basic/nonbasic ones; only
+        basic/nonbasic sets are exported - triangular factorization is NOT exported.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisexportto(dualsimplexbasis s0,
+            dualsimplexbasis s1,
+            alglib.xparams _params)
+        {
+            s1.ns = s0.ns;
+            s1.m = s0.m;
+            apserv.copyintegerarray(s0.idx, ref s1.idx, _params);
+            apserv.copyintegerarray(s0.nidx, ref s1.nidx, _params);
+            apserv.copybooleanarray(s0.isbasic, ref s1.isbasic, _params);
+            s1.isvalidtrf = false;
+            s1.trftype = -1;
+            s1.dsevalid = false;
+        }
+
+
+        /*************************************************************************
+        This function imports from S1 to S0 a division of variables into
+        basic/nonbasic ones; only basic/nonbasic sets are imported;
+        triangular factorization is not imported.
+
+        IMPORTANT: if metrics of S0 and S1 do not match, an exception will be generated.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisimportfrom(dualsimplexbasis s0,
+            dualsimplexbasis s1,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            alglib.ap.assert(s0.ns==s1.ns, "BasisImportFrom: structural variable counts do not match");
+            s0.m = s1.m;
+            for(i=0; i<=s0.m-1; i++)
+            {
+                s0.idx[i] = s1.idx[i];
+            }
+            for(i=0; i<=s0.ns-1; i++)
+            {
+                s0.nidx[i] = s1.nidx[i];
+            }
+            for(i=0; i<=s0.m+s0.ns-1; i++)
+            {
+                s0.isbasic[i] = s1.isbasic[i];
+            }
+            s0.isvalidtrf = false;
+            apserv.rvectorsetlengthatleast(ref s0.dseweights, s1.m, _params);
+            for(i=0; i<=s1.m-1; i++)
+            {
+                s0.dseweights[i] = 1.0;
+            }
+            s0.dsevalid = false;
+        }
+
+
+        /*************************************************************************
+        This function invalidates triangular factorization stored in the basis.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisinvalidatetrf(dualsimplexbasis s,
+            alglib.xparams _params)
+        {
+            s.isvalidtrf = false;
+        }
+
+
+        /*************************************************************************
+        This function computes fresh triangular factorization.
+
+        If TRF of age 0 (fresh) is already present, no new factorization is calculated.
+        Use BasisInvalidateTrf() to invalidate factorization.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisfreshtrf(dualsimplexbasis s,
+            sparse.sparsematrix at,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int m = 0;
+            int ns = 0;
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            int j0 = 0;
+            int j1 = 0;
+            int k1 = 0;
+            int nzl = 0;
+            int nzu = 0;
+            int nlogical = 0;
+            int nstructural = 0;
+            int offs = 0;
+            int offs1 = 0;
+            int offs2 = 0;
+            double vdiag = 0;
+            double v = 0;
+
+            m = s.m;
+            ns = s.ns;
+            
+            //
+            // Compare TRF type with one required by settings, invalidation and refresh otherwise
+            //
+            if( s.trftype!=settings.trftype )
+            {
+                s.trftype = settings.trftype;
+                s.isvalidtrf = false;
+                basisfreshtrf(s, at, settings, _params);
+                return;
+            }
+            
+            //
+            // Is it valid and fresh?
+            //
+            if( s.isvalidtrf && s.trfage==0 )
+            {
+                return;
+            }
+            
+            //
+            // Dense TRF
+            //
+            if( s.trftype==0 || s.trftype==1 )
+            {
+                apserv.ivectorsetlengthatleast(ref s.densepright, m, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    s.densepright[i] = i;
+                }
+                apserv.rmatrixsetlengthatleast(ref s.denselu, m, m, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    for(j=0; j<=m-1; j++)
+                    {
+                        s.denselu[i,j] = 0;
+                    }
+                }
+                for(i=0; i<=m-1; i++)
+                {
+                    j0 = at.ridx[s.idx[i]];
+                    j1 = at.ridx[s.idx[i]+1]-1;
+                    for(j=j0; j<=j1; j++)
+                    {
+                        s.denselu[i,at.idx[j]] = at.vals[j];
+                    }
+                }
+                trfac.rmatrixlu(ref s.denselu, m, m, ref s.rowpermpiv, _params);
+                pivottofwdbwd(s.rowpermpiv, m, ref s.rowpermfwd, ref s.rowpermbwd, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    alglib.ap.assert((double)(s.denselu[i,i])!=(double)(0.0), "BasisFreshTrf: degeneracy of B is detected");
+                }
+                s.isvalidtrf = true;
+                s.trfage = 0;
+                return;
+            }
+            
+            //
+            // Sparse TRF (with either PFI or Forest-Tomlin)
+            //
+            if( s.trftype==2 || s.trftype==3 )
+            {
+                
+                //
+                // Determine permutation which moves logical variables
+                // to the beginning.
+                //
+                // After this block is done we have following arrays:
+                // * tRIdx[i] and tCIdx[j], which tell what columns/rows are located
+                //   at positions i/j of the reordered matrix
+                // * tRInvIdx[i] and tCInvIdx[j], which tell where columns/rows i/j of
+                //   the original matrix are located in the reordered matrix
+                // * DensePRight[], a permutation of columns
+                // * RowPermPiv[], a permutation of rows, only elements [0,NLogical) are filled
+                //
+                apserv.ivectorsetlengthatleast(ref s.tridx, m, _params);
+                apserv.ivectorsetlengthatleast(ref s.tcidx, m, _params);
+                apserv.ivectorsetlengthatleast(ref s.tcinvidx, m, _params);
+                apserv.ivectorsetlengthatleast(ref s.trinvidx, m, _params);
+                apserv.ivectorsetlengthatleast(ref s.rowpermpiv, m, _params);
+                apserv.ivectorsetlengthatleast(ref s.densepright, m, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    s.densepright[i] = i;
+                    s.tridx[i] = i;
+                    s.tcidx[i] = i;
+                    s.trinvidx[i] = i;
+                    s.tcinvidx[i] = i;
+                }
+                nlogical = 0;
+                for(i=0; i<=m-1; i++)
+                {
+                    if( s.idx[i]>=ns )
+                    {
+                        s.rowpermpiv[nlogical] = i;
+                        j = s.tridx[i];
+                        s.tridx[i] = s.tridx[nlogical];
+                        s.tridx[nlogical] = j;
+                        s.trinvidx[s.tridx[nlogical]] = nlogical;
+                        s.trinvidx[s.tridx[i]] = i;
+                        j1 = s.tcinvidx[s.idx[i]-ns];
+                        s.densepright[nlogical] = j1;
+                        j = s.tcidx[j1];
+                        s.tcidx[j1] = s.tcidx[nlogical];
+                        s.tcidx[nlogical] = j;
+                        s.tcinvidx[s.tcidx[nlogical]] = nlogical;
+                        s.tcinvidx[s.tcidx[j1]] = j1;
+                        nlogical = nlogical+1;
+                    }
+                }
+                nstructural = m-nlogical;
+                
+                //
+                // Prepare SparseLU1 to receive factored out logical part of the matrix
+                // and SparseLU2 to receive structural part of the matrix.
+                //
+                apserv.ivectorsetlengthatleast(ref s.sparselu1.ridx, nstructural+1, _params);
+                apserv.ivectorsetlengthatleast(ref s.sparselu1.didx, nstructural, _params);
+                apserv.ivectorsetlengthatleast(ref s.sparselu1.uidx, nstructural, _params);
+                s.sparselu1.matrixtype = 1;
+                s.sparselu1.m = nstructural;
+                s.sparselu1.n = nlogical;
+                s.sparselu1.ridx[0] = 0;
+                apserv.ivectorsetlengthatleast(ref s.sparselu2.ridx, nstructural+1, _params);
+                apserv.ivectorsetlengthatleast(ref s.sparselu2.didx, nstructural, _params);
+                apserv.ivectorsetlengthatleast(ref s.sparselu2.uidx, nstructural, _params);
+                s.sparselu2.matrixtype = 1;
+                s.sparselu2.m = nstructural;
+                s.sparselu2.n = nstructural;
+                s.sparselu2.ridx[0] = 0;
+                
+                //
+                // Reorder array, perform LU factorization
+                //
+                for(k=0; k<=nstructural-1; k++)
+                {
+                    
+                    //
+                    // Make sure SparseLU1 and SparseLU2 have enough place.
+                    //
+                    offs1 = s.sparselu1.ridx[k];
+                    offs2 = s.sparselu2.ridx[k];
+                    apserv.ivectorgrowto(ref s.sparselu1.idx, offs1+m, _params);
+                    apserv.rvectorgrowto(ref s.sparselu1.vals, offs1+m, _params);
+                    apserv.ivectorgrowto(ref s.sparselu2.idx, offs2+m, _params);
+                    apserv.rvectorgrowto(ref s.sparselu2.vals, offs2+m, _params);
+                    
+                    //
+                    // Extract K-th row of the SparseLU1/2 (I-th row of the original matrix)
+                    //
+                    i = s.tridx[k+nlogical];
+                    j0 = at.ridx[s.idx[i]];
+                    j1 = at.ridx[s.idx[i]+1]-1;
+                    for(j=j0; j<=j1; j++)
+                    {
+                        k1 = s.tcinvidx[at.idx[j]];
+                        if( k1<nlogical )
+                        {
+                            
+                            //
+                            // Append element to SparseLU1
+                            //
+                            s.sparselu1.idx[offs1] = k1;
+                            s.sparselu1.vals[offs1] = at.vals[j];
+                            offs1 = offs1+1;
+                        }
+                        else
+                        {
+                            
+                            //
+                            // Append element to SparseLU2
+                            //
+                            s.sparselu2.idx[offs2] = k1-nlogical;
+                            s.sparselu2.vals[offs2] = at.vals[j];
+                            offs2 = offs2+1;
+                        }
+                    }
+                    
+                    //
+                    // Elements added to the row can be unordered.
+                    // Sort new row, store it.
+                    //
+                    tsort.tagsortmiddleir(ref s.sparselu1.idx, ref s.sparselu1.vals, s.sparselu1.ridx[k], offs1-s.sparselu1.ridx[k], _params);
+                    tsort.tagsortmiddleir(ref s.sparselu2.idx, ref s.sparselu2.vals, s.sparselu2.ridx[k], offs2-s.sparselu2.ridx[k], _params);
+                    s.sparselu1.ridx[k+1] = offs1;
+                    s.sparselu2.ridx[k+1] = offs2;
+                }
+                s.sparselu1.ninitialized = s.sparselu1.ridx[nstructural];
+                s.sparselu2.ninitialized = s.sparselu2.ridx[nstructural];
+                sparse.sparseinitduidx(s.sparselu1, _params);
+                sparse.sparseinitduidx(s.sparselu2, _params);
+                if( nstructural>0 )
+                {
+                    sptrf.sptrfplu(s.sparselu2, 1, ref s.densep2, ref s.densep2c, s.lubuf, _params);
+                    for(i=0; i<=nstructural-1; i++)
+                    {
+                        s.rowpermpiv[i+nlogical] = s.densep2[i]+nlogical;
+                        s.densepright[i+nlogical] = s.densep2c[i]+nlogical;
+                    }
+                    
+                    //
+                    // Process L factor:
+                    //
+                    // 1. count number of non-zeros in the L factor,
+                    // 2. fill NLogical*NLogical leading block
+                    // 3. NStructural*M bottom block
+                    //
+                    nzl = nlogical;
+                    for(i=0; i<=nstructural-1; i++)
+                    {
+                        k = s.lubuf.rowperm.rawidx[i];
+                        nzl = nzl+(s.sparselu1.ridx[k+1]-s.sparselu1.ridx[k]);
+                        nzl = nzl+1+(s.sparselu2.didx[i]-s.sparselu2.ridx[i]);
+                    }
+                    apserv.rvectorsetlengthatleast(ref s.sparsel.vals, nzl, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparsel.idx, nzl, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparsel.ridx, m+1, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparsel.didx, m, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparsel.uidx, m, _params);
+                    s.sparsel.matrixtype = 1;
+                    s.sparsel.m = m;
+                    s.sparsel.n = m;
+                    s.sparsel.ninitialized = nzl;
+                    s.sparsel.ridx[0] = 0;
+                    for(i=0; i<=nlogical-1; i++)
+                    {
+                        s.sparsel.idx[i] = i;
+                        s.sparsel.vals[i] = 1.0;
+                        s.sparsel.ridx[i+1] = i+1;
+                    }
+                    for(i=0; i<=nstructural-1; i++)
+                    {
+                        offs = s.sparsel.ridx[nlogical+i];
+                        k = s.lubuf.rowperm.rawidx[i];
+                        j0 = s.sparselu1.ridx[k];
+                        j1 = s.sparselu1.ridx[k+1]-1;
+                        for(j=j0; j<=j1; j++)
+                        {
+                            s.sparsel.idx[offs] = s.sparselu1.idx[j];
+                            s.sparsel.vals[offs] = -s.sparselu1.vals[j];
+                            offs = offs+1;
+                        }
+                        j0 = s.sparselu2.ridx[i];
+                        j1 = s.sparselu2.didx[i]-1;
+                        for(j=j0; j<=j1; j++)
+                        {
+                            s.sparsel.idx[offs] = nlogical+s.sparselu2.idx[j];
+                            s.sparsel.vals[offs] = s.sparselu2.vals[j];
+                            offs = offs+1;
+                        }
+                        s.sparsel.idx[offs] = nlogical+i;
+                        s.sparsel.vals[offs] = 1.0;
+                        offs = offs+1;
+                        s.sparsel.ridx[nlogical+i+1] = offs;
+                    }
+                    alglib.ap.assert(s.sparsel.ninitialized==s.sparsel.ridx[m], "BasisFreshTrf: integrity check failed");
+                    sparse.sparseinitduidx(s.sparsel, _params);
+                    
+                    //
+                    // Process U factor:
+                    //
+                    // 1. count number of non-zeros in the U factor,
+                    // 2. fill NLogical*NLogical leading block
+                    // 3. NStructural*NStructural bottom block
+                    //
+                    nzu = nlogical;
+                    for(i=0; i<=nstructural-1; i++)
+                    {
+                        nzu = nzu+(s.sparselu2.ridx[i+1]-s.sparselu2.didx[i]);
+                    }
+                    apserv.rvectorsetlengthatleast(ref s.sparseu.vals, nzu, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparseu.idx, nzu, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparseu.ridx, m+1, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparseu.didx, m, _params);
+                    apserv.ivectorsetlengthatleast(ref s.sparseu.uidx, m, _params);
+                    s.sparseu.matrixtype = 1;
+                    s.sparseu.m = m;
+                    s.sparseu.n = m;
+                    s.sparseu.ninitialized = nzu;
+                    s.sparseu.ridx[0] = 0;
+                    for(i=0; i<=nlogical-1; i++)
+                    {
+                        s.sparseu.idx[i] = i;
+                        s.sparseu.vals[i] = -1.0;
+                        s.sparseu.ridx[i+1] = i+1;
+                    }
+                    for(i=0; i<=nstructural-1; i++)
+                    {
+                        offs = s.sparseu.ridx[nlogical+i];
+                        alglib.ap.assert(s.sparselu2.didx[i]<s.sparselu2.uidx[i] && s.sparselu2.vals[s.sparselu2.didx[i]]!=0, "BasisFreshTrf: degeneracy of B is detected");
+                        j0 = s.sparselu2.didx[i];
+                        j1 = s.sparselu2.ridx[i+1]-1;
+                        for(j=j0; j<=j1; j++)
+                        {
+                            s.sparseu.idx[offs] = nlogical+s.sparselu2.idx[j];
+                            s.sparseu.vals[offs] = s.sparselu2.vals[j];
+                            offs = offs+1;
+                        }
+                        s.sparseu.ridx[nlogical+i+1] = offs;
+                    }
+                    alglib.ap.assert(s.sparseu.ninitialized==s.sparseu.ridx[m], "BasisFreshTrf: integrity check failed");
+                    sparse.sparseinitduidx(s.sparseu, _params);
+                }
+                else
+                {
+                    apserv.ivectorsetlengthatleast(ref s.nrs, m, _params);
+                    for(i=0; i<=m-1; i++)
+                    {
+                        s.nrs[i] = 1;
+                    }
+                    sparse.sparsecreatecrsbuf(m, m, s.nrs, s.sparsel, _params);
+                    for(i=0; i<=nlogical-1; i++)
+                    {
+                        sparse.sparseset(s.sparsel, i, i, 1.0, _params);
+                    }
+                    sparse.sparsecreatecrsbuf(m, m, s.nrs, s.sparseu, _params);
+                    for(i=0; i<=nlogical-1; i++)
+                    {
+                        sparse.sparseset(s.sparseu, i, i, -1.0, _params);
+                    }
+                }
+                pivottofwdbwd(s.rowpermpiv, m, ref s.rowpermfwd, ref s.rowpermbwd, _params);
+                s.isvalidtrf = true;
+                s.trfage = 0;
+                return;
+            }
+            
+            //
+            //
+            //
+            alglib.ap.assert(false, "BasisFreshTrf: only dense TRF");
+        }
+
+
+        /*************************************************************************
+        This function fills S.DSEWeights by actual weights according to current
+        settings and sets validity flag.
+
+        Basis object MUST store valid triangular factorization, otherwise this
+        function throws an exception.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisrequestweights(dualsimplexbasis s,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int m = 0;
+            int ns = 0;
+            int i = 0;
+            int j = 0;
+            double v = 0;
+            double vv = 0;
+
+            m = s.m;
+            ns = s.ns;
+            alglib.ap.assert((settings.pricing==-1 || settings.pricing==0) || settings.pricing==1, "BasisRequestWeights: unknown pricing type");
+            alglib.ap.assert(s.isvalidtrf, "BasisRequestWeights: factorization is not computed prior to calling this function");
+            
+            //
+            // If weights are valid, return immediately
+            //
+            if( s.dsevalid )
+            {
+                return;
+            }
+            
+            //
+            // Compute weights from scratch
+            //
+            if( settings.pricing==-1 || settings.pricing==1 )
+            {
+                for(i=0; i<=m-1; i++)
+                {
+                    if( s.idx[i]<ns )
+                    {
+                        
+                        //
+                        // Structural variable, DSE weight is computed by definition
+                        //
+                        apserv.rvectorsetlengthatleast(ref s.wtmp0, m, _params);
+                        apserv.rvectorsetlengthatleast(ref s.wtmp1, m, _params);
+                        for(j=0; j<=m-1; j++)
+                        {
+                            s.wtmp0[j] = 0;
+                        }
+                        s.wtmp0[i] = 1;
+                        basissolvet(s, s.wtmp0, ref s.wtmp1, _params);
+                        v = 0;
+                        for(j=0; j<=m-1; j++)
+                        {
+                            vv = s.wtmp1[j];
+                            v = v+vv*vv;
+                        }
+                        s.dseweights[i] = v;
+                    }
+                    else
+                    {
+                        
+                        //
+                        // Logical variable, weight can be set to 1.0
+                        //
+                        s.dseweights[i] = 1.0;
+                    }
+                }
+                s.dsevalid = true;
+                return;
+            }
+            
+            //
+            // Compute weights from scratch
+            //
+            if( settings.pricing==0 )
+            {
+                for(i=0; i<=m-1; i++)
+                {
+                    s.dseweights[i] = 1.0;
+                }
+                s.dsevalid = true;
+                return;
+            }
+            alglib.ap.assert(false, "BasisRequestWeights: unexpected pricing type");
+        }
+
+
+        /*************************************************************************
+        This function updates triangular factorization by adding Q  to  basis  and
+        removing P from basis. It also updates index tables IsBasic[], BasicIdx[],
+        Basis.NIdx[].
+
+        AlphaQim contains intermediate result from Ftran for AlphaQ, it is used
+        by Forest-Tomlin update scheme. If other update is used, it is not referenced
+        at all.
+
+        X[], D[], Z are NOT recomputed.
+
+        Tau is used if Settings.Pricing=1, ignored otherwise.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basisupdatetrf(dualsimplexbasis s,
+            sparse.sparsematrix at,
+            int p,
+            int q,
+            double[] alphaq,
+            double[] alphaqim,
+            int r,
+            double[] tau,
+            dualsimplexsettings settings,
+            alglib.xparams _params)
+        {
+            int m = 0;
+            int nn = 0;
+            int i = 0;
+            int j = 0;
+            bool processed = new bool();
+            double invaq = 0;
+            int dstoffs = 0;
+            int srcoffs = 0;
+            int srcidx = 0;
+            double srcval = 0;
+            double vcorner = 0;
+            int idxd = 0;
+            int k = 0;
+            double v = 0;
+            int j0 = 0;
+            int j1 = 0;
+
+            m = s.m;
+            nn = s.ns;
+            
+            //
+            // Update index tables
+            //
+            // TODO: better code!!!!!!!!!!!!!!!!!!!!!!!
+            //
+            s.isbasic[p] = false;
+            s.isbasic[q] = true;
+            for(i=0; i<=m-1; i++)
+            {
+                if( s.idx[i]==p )
+                {
+                    s.idx[i] = q;
+                    break;
+                }
+            }
+            for(i=0; i<=nn-1; i++)
+            {
+                if( s.nidx[i]==q )
+                {
+                    s.nidx[i] = p;
+                    break;
+                }
+            }
+            
+            //
+            // Update dense factorization
+            //
+            if( ((s.trftype!=settings.trftype || s.trftype==0) || !s.isvalidtrf) || s.trfage>=settings.maxtrfage )
+            {
+                
+                //
+                // Complete refresh is needed for factorization
+                //
+                s.isvalidtrf = false;
+                basisfreshtrf(s, at, settings, _params);
+            }
+            else
+            {
+                processed = false;
+                if( (s.trftype==0 || s.trftype==1) || s.trftype==2 )
+                {
+                    
+                    //
+                    // Dense/sparse factorizations with dense PFI
+                    //
+                    alglib.ap.assert((double)(alphaq[r])!=(double)(0), "BasisUpdateTrf: integrity check failed, AlphaQ[R]=0");
+                    apserv.rvectorgrowto(ref s.densepfieta, (s.trfage+1)*m, _params);
+                    apserv.ivectorgrowto(ref s.rk, s.trfage+1, _params);
+                    s.rk[s.trfage] = r;
+                    invaq = 1.0/alphaq[r];
+                    for(i=0; i<=m-1; i++)
+                    {
+                        if( i!=r )
+                        {
+                            s.densepfieta[s.trfage*m+i] = -(alphaq[i]*invaq);
+                        }
+                        else
+                        {
+                            s.densepfieta[s.trfage*m+i] = invaq;
+                        }
+                    }
+                    apserv.inc(ref s.trfage, _params);
+                    processed = true;
+                }
+                if( s.trftype==3 )
+                {
+                    
+                    //
+                    // Sparse factorization with Forest-Tomlin update
+                    //
+                    alglib.ap.assert((double)(alphaq[r])!=(double)(0), "BasisUpdateTrf: integrity check failed, AlphaQ[R]=0");
+                    apserv.rvectorgrowto(ref s.densemu, (s.trfage+1)*m, _params);
+                    apserv.ivectorgrowto(ref s.rk, s.trfage+1, _params);
+                    apserv.ivectorgrowto(ref s.dk, s.trfage+1, _params);
+                    apserv.rvectorsetlengthatleast(ref s.utmp0, m, _params);
+                    
+                    //
+                    // Determine D - index of row being overwritten by Forest-Tomlin update
+                    //
+                    idxd = s.rowpermfwd[r];
+                    s.rk[s.trfage] = r;
+                    s.dk[s.trfage] = idxd;
+                    
+                    //
+                    // Modify L with permutation which moves D-th row/column to the end:
+                    // * rows 0...D-1 are left intact
+                    // * rows D+1...M-1 are moved one position up, with columns 0..D-1
+                    //   retained as is, and columns D+1...M-1 being moved one position left.
+                    // * last row is filled by permutation/modification of AlphaQim
+                    // Determine FT update coefficients in the process.
+                    //
+                    apserv.ivectorgrowto(ref s.sparsel.idx, s.sparsel.ridx[m]+m, _params);
+                    apserv.rvectorgrowto(ref s.sparsel.vals, s.sparsel.ridx[m]+m, _params);
+                    for(i=0; i<=m-1; i++)
+                    {
+                        s.utmp0[i] = 0;
+                    }
+                    for(i=idxd+1; i<=m-1; i++)
+                    {
+                        j = s.sparsel.ridx[i+1]-1;
+                        if( s.sparsel.idx[j]!=i || s.sparsel.vals[j]!=1 )
+                        {
+                            alglib.ap.assert(false, "UpdateTrf: integrity check failed for sparse L");
+                        }
+                        dstoffs = s.sparsel.ridx[i-1];
+                        srcoffs = s.sparsel.ridx[i];
+                        
+                        //
+                        // Read first element in the row (it has at least one - unit diagonal)
+                        //
+                        srcidx = s.sparsel.idx[srcoffs];
+                        srcval = s.sparsel.vals[srcoffs];
+                        
+                        //
+                        // Read/write columns 0...D-1
+                        //
+                        while( srcidx<idxd )
+                        {
+                            s.sparsel.idx[dstoffs] = srcidx;
+                            s.sparsel.vals[dstoffs] = srcval;
+                            dstoffs = dstoffs+1;
+                            srcoffs = srcoffs+1;
+                            srcidx = s.sparsel.idx[srcoffs];
+                            srcval = s.sparsel.vals[srcoffs];
+                        }
+                        
+                        //
+                        // If we have non-zero element in column D, use it as
+                        // right-hand side of intermediate linear system which
+                        // is used to determine coefficients of update matrix.
+                        //
+                        if( srcidx==idxd )
+                        {
+                            s.utmp0[i-1] = srcval;
+                            srcoffs = srcoffs+1;
+                            srcidx = s.sparsel.idx[srcoffs];
+                            srcval = s.sparsel.vals[srcoffs];
+                        }
+                        
+                        //
+                        // Process columns D+1...I-1
+                        //
+                        v = s.utmp0[i-1];
+                        while( srcidx<i )
+                        {
+                            s.sparsel.idx[dstoffs] = srcidx-1;
+                            s.sparsel.vals[dstoffs] = srcval;
+                            v = v-srcval*s.utmp0[srcidx-1];
+                            dstoffs = dstoffs+1;
+                            srcoffs = srcoffs+1;
+                            srcidx = s.sparsel.idx[srcoffs];
+                            srcval = s.sparsel.vals[srcoffs];
+                        }
+                        s.utmp0[i-1] = v;
+                        
+                        //
+                        // Write out unit diagonal, finalize row
+                        //
+                        s.sparsel.idx[dstoffs] = i-1;
+                        s.sparsel.vals[dstoffs] = 1;
+                        dstoffs = dstoffs+1;
+                        s.sparsel.ridx[i] = dstoffs;
+                    }
+                    s.utmp0[m-1] = 1;
+                    dstoffs = s.sparsel.ridx[m-1];
+                    for(j=0; j<=idxd-1; j++)
+                    {
+                        v = alphaqim[j];
+                        if( v!=0 )
+                        {
+                            s.sparsel.idx[dstoffs] = j;
+                            s.sparsel.vals[dstoffs] = v;
+                            dstoffs = dstoffs+1;
+                        }
+                    }
+                    vcorner = alphaqim[idxd];
+                    for(j=idxd+1; j<=m-1; j++)
+                    {
+                        v = alphaqim[j];
+                        if( v!=0 )
+                        {
+                            s.sparsel.idx[dstoffs] = j-1;
+                            s.sparsel.vals[dstoffs] = v;
+                            dstoffs = dstoffs+1;
+                            vcorner = vcorner-v*s.utmp0[j-1];
+                        }
+                    }
+                    s.sparsel.idx[dstoffs] = m-1;
+                    s.sparsel.vals[dstoffs] = 1;
+                    dstoffs = dstoffs+1;
+                    s.sparsel.ridx[m] = dstoffs;
+                    s.sparsel.ninitialized = s.sparsel.ridx[m];
+                    for(i=0; i<=m-1; i++)
+                    {
+                        j = s.sparsel.ridx[i+1];
+                        s.sparsel.didx[i] = j-1;
+                        s.sparsel.uidx[i] = j;
+                    }
+                    alglib.ap.assert(vcorner!=0, "UpdateTrf: corner element is zero, degeneracy detected");
+                    v = 1/vcorner;
+                    for(i=0; i<=m-2; i++)
+                    {
+                        s.densemu[s.trfage*m+i] = -(s.utmp0[i]*v);
+                    }
+                    s.densemu[s.trfage*m+m-1] = v;
+                    
+                    //
+                    // Multiply row permutation matrix by cyclic permutation applied to L
+                    //
+                    inversecyclicpermutation(s.rowpermpiv, s.rowpermfwd, s.rowpermbwd, m, idxd, ref s.utmpi, _params);
+                    
+                    //
+                    // Done
+                    //
+                    apserv.inc(ref s.trfage, _params);
+                    processed = true;
+                }
+                alglib.ap.assert(processed, "BasisUpdateTrf: unexpected TRF type");
+            }
+            
+            //
+            // Update pricing weights
+            //
+            alglib.ap.assert((settings.pricing==-1 || settings.pricing==0) || settings.pricing==1, "BasisUpdateTrf: unexpected Settings.Pricing");
+            processed = false;
+            if( settings.pricing==-1 )
+            {
+                
+                //
+                // Weights are recomputed from scratch at every step.
+                // VERY, VERY time consuming, used only for debug purposes.
+                //
+                s.dsevalid = false;
+                basisrequestweights(s, settings, _params);
+                processed = true;
+            }
+            if( settings.pricing==0 )
+            {
+                
+                //
+                // Weights are filled by 1.0
+                //
+                if( !s.dsevalid )
+                {
+                    for(i=0; i<=m-1; i++)
+                    {
+                        s.dseweights[i] = 1.0;
+                    }
+                    s.dsevalid = true;
+                }
+                processed = true;
+            }
+            if( settings.pricing==1 )
+            {
+                
+                //
+                // Weights are computed using DSE update formula.
+                //
+                if( s.dsevalid )
+                {
+                    
+                    //
+                    // Compute using update formula
+                    //
+                    for(i=0; i<=m-1; i++)
+                    {
+                        if( i!=r )
+                        {
+                            s.dseweights[i] = s.dseweights[i]-2*(alphaq[i]/alphaq[r])*tau[i]+s.dseweights[r]*math.sqr(alphaq[i]/alphaq[r]);
+                            s.dseweights[i] = Math.Max(s.dseweights[i], minbeta);
+                        }
+                    }
+                    s.dseweights[r] = s.dseweights[r]/(alphaq[r]*alphaq[r]);
+                }
+                else
+                {
+                    
+                    //
+                    // No prior values, compute from scratch (usually it is done only once)
+                    //
+                    basisrequestweights(s, settings, _params);
+                }
+                processed = true;
+            }
+            alglib.ap.assert(processed, "BasisUpdateTrf: unexpected pricing type");
+        }
+
+
+        /*************************************************************************
+        This function computes solution to B*x=r.
+
+        Output array is reallocated if needed.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basissolve(dualsimplexbasis s,
+            double[] r,
+            ref double[] x,
+            alglib.xparams _params)
+        {
+            basissolvex(s, r, ref x, ref x, false, _params);
+        }
+
+
+        /*************************************************************************
+        This function computes solution to B*x=r. It  also   additionally  outputs
+        intermediate  result  of multiplication by inv(DS)*inv(U)*inv(colPerm),  a
+        value essential for Forest-Tomlin update.
+
+        Output arrays are reallocated if needed.
+
+        If NeedIntermediate is False or Forest-Tomlin updates are not used,
+        then Xim[] is not referenced at all.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basissolvex(dualsimplexbasis s,
+            double[] r,
+            ref double[] x,
+            ref double[] xim,
+            bool needintermediate,
+            alglib.xparams _params)
+        {
+            int m = 0;
+            int i = 0;
+            int d = 0;
+            int k = 0;
+            double v = 0;
+            double vd = 0;
+            double vv = 0;
+            bool processed = new bool();
+
+            alglib.ap.assert(s.isvalidtrf, "BasisSolve: integrity check failed");
+            m = s.m;
+            processed = false;
+            
+            //
+            // Dense/sparse factorizations with dense PFI
+            //
+            // NOTE: although we solve B*x=r, internally we store factorization of B^T
+            //
+            if( (s.trftype==0 || s.trftype==1) || s.trftype==2 )
+            {
+                alglib.ap.assert(s.trfage==0 || s.trftype!=0, "BasisSolve: integrity check failed TrfAge vs TrfType");
+                apserv.rvectorsetlengthatleast(ref x, m, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    x[i] = r[i];
+                }
+                for(i=0; i<=m-1; i++)
+                {
+                    if( s.densepright[i]!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[s.densepright[i]];
+                        x[s.densepright[i]] = v;
+                    }
+                }
+                if( s.trftype==0 || s.trftype==1 )
+                {
+                    
+                    //
+                    // Dense TRF
+                    //
+                    ablas.rmatrixtrsv(m, s.denselu, 0, 0, true, false, 1, x, 0, _params);
+                    ablas.rmatrixtrsv(m, s.denselu, 0, 0, false, true, 1, x, 0, _params);
+                }
+                else
+                {
+                    
+                    //
+                    // Sparse TRF
+                    //
+                    sparse.sparsetrsv(s.sparseu, true, false, 1, x, _params);
+                    sparse.sparsetrsv(s.sparsel, false, false, 1, x, _params);
+                }
+                for(i=m-1; i>=0; i--)
+                {
+                    if( s.rowpermpiv[i]!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[s.rowpermpiv[i]];
+                        x[s.rowpermpiv[i]] = v;
+                    }
+                }
+                for(k=0; k<=s.trfage-1; k++)
+                {
+                    v = x[s.rk[k]];
+                    for(i=0; i<=m-1; i++)
+                    {
+                        x[i] = x[i]+s.densepfieta[k*m+i]*v;
+                    }
+                    x[s.rk[k]] = x[s.rk[k]]-v;
+                }
+                processed = true;
+            }
+            
+            //
+            // Sparse factorization with Forest-Tomlin update
+            //
+            // NOTE: although we solve B*x=r, internally we store factorization of B^T
+            //
+            if( s.trftype==3 )
+            {
+                apserv.rvectorsetlengthatleast(ref x, m, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    x[i] = r[i];
+                }
+                for(i=0; i<=m-1; i++)
+                {
+                    k = s.densepright[i];
+                    if( k!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[k];
+                        x[k] = v;
+                    }
+                }
+                sparse.sparsetrsv(s.sparseu, true, false, 1, x, _params);
+                for(k=0; k<=s.trfage-1; k++)
+                {
+                    
+                    //
+                    // The code below is an amalgamation of two parts:
+                    //
+                    // cyclic permutation
+                    // V:=X[D];
+                    // for I:=D to M-2 do
+                    //     X[I]:=X[I+1];
+                    // X[M-1]:=V;
+                    // 
+                    // and triangular factor
+                    // V:=0;
+                    // for I:=D to M-1 do
+                    //     V:=V+X[I]*S.DenseMu[K*M+I];
+                    // X[M-1]:=V;
+                    //
+                    d = s.dk[k];
+                    vv = 0;
+                    vd = x[d];
+                    for(i=d; i<=m-2; i++)
+                    {
+                        v = x[i+1];
+                        x[i] = v;
+                        vv = vv+v*s.densemu[k*m+i];
+                    }
+                    x[m-1] = vv+vd*s.densemu[k*m+m-1];
+                }
+                if( needintermediate )
+                {
+                    apserv.rvectorsetlengthatleast(ref xim, m, _params);
+                    for(i=0; i<=m-1; i++)
+                    {
+                        xim[i] = x[i];
+                    }
+                }
+                sparse.sparsetrsv(s.sparsel, false, false, 1, x, _params);
+                for(i=m-1; i>=0; i--)
+                {
+                    k = s.rowpermpiv[i];
+                    if( k!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[k];
+                        x[k] = v;
+                    }
+                }
+                processed = true;
+            }
+            
+            //
+            // Integrity check
+            //
+            alglib.ap.assert(processed, "BasisSolve: unsupported TRF type");
+            v = 0;
+            for(i=0; i<=m-1; i++)
+            {
+                v = v+x[i];
+            }
+            alglib.ap.assert(math.isfinite(v), "BasisSolve: integrity check failed (degeneracy in B?)");
+        }
+
+
+        /*************************************************************************
+        This function computes solution to (B^T)*x=r.
+
+        Output array is reallocated if needed.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void basissolvet(dualsimplexbasis s,
+            double[] r,
+            ref double[] x,
+            alglib.xparams _params)
+        {
+            int m = 0;
+            int i = 0;
+            int d = 0;
+            int k = 0;
+            double v = 0;
+            double vm = 0;
+            bool processed = new bool();
+
+            alglib.ap.assert(s.isvalidtrf, "BasisSolveT: integrity check failed");
+            m = s.m;
+            processed = false;
+            
+            //
+            // Dense factorizations
+            //
+            if( (s.trftype==0 || s.trftype==1) || s.trftype==2 )
+            {
+                alglib.ap.assert(s.trfage==0 || s.trftype!=0, "BasisSolveT: integrity check failed TrfAge vs TrfType");
+                apserv.rvectorsetlengthatleast(ref x, m, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    x[i] = r[i];
+                }
+                for(k=s.trfage-1; k>=0; k--)
+                {
+                    v = 0;
+                    for(i=0; i<=m-1; i++)
+                    {
+                        v = v+s.densepfieta[k*m+i]*x[i];
+                    }
+                    x[s.rk[k]] = v;
+                }
+                for(i=0; i<=m-1; i++)
+                {
+                    if( s.rowpermpiv[i]!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[s.rowpermpiv[i]];
+                        x[s.rowpermpiv[i]] = v;
+                    }
+                }
+                if( s.trftype==0 || s.trftype==1 )
+                {
+                    
+                    //
+                    // Dense TRF
+                    //
+                    ablas.rmatrixtrsv(m, s.denselu, 0, 0, false, true, 0, x, 0, _params);
+                    ablas.rmatrixtrsv(m, s.denselu, 0, 0, true, false, 0, x, 0, _params);
+                }
+                else
+                {
+                    
+                    //
+                    // Sparse TRF
+                    //
+                    sparse.sparsetrsv(s.sparsel, false, false, 0, x, _params);
+                    sparse.sparsetrsv(s.sparseu, true, false, 0, x, _params);
+                }
+                for(i=m-1; i>=0; i--)
+                {
+                    if( s.densepright[i]!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[s.densepright[i]];
+                        x[s.densepright[i]] = v;
+                    }
+                }
+                processed = true;
+            }
+            
+            //
+            // Sparse factorization with Forest-Tomlin update
+            //
+            if( s.trftype==3 )
+            {
+                apserv.rvectorsetlengthatleast(ref x, m, _params);
+                for(i=0; i<=m-1; i++)
+                {
+                    x[i] = r[i];
+                }
+                for(i=0; i<=m-1; i++)
+                {
+                    k = s.rowpermpiv[i];
+                    if( k!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[k];
+                        x[k] = v;
+                    }
+                }
+                sparse.sparsetrsv(s.sparsel, false, false, 0, x, _params);
+                for(k=s.trfage-1; k>=0; k--)
+                {
+                    
+                    //
+                    // The code below is an amalgamation of two parts:
+                    //
+                    // triangular factor
+                    // V:=X[M-1];
+                    // for I:=D to M-2 do
+                    //     X[I]:=X[I]+S.DenseMu[K*M+I]*V;
+                    // X[M-1]:=S.DenseMu[K*M+(M-1)]*V;
+                    // 
+                    // inverse of cyclic permutation
+                    // V:=X[M-1];
+                    // for I:=M-1 downto D+1 do
+                    //     X[I]:=X[I-1];
+                    // X[D]:=V;
+                    //
+                    d = s.dk[k];
+                    vm = x[m-1];
+                    v = s.densemu[k*m+(m-1)]*vm;
+                    if( vm!=0 )
+                    {
+                        
+                        //
+                        // X[M-1] is non-zero, apply update
+                        //
+                        for(i=m-2; i>=d; i--)
+                        {
+                            x[i+1] = x[i]+s.densemu[k*m+i]*vm;
+                        }
+                    }
+                    else
+                    {
+                        
+                        //
+                        // X[M-1] is zero, just cyclic permutation
+                        //
+                        for(i=m-2; i>=d; i--)
+                        {
+                            x[i+1] = x[i];
+                        }
+                    }
+                    x[d] = v;
+                }
+                sparse.sparsetrsv(s.sparseu, true, false, 0, x, _params);
+                for(i=m-1; i>=0; i--)
+                {
+                    k = s.densepright[i];
+                    if( k!=i )
+                    {
+                        v = x[i];
+                        x[i] = x[k];
+                        x[k] = v;
+                    }
+                }
+                processed = true;
+            }
+            
+            //
+            // Integrity check
+            //
+            alglib.ap.assert(processed, "BasisSolveT: unsupported TRF type");
+            v = 0;
+            for(i=0; i<=m-1; i++)
+            {
+                v = v+x[i];
+            }
+            alglib.ap.assert(math.isfinite(v), "BasisSolveT: integrity check failed (degeneracy in B?)");
+        }
+
+
+        /*************************************************************************
+        This function computes product AN*XN, where AN is a  non-basic  subset  of
+        columns of A, and XN is a non-basic subset of columns of X.
+
+        Output array is reallocated if its size is too small.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void computeanxn(dualsimplexstate state,
+            dualsimplexsubproblem subproblem,
+            double[] x,
+            ref double[] y,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            int j0 = 0;
+            int j1 = 0;
+            double v = 0;
+
+            nx = subproblem.ns+subproblem.m;
+            m = subproblem.m;
+            nn = nx-m;
+            
+            //
+            // Integrity check
+            //
+            alglib.ap.assert(subproblem.state>=ssvalidxn, "ComputeANXN: XN is invalid");
+            
+            //
+            // Compute
+            //
+            apserv.rvectorsetlengthatleast(ref y, m, _params);
+            for(i=0; i<=m-1; i++)
+            {
+                y[i] = 0;
+            }
+            for(i=0; i<=nn-1; i++)
+            {
+                j0 = state.at.ridx[state.basis.nidx[i]];
+                j1 = state.at.ridx[state.basis.nidx[i]+1]-1;
+                v = x[state.basis.nidx[i]];
+                for(j=j0; j<=j1; j++)
+                {
+                    k = state.at.idx[j];
+                    y[k] = y[k]+v*state.at.vals[j];
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        This function computes product (AN^T)*y, where AN is a non-basic subset of
+        columns of A, and y is some vector.
+
+        Output array is set to full NX-sized length, with basic components of  the
+        output being set to zeros.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void computeantv(dualsimplexstate state,
+            dualsimplexsubproblem subproblem,
+            double[] y,
+            ref double[] r,
+            alglib.xparams _params)
+        {
+            int nn = 0;
+            int nx = 0;
+            int m = 0;
+            int i = 0;
+            int j = 0;
+            int j0 = 0;
+            int j1 = 0;
+            double v = 0;
+
+            nx = subproblem.ns+subproblem.m;
+            m = subproblem.m;
+            nn = nx-m;
+            
+            //
+            // Allocate output, set to zero
+            //
+            apserv.rvectorsetlengthatleast(ref r, nx, _params);
+            for(i=0; i<=nx-1; i++)
+            {
+                r[i] = 0;
+            }
+            for(i=0; i<=nn-1; i++)
+            {
+                j0 = state.at.ridx[state.basis.nidx[i]];
+                j1 = state.at.ridx[state.basis.nidx[i]+1]-1;
+                v = 0;
+                for(j=j0; j<=j1; j++)
+                {
+                    v = v+state.at.vals[j]*y[state.at.idx[j]];
+                }
+                r[state.basis.nidx[i]] = v;
+            }
+        }
+
+
+        /*************************************************************************
+        Returns True if I-th lower bound is present
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static bool hasbndl(dualsimplexsubproblem subproblem,
+            int i,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            int k = 0;
+
+            k = subproblem.bndt[i];
+            result = false;
+            if( (k==0 || k==1) || k==3 )
+            {
+                result = true;
+                return result;
+            }
+            if( k==2 || k==4 )
+            {
+                result = false;
+                return result;
+            }
+            alglib.ap.assert(false, "HasBndL: integrity check failed");
+            return result;
+        }
+
+
+        /*************************************************************************
+        Returns True if I-th upper bound is present
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static bool hasbndu(dualsimplexsubproblem subproblem,
+            int i,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            int k = 0;
+
+            k = subproblem.bndt[i];
+            result = false;
+            if( (k==0 || k==2) || k==3 )
+            {
+                result = true;
+                return result;
+            }
+            if( k==1 || k==4 )
+            {
+                result = false;
+                return result;
+            }
+            alglib.ap.assert(false, "HasBndL: integrity check failed");
+            return result;
+        }
+
+
+        /*************************************************************************
+        Returns True if I-th variable if fixed
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static bool isfixed(dualsimplexsubproblem subproblem,
+            int i,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            int k = 0;
+
+            k = subproblem.bndt[i];
+            result = false;
+            if( ((k==1 || k==2) || k==3) || k==4 )
+            {
+                result = false;
+                return result;
+            }
+            if( k==0 )
+            {
+                result = true;
+                return result;
+            }
+            alglib.ap.assert(false, "IsFixed: integrity check failed");
+            return result;
+        }
+
+
+        /*************************************************************************
+        Returns True if I-th variable if free
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static bool isfree(dualsimplexsubproblem subproblem,
+            int i,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            int k = 0;
+
+            k = subproblem.bndt[i];
+            result = false;
+            if( ((k==0 || k==1) || k==2) || k==3 )
+            {
+                result = false;
+                return result;
+            }
+            if( k==4 )
+            {
+                result = true;
+                return result;
+            }
+            alglib.ap.assert(false, "IsFree: integrity check failed");
+            return result;
+        }
+
+
+        /*************************************************************************
+        Downgrades problem state to the specified one (if status is lower than one
+        specified by user, nothing is changed)
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void downgradestate(dualsimplexsubproblem subproblem,
+            int s,
+            alglib.xparams _params)
+        {
+            subproblem.state = Math.Min(subproblem.state, s);
+        }
+
+
+        /*************************************************************************
+        Returns maximum dual infeasibility (only non-basic variables are  checked,
+        we assume that basic variables are good enough).
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static double dualfeasibilityerror(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            alglib.xparams _params)
+        {
+            double result = 0;
+            int i = 0;
+            int j = 0;
+            int nn = 0;
+            int bndt = 0;
+
+            nn = s.ns;
+            alglib.ap.assert(s.state==ssvalid, "DualFeasibilityError: invalid X");
+            result = 0;
+            for(i=0; i<=nn-1; i++)
+            {
+                j = state.basis.nidx[i];
+                bndt = s.bndt[j];
+                if( bndt==ccfixed )
+                {
+                    continue;
+                }
+                if( bndt==ccrange )
+                {
+                    if( s.x[j]==s.bndl[j] )
+                    {
+                        result = Math.Max(result, -s.d[j]);
+                        continue;
+                    }
+                    if( s.x[j]==s.bndu[j] )
+                    {
+                        result = Math.Max(result, s.d[j]);
+                        continue;
+                    }
+                    alglib.ap.assert(false, "DualFeasibilityError: integrity check failed");
+                }
+                if( bndt==cclower )
+                {
+                    alglib.ap.assert(s.x[j]==s.bndl[j], "DualFeasibilityError: integrity check failed");
+                    result = Math.Max(result, -s.d[j]);
+                    continue;
+                }
+                if( bndt==ccupper )
+                {
+                    alglib.ap.assert(s.x[j]==s.bndu[j], "DualFeasibilityError: integrity check failed");
+                    result = Math.Max(result, s.d[j]);
+                    continue;
+                }
+                if( bndt==ccfree )
+                {
+                    result = Math.Max(result, Math.Abs(s.d[j]));
+                    continue;
+                }
+                alglib.ap.assert(false, "DSSOptimize: integrity check failed (infeasible constraint)");
+            }
+            return result;
+        }
+
+
+        /*************************************************************************
+        Returns True for dual feasible basis (some minor dual feasibility error is
+        allowed), False otherwise
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static bool isdualfeasible(dualsimplexstate state,
+            dualsimplexsubproblem s,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+
+            result = (double)(dualfeasibilityerror(state, s, _params))<=(double)(dtol);
+            return result;
+        }
+
+
+        /*************************************************************************
+        Transforms sequence of pivot permutations P0*P1*...*Pm to forward/backward
+        permutation representation.
+
+          -- ALGLIB --
+             Copyright 12.09.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void pivottofwdbwd(int[] p,
+            int m,
+            ref int[] fwd,
+            ref int[] bwd,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int k = 0;
+            int t = 0;
+
+            apserv.ivectorsetlengthatleast(ref fwd, m, _params);
+            apserv.ivectorsetlengthatleast(ref bwd, m, _params);
+            for(i=0; i<=m-1; i++)
+            {
+                bwd[i] = i;
+            }
+            for(i=0; i<=m-1; i++)
+            {
+                k = p[i];
+                if( k!=i )
+                {
+                    t = bwd[i];
+                    bwd[i] = bwd[k];
+                    bwd[k] = t;
+                }
+            }
+            for(i=0; i<=m-1; i++)
+            {
+                fwd[bwd[i]] = i;
+            }
+        }
+
+
+        /*************************************************************************
+        Applies inverse cyclic permutation of [D,M-1) (element D is moved to the end, the
+        rest of elements is shifted one position backward) to the already existing
+        permutation.
+
+          -- ALGLIB --
+             Copyright 12.09.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void inversecyclicpermutation(int[] p,
+            int[] fwd,
+            int[] bwd,
+            int m,
+            int d,
+            ref int[] tmpi,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int j = 0;
+            int k = 0;
+
+            
+            //
+            // update Bwd[]
+            //
+            k = bwd[d];
+            for(i=d; i<=m-2; i++)
+            {
+                bwd[i] = bwd[i+1];
+            }
+            bwd[m-1] = k;
+            
+            //
+            // update Fwd[]
+            //
+            for(i=0; i<=m-1; i++)
+            {
+                k = fwd[i];
+                if( k<d )
+                {
+                    continue;
+                }
+                if( k==d )
+                {
+                    fwd[i] = m-1;
+                    continue;
+                }
+                fwd[i] = k-1;
+            }
+            
+            //
+            // Recompute P
+            //
+            apserv.ivectorsetlengthatleast(ref tmpi, m, _params);
+            for(i=0; i<=m-1; i++)
+            {
+                p[i] = bwd[i];
+                tmpi[bwd[i]] = i;
+            }
+            for(i=0; i<=m-1; i++)
+            {
+                j = p[i];
+                k = tmpi[i];
+                p[k] = j;
+                tmpi[j] = k;
+            }
+        }
+
+
+        private static void dbgprintsparsityof(double[] x,
+            int n,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int k = 0;
+            double mx = 0;
+
+            mx = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                mx = Math.Max(mx, Math.Abs(x[i]));
+            }
+            k = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                if( (double)(Math.Abs(x[i]))>(double)(1000*math.machineepsilon*mx) )
+                {
+                    k = k+1;
+                }
+            }
+            System.Console.Write("{0,0:F4}",k/apserv.coalesce(n, 1, _params));
+            System.Console.Write(" ");
+        }
+
+
+    }
+    public class minlp
+    {
+        /*************************************************************************
+        This object stores linear solver state.
+        You should use functions provided by MinLP subpackage to work with this
+        object
+        *************************************************************************/
+        public class minlpstate : apobject
+        {
+            public int n;
+            public int algokind;
+            public double[] s;
+            public double[] c;
+            public double[] bndl;
+            public double[] bndu;
+            public int m;
+            public sparse.sparsematrix a;
+            public double[] al;
+            public double[] au;
+            public double[] xs;
+            public double[] ys;
+            public int[] cs;
+            public double repf;
+            public double repprimalerror;
+            public double repdualerror;
+            public int repiterationscount;
+            public int repterminationtype;
+            public reviseddualsimplex.dualsimplexstate dss;
+            public minlpstate()
+            {
+                init();
+            }
+            public override void init()
+            {
+                s = new double[0];
+                c = new double[0];
+                bndl = new double[0];
+                bndu = new double[0];
+                a = new sparse.sparsematrix();
+                al = new double[0];
+                au = new double[0];
+                xs = new double[0];
+                ys = new double[0];
+                cs = new int[0];
+                dss = new reviseddualsimplex.dualsimplexstate();
+            }
+            public override alglib.apobject make_copy()
+            {
+                minlpstate _result = new minlpstate();
+                _result.n = n;
+                _result.algokind = algokind;
+                _result.s = (double[])s.Clone();
+                _result.c = (double[])c.Clone();
+                _result.bndl = (double[])bndl.Clone();
+                _result.bndu = (double[])bndu.Clone();
+                _result.m = m;
+                _result.a = (sparse.sparsematrix)a.make_copy();
+                _result.al = (double[])al.Clone();
+                _result.au = (double[])au.Clone();
+                _result.xs = (double[])xs.Clone();
+                _result.ys = (double[])ys.Clone();
+                _result.cs = (int[])cs.Clone();
+                _result.repf = repf;
+                _result.repprimalerror = repprimalerror;
+                _result.repdualerror = repdualerror;
+                _result.repiterationscount = repiterationscount;
+                _result.repterminationtype = repterminationtype;
+                _result.dss = (reviseddualsimplex.dualsimplexstate)dss.make_copy();
                 return _result;
             }
         };
@@ -29747,57 +35192,57 @@ public partial class alglib
 
         /*************************************************************************
         This structure stores optimization report:
-        * IterationsCount           number of iterations
-        * NFEV                      number of gradient evaluations
-        * TerminationType           termination type (see below)
+        * f                         target function value
+        * y                         dual variables
+        * stats                     array[N+M], statuses of box (N) and linear (M)
+                                    constraints:
+                                    * stats[i]>0  =>  constraint at upper bound
+                                                      (also used for free non-basic
+                                                      variables set to zero)
+                                    * stats[i]<0  =>  constraint at lower bound
+                                    * stats[i]=0  =>  constraint is inactive, basic
+                                                      variable
+        * primalerror               primal feasibility error
+        * dualerror                 dual feasibility error
+        * iterationscount           iteration count
+        * terminationtype           completion code (see below)
 
-        TERMINATION CODES
-
-        TerminationType field contains completion code, which can be:
-          -8    internal integrity control detected  infinite  or  NAN  values  in
-                function/gradient. Abnormal termination signalled.
-          -7    gradient verification failed.
-                See MinBCSetGradientCheck() for more information.
-          -3    inconsistent constraints.
-           1    relative function improvement is no more than EpsF.
-           2    relative step is no more than EpsX.
-           4    gradient norm is no more than EpsG
-           5    MaxIts steps was taken
-           7    stopping conditions are too stringent,
+        Completion codes:
+        * -4    LP problem is primal unbounded (dual infeasible)
+        * -3    LP problem is primal infeasible (dual unbounded)
+        *  1..4 successful completion
+        *  5    MaxIts steps was taken
+        *  7    stopping conditions are too stringent,
                 further improvement is impossible,
                 X contains best point found so far.
-           8    terminated by user who called minbcrequesttermination(). X contains
-                point which was "current accepted" when  termination  request  was
-                submitted.
-
-        ADDITIONAL FIELDS
-
-        There are additional fields which can be used for debugging:
-        * DebugEqErr                error in the equality constraints (2-norm)
-        * DebugFS                   f, calculated at projection of initial point
-                                    to the feasible set
-        * DebugFF                   f, calculated at the final point
-        * DebugDX                   |X_start-X_final|
         *************************************************************************/
-        public class minbcreport : apobject
+        public class minlpreport : apobject
         {
+            public double f;
+            public double[] y;
+            public int[] stats;
+            public double primalerror;
+            public double dualerror;
             public int iterationscount;
-            public int nfev;
-            public int varidx;
             public int terminationtype;
-            public minbcreport()
+            public minlpreport()
             {
                 init();
             }
             public override void init()
             {
+                y = new double[0];
+                stats = new int[0];
             }
             public override alglib.apobject make_copy()
             {
-                minbcreport _result = new minbcreport();
+                minlpreport _result = new minlpreport();
+                _result.f = f;
+                _result.y = (double[])y.Clone();
+                _result.stats = (int[])stats.Clone();
+                _result.primalerror = primalerror;
+                _result.dualerror = dualerror;
                 _result.iterationscount = iterationscount;
-                _result.nfev = nfev;
-                _result.varidx = varidx;
                 _result.terminationtype = terminationtype;
                 return _result;
             }
@@ -29806,282 +35251,110 @@ public partial class alglib
 
 
 
-        public const double gtol = 0.4;
-        public const double maxnonmonotoniclen = 1.0E-5;
-        public const double initialdecay = 0.5;
-        public const double mindecay = 0.1;
-        public const double decaycorrection = 0.8;
+        public const int alllogicalsbasis = 0;
 
 
         /*************************************************************************
-                             BOX CONSTRAINED OPTIMIZATION
-                  WITH FAST ACTIVATION OF MULTIPLE BOX CONSTRAINTS
+                                    LINEAR PROGRAMMING
 
-        DESCRIPTION:
-        The  subroutine  minimizes  function   F(x) of N arguments subject  to box
-        constraints (with some of box constraints actually being equality ones).
+        The subroutine creates LP  solver.  After  initial  creation  it  contains
+        default optimization problem with zero cost vector and all variables being
+        fixed to zero values and no constraints.
 
-        This optimizer uses algorithm similar to that of MinBLEIC (optimizer  with
-        general linear constraints), but presence of box-only  constraints  allows
-        us to use faster constraint activation strategies. On large-scale problems,
-        with multiple constraints active at the solution, this  optimizer  can  be
-        several times faster than BLEIC.
+        In order to actually solve something you should:
+        * set cost vector with minlpsetcost()
+        * set variable bounds with minlpsetbc() or minlpsetbcall()
+        * specify constraint matrix with one of the following functions:
+          [*] minlpsetlc1()       for dense one-sided constraints
+          [*] minlpsetlc2()       for dense two-sided constraints
+          [*] minlpsetlc2sparse() for sparse two-sided constraints
+          [*] minlpaddlc2()       to add one dense row to constraint matrix
+          [*] minlpaddlc2compr()  to add one row to constraint matrix (compressed format)
+        * call minlpoptimize() to run the solver and  minlpresults()  to  get  the
+          solution vector and additional information.
 
-        REQUIREMENTS:
-        * user must provide function value and gradient
-        * starting point X0 must be feasible or
-          not too far away from the feasible set
-        * grad(f) must be Lipschitz continuous on a level set:
-          L = { x : f(x)<=f(x0) }
-        * function must be defined everywhere on the feasible set F
-
-        USAGE:
-
-        Constrained optimization if far more complex than the unconstrained one.
-        Here we give very brief outline of the BC optimizer. We strongly recommend
-        you to read examples in the ALGLIB Reference Manual and to read ALGLIB User Guide
-        on optimization, which is available at http://www.alglib.net/optimization/
-
-        1. User initializes algorithm state with MinBCCreate() call
-
-        2. USer adds box constraints by calling MinBCSetBC() function.
-
-        3. User sets stopping conditions with MinBCSetCond().
-
-        4. User calls MinBCOptimize() function which takes algorithm  state and
-           pointer (delegate, etc.) to callback function which calculates F/G.
-
-        5. User calls MinBCResults() to get solution
-
-        6. Optionally user may call MinBCRestartFrom() to solve another problem
-           with same N but another starting point.
-           MinBCRestartFrom() allows to reuse already initialized structure.
-
+        Presently  this  optimizer  supports  only  revised  simplex   method   as
+        underlying solver. Future releases of ALGLIB may introduce other solvers.
 
         INPUT PARAMETERS:
-            N       -   problem dimension, N>0:
-                        * if given, only leading N elements of X are used
-                        * if not given, automatically determined from size ofX
-            X       -   starting point, array[N]:
-                        * it is better to set X to a feasible point
-                        * but X can be infeasible, in which case algorithm will try
-                          to find feasible point first, using X as initial
-                          approximation.
-
+            N       -   problem size
+            
         OUTPUT PARAMETERS:
-            State   -   structure stores algorithm state
+            State   -   optimizer in the default state
 
           -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbccreate(int n,
-            double[] x,
-            minbcstate state,
-            alglib.xparams _params)
-        {
-            double[,] c = new double[0,0];
-            int[] ct = new int[0];
-
-            alglib.ap.assert(n>=1, "MinBCCreate: N<1");
-            alglib.ap.assert(alglib.ap.len(x)>=n, "MinBCCreate: Length(X)<N");
-            alglib.ap.assert(apserv.isfinitevector(x, n, _params), "MinBCCreate: X contains infinite or NaN values!");
-            minbcinitinternal(n, x, 0.0, state, _params);
-        }
-
-
-        /*************************************************************************
-        The subroutine is finite difference variant of MinBCCreate().  It  uses
-        finite differences in order to differentiate target function.
-
-        Description below contains information which is specific to  this function
-        only. We recommend to read comments on MinBCCreate() in  order  to  get
-        more information about creation of BC optimizer.
-
-        INPUT PARAMETERS:
-            N       -   problem dimension, N>0:
-                        * if given, only leading N elements of X are used
-                        * if not given, automatically determined from size of X
-            X       -   starting point, array[0..N-1].
-            DiffStep-   differentiation step, >0
-
-        OUTPUT PARAMETERS:
-            State   -   structure which stores algorithm state
-
-        NOTES:
-        1. algorithm uses 4-point central formula for differentiation.
-        2. differentiation step along I-th axis is equal to DiffStep*S[I] where
-           S[] is scaling vector which can be set by MinBCSetScale() call.
-        3. we recommend you to use moderate values of  differentiation  step.  Too
-           large step will result in too large truncation  errors, while too small
-           step will result in too large numerical  errors.  1.0E-6  can  be  good
-           value to start with.
-        4. Numerical  differentiation  is   very   inefficient  -   one   gradient
-           calculation needs 4*N function evaluations. This function will work for
-           any N - either small (1...10), moderate (10...100) or  large  (100...).
-           However, performance penalty will be too severe for any N's except  for
-           small ones.
-           We should also say that code which relies on numerical  differentiation
-           is  less  robust and precise. CG needs exact gradient values. Imprecise
-           gradient may slow  down  convergence, especially  on  highly  nonlinear
-           problems.
-           Thus  we  recommend to use this function for fast prototyping on small-
-           dimensional problems only, and to implement analytical gradient as soon
-           as possible.
-
-          -- ALGLIB --
-             Copyright 16.05.2011 by Bochkanov Sergey
-        *************************************************************************/
-        public static void minbccreatef(int n,
-            double[] x,
-            double diffstep,
-            minbcstate state,
-            alglib.xparams _params)
-        {
-            double[,] c = new double[0,0];
-            int[] ct = new int[0];
-
-            alglib.ap.assert(n>=1, "MinBCCreateF: N<1");
-            alglib.ap.assert(alglib.ap.len(x)>=n, "MinBCCreateF: Length(X)<N");
-            alglib.ap.assert(apserv.isfinitevector(x, n, _params), "MinBCCreateF: X contains infinite or NaN values!");
-            alglib.ap.assert(math.isfinite(diffstep), "MinBCCreateF: DiffStep is infinite or NaN!");
-            alglib.ap.assert((double)(diffstep)>(double)(0), "MinBCCreateF: DiffStep is non-positive!");
-            minbcinitinternal(n, x, diffstep, state, _params);
-        }
-
-
-        /*************************************************************************
-        This function sets boundary constraints for BC optimizer.
-
-        Boundary constraints are inactive by default (after initial creation).
-        They are preserved after algorithm restart with MinBCRestartFrom().
-
-        INPUT PARAMETERS:
-            State   -   structure stores algorithm state
-            BndL    -   lower bounds, array[N].
-                        If some (all) variables are unbounded, you may specify
-                        very small number or -INF.
-            BndU    -   upper bounds, array[N].
-                        If some (all) variables are unbounded, you may specify
-                        very large number or +INF.
-
-        NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
-        variable will be "frozen" at X[i]=BndL[i]=BndU[i].
-
-        NOTE 2: this solver has following useful properties:
-        * bound constraints are always satisfied exactly
-        * function is evaluated only INSIDE area specified by  bound  constraints,
-          even  when  numerical  differentiation is used (algorithm adjusts  nodes
-          according to boundary constraints)
-
-          -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
-        *************************************************************************/
-        public static void minbcsetbc(minbcstate state,
-            double[] bndl,
-            double[] bndu,
+        public static void minlpcreate(int n,
+            minlpstate state,
             alglib.xparams _params)
         {
             int i = 0;
-            int n = 0;
 
-            n = state.nmain;
-            alglib.ap.assert(alglib.ap.len(bndl)>=n, "MinBCSetBC: Length(BndL)<N");
-            alglib.ap.assert(alglib.ap.len(bndu)>=n, "MinBCSetBC: Length(BndU)<N");
+            alglib.ap.assert(n>=1, "MinLPCreate: N<1");
+            
+            //
+            // Initialize
+            //
+            state.n = n;
+            state.m = 0;
+            state.algokind = 1;
+            state.c = new double[n];
+            state.s = new double[n];
+            state.bndl = new double[n];
+            state.bndu = new double[n];
+            state.xs = new double[n];
             for(i=0; i<=n-1; i++)
             {
-                alglib.ap.assert(math.isfinite(bndl[i]) || Double.IsNegativeInfinity(bndl[i]), "MinBCSetBC: BndL contains NAN or +INF");
-                alglib.ap.assert(math.isfinite(bndu[i]) || Double.IsPositiveInfinity(bndu[i]), "MinBCSetBC: BndL contains NAN or -INF");
-                state.bndl[i] = bndl[i];
-                state.hasbndl[i] = math.isfinite(bndl[i]);
-                state.bndu[i] = bndu[i];
-                state.hasbndu[i] = math.isfinite(bndu[i]);
+                state.bndl[i] = 0;
+                state.bndu[i] = 0;
+                state.c[i] = 0.0;
+                state.s[i] = 1.0;
+                state.xs[i] = 1.0;
             }
+            clearreportfields(state, _params);
         }
 
 
         /*************************************************************************
-        This function sets stopping conditions for the optimizer.
+        This function sets cost term for LP solver.
+
+        By default, cost term is zero.
 
         INPUT PARAMETERS:
             State   -   structure which stores algorithm state
-            EpsG    -   >=0
-                        The  subroutine  finishes  its  work   if   the  condition
-                        |v|<EpsG is satisfied, where:
-                        * |.| means Euclidian norm
-                        * v - scaled gradient vector, v[i]=g[i]*s[i]
-                        * g - gradient
-                        * s - scaling coefficients set by MinBCSetScale()
-            EpsF    -   >=0
-                        The  subroutine  finishes  its work if on k+1-th iteration
-                        the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
-                        is satisfied.
-            EpsX    -   >=0
-                        The subroutine finishes its work if  on  k+1-th  iteration
-                        the condition |v|<=EpsX is fulfilled, where:
-                        * |.| means Euclidian norm
-                        * v - scaled step vector, v[i]=dx[i]/s[i]
-                        * dx - step vector, dx=X(k+1)-X(k)
-                        * s - scaling coefficients set by MinBCSetScale()
-            MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
-                        iterations is unlimited.
-
-        Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
-        to automatic stopping criterion selection.
-
-        NOTE: when SetCond() called with non-zero MaxIts, BC solver may perform
-              slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
-              limit on iterations count.
+            C       -   cost term, array[N].
 
           -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbcsetcond(minbcstate state,
-            double epsg,
-            double epsf,
-            double epsx,
-            int maxits,
+        public static void minlpsetcost(minlpstate state,
+            double[] c,
             alglib.xparams _params)
         {
-            alglib.ap.assert(math.isfinite(epsg), "MinBCSetCond: EpsG is not finite number");
-            alglib.ap.assert((double)(epsg)>=(double)(0), "MinBCSetCond: negative EpsG");
-            alglib.ap.assert(math.isfinite(epsf), "MinBCSetCond: EpsF is not finite number");
-            alglib.ap.assert((double)(epsf)>=(double)(0), "MinBCSetCond: negative EpsF");
-            alglib.ap.assert(math.isfinite(epsx), "MinBCSetCond: EpsX is not finite number");
-            alglib.ap.assert((double)(epsx)>=(double)(0), "MinBCSetCond: negative EpsX");
-            alglib.ap.assert(maxits>=0, "MinBCSetCond: negative MaxIts!");
-            if( (((double)(epsg)==(double)(0) && (double)(epsf)==(double)(0)) && (double)(epsx)==(double)(0)) && maxits==0 )
+            int n = 0;
+            int i = 0;
+
+            n = state.n;
+            alglib.ap.assert(alglib.ap.len(c)>=n, "MinLPSetCost: Length(C)<N");
+            alglib.ap.assert(apserv.isfinitevector(c, n, _params), "MinLPSetCost: C contains infinite or NaN elements");
+            for(i=0; i<=n-1; i++)
             {
-                epsx = 1.0E-6;
+                state.c[i] = c[i];
             }
-            state.epsg = epsg;
-            state.epsf = epsf;
-            state.epsx = epsx;
-            state.maxits = maxits;
         }
 
 
         /*************************************************************************
-        This function sets scaling coefficients for BC optimizer.
+        This function sets scaling coefficients.
 
-        ALGLIB optimizers use scaling matrices to test stopping  conditions  (step
-        size and gradient are scaled before comparison with tolerances).  Scale of
-        the I-th variable is a translation invariant measure of:
+        ALGLIB optimizers use scaling matrices to test stopping  conditions and as
+        preconditioner.
+
+        Scale of the I-th variable is a translation invariant measure of:
         a) "how large" the variable is
-        b) how large the step should be to make significant changes in the function
-
-        Scaling is also used by finite difference variant of the optimizer  - step
-        along I-th axis is equal to DiffStep*S[I].
-
-        In  most  optimizers  (and  in  the  BC  too)  scaling is NOT a form of
-        preconditioning. It just  affects  stopping  conditions.  You  should  set
-        preconditioner  by  separate  call  to  one  of  the  MinBCSetPrec...()
-        functions.
-
-        There is a special  preconditioning  mode, however,  which  uses   scaling
-        coefficients to form diagonal preconditioning matrix. You  can  turn  this
-        mode on, if you want.   But  you should understand that scaling is not the
-        same thing as preconditioning - these are two different, although  related
-        forms of tuning solver.
+        b) how large the step should be to make significant changes in the
+           function
 
         INPUT PARAMETERS:
             State   -   structure stores algorithm state
@@ -30089,2001 +35362,616 @@ public partial class alglib
                         S[i] may be negative, sign doesn't matter.
 
           -- ALGLIB --
-             Copyright 14.01.2011 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbcsetscale(minbcstate state,
+        public static void minlpsetscale(minlpstate state,
             double[] s,
             alglib.xparams _params)
         {
             int i = 0;
 
-            alglib.ap.assert(alglib.ap.len(s)>=state.nmain, "MinBCSetScale: Length(S)<N");
-            for(i=0; i<=state.nmain-1; i++)
+            alglib.ap.assert(alglib.ap.len(s)>=state.n, "MinLPSetScale: Length(S)<N");
+            for(i=0; i<=state.n-1; i++)
             {
-                alglib.ap.assert(math.isfinite(s[i]), "MinBCSetScale: S contains infinite or NAN elements");
-                alglib.ap.assert((double)(s[i])!=(double)(0), "MinBCSetScale: S contains zero elements");
+                alglib.ap.assert(math.isfinite(s[i]), "MinLPSetScale: S contains infinite or NAN elements");
+                alglib.ap.assert((double)(s[i])!=(double)(0), "MinLPSetScale: S contains zero elements");
+            }
+            for(i=0; i<=state.n-1; i++)
+            {
                 state.s[i] = Math.Abs(s[i]);
             }
         }
 
 
         /*************************************************************************
-        Modification of the preconditioner: preconditioning is turned off.
+        This function sets box constraints for LP solver (all variables  at  once,
+        different constraints for different variables).
+
+        The default state of constraints is to have all variables fixed  at  zero.
+        You have to overwrite it by your own constraint vector. Constraint  status
+        is preserved until constraints are  explicitly  overwritten  with  another
+        minlpsetbc() call or partially overwritten with minlpsetbcall().
+
+        Following types of constraints are supported:
+
+            DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
+            fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
+            lower bound         BndL[i]<=x[i]           BndU[i]=+INF
+            upper bound         x[i]<=BndU[i]           BndL[i]=-INF
+            range               BndL[i]<=x[i]<=BndU[i]  ...
+            free variable       -                       BndL[I]=-INF, BndU[I]+INF
 
         INPUT PARAMETERS:
-            State   -   structure which stores algorithm state
+            State   -   structure stores algorithm state
+            BndL    -   lower bounds, array[N].
+            BndU    -   upper bounds, array[N].
+
+        NOTE: infinite values can be specified by means of Double.PositiveInfinity
+              and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
+              alglib::fp_neginf (in C++).
+              
+        NOTE: you may replace infinities by very small/very large values,  but  it
+              is not recommended because large numbers may introduce large numerical
+              errors in the algorithm.
+              
+        NOTE: if constraints for all variables are same you may use minlpsetbcall()
+              which allows to specify constraints without using arrays.
+              
+        NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
 
           -- ALGLIB --
-             Copyright 13.10.2010 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbcsetprecdefault(minbcstate state,
-            alglib.xparams _params)
-        {
-            state.prectype = 0;
-        }
-
-
-        /*************************************************************************
-        Modification  of  the  preconditioner:  diagonal of approximate Hessian is
-        used.
-
-        INPUT PARAMETERS:
-            State   -   structure which stores algorithm state
-            D       -   diagonal of the approximate Hessian, array[0..N-1],
-                        (if larger, only leading N elements are used).
-
-        NOTE 1: D[i] should be positive. Exception will be thrown otherwise.
-
-        NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
-
-          -- ALGLIB --
-             Copyright 13.10.2010 by Bochkanov Sergey
-        *************************************************************************/
-        public static void minbcsetprecdiag(minbcstate state,
-            double[] d,
+        public static void minlpsetbc(minlpstate state,
+            double[] bndl,
+            double[] bndu,
             alglib.xparams _params)
         {
             int i = 0;
+            int n = 0;
 
-            alglib.ap.assert(alglib.ap.len(d)>=state.nmain, "MinBCSetPrecDiag: D is too short");
-            for(i=0; i<=state.nmain-1; i++)
+            n = state.n;
+            alglib.ap.assert(alglib.ap.len(bndl)>=n, "MinLPSetBC: Length(BndL)<N");
+            alglib.ap.assert(alglib.ap.len(bndu)>=n, "MinLPSetBC: Length(BndU)<N");
+            for(i=0; i<=n-1; i++)
             {
-                alglib.ap.assert(math.isfinite(d[i]), "MinBCSetPrecDiag: D contains infinite or NAN elements");
-                alglib.ap.assert((double)(d[i])>(double)(0), "MinBCSetPrecDiag: D contains non-positive elements");
+                alglib.ap.assert(math.isfinite(bndl[i]) || Double.IsNegativeInfinity(bndl[i]), "MinLPSetBC: BndL contains NAN or +INF");
+                alglib.ap.assert(math.isfinite(bndu[i]) || Double.IsPositiveInfinity(bndu[i]), "MinLPSetBC: BndU contains NAN or -INF");
+                state.bndl[i] = bndl[i];
+                state.bndu[i] = bndu[i];
             }
-            apserv.rvectorsetlengthatleast(ref state.diagh, state.nmain, _params);
-            state.prectype = 2;
-            for(i=0; i<=state.nmain-1; i++)
+        }
+
+
+        /*************************************************************************
+        This function sets box constraints for LP solver (all variables  at  once,
+        same constraints for all variables)
+
+        The default state of constraints is to have all variables fixed  at  zero.
+        You have to overwrite it by your own constraint vector. Constraint  status
+        is preserved until constraints are  explicitly  overwritten  with  another
+        minlpsetbc() call or partially overwritten with minlpsetbcall().
+
+        Following types of constraints are supported:
+
+            DESCRIPTION         CONSTRAINT              HOW TO SPECIFY
+            fixed variable      x[i]=Bnd[i]             BndL[i]=BndU[i]
+            lower bound         BndL[i]<=x[i]           BndU[i]=+INF
+            upper bound         x[i]<=BndU[i]           BndL[i]=-INF
+            range               BndL[i]<=x[i]<=BndU[i]  ...
+            free variable       -                       BndL[I]=-INF, BndU[I]+INF
+
+        INPUT PARAMETERS:
+            State   -   structure stores algorithm state
+            BndL    -   lower bound, same for all variables
+            BndU    -   upper bound, same for all variables
+
+        NOTE: infinite values can be specified by means of Double.PositiveInfinity
+              and  Double.NegativeInfinity  (in  C#)  and  alglib::fp_posinf   and
+              alglib::fp_neginf (in C++).
+              
+        NOTE: you may replace infinities by very small/very large values,  but  it
+              is not recommended because large numbers may introduce large numerical
+              errors in the algorithm.
+              
+        NOTE: minlpsetbc() can  be  used  to  specify  different  constraints  for
+              different variables.
+              
+        NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
+
+          -- ALGLIB --
+             Copyright 19.07.2018 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minlpsetbcall(minlpstate state,
+            double bndl,
+            double bndu,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int n = 0;
+
+            n = state.n;
+            alglib.ap.assert(math.isfinite(bndl) || Double.IsNegativeInfinity(bndl), "MinLPSetBC: BndL is NAN or +INF");
+            alglib.ap.assert(math.isfinite(bndu) || Double.IsPositiveInfinity(bndu), "MinLPSetBC: BndU is NAN or -INF");
+            for(i=0; i<=n-1; i++)
             {
-                state.diagh[i] = d[i];
+                state.bndl[i] = bndl;
+                state.bndu[i] = bndu;
             }
         }
 
 
         /*************************************************************************
-        Modification of the preconditioner: scale-based diagonal preconditioning.
+        This function sets one-sided linear constraints A*x ~ AU, where "~" can be
+        a mix of "<=", "=" and ">=".
 
-        This preconditioning mode can be useful when you  don't  have  approximate
-        diagonal of Hessian, but you know that your  variables  are  badly  scaled
-        (for  example,  one  variable is in [1,10], and another in [1000,100000]),
-        and most part of the ill-conditioning comes from different scales of vars.
-
-        In this case simple  scale-based  preconditioner,  with H[i] = 1/(s[i]^2),
-        can greatly improve convergence.
-
-        IMPRTANT: you should set scale of your variables  with  MinBCSetScale()
-        call  (before  or after MinBCSetPrecScale() call). Without knowledge of
-        the scale of your variables scale-based preconditioner will be  just  unit
-        matrix.
+        IMPORTANT: this function is provided here for compatibility with the  rest
+                   of ALGLIB optimizers which accept constraints  in  format  like
+                   this one. Many real-life problem feature two-sided  constraints
+                   like a0 <= a*x <= a1. It is really inefficient to add  them  as
+                   pair of one-sided constraints. Use minlpsetlc2() or minlpaddlc2()
+                   wherever possible.
 
         INPUT PARAMETERS:
-            State   -   structure which stores algorithm state
+            State   -   structure previously allocated with minlpcreate() call.
+            A       -   linear constraints, array[K,N+1]. Each row of A represents
+                        one constraint, with first N elements being linear coefficients,
+                        and last element being right side.
+            CT      -   constraint types, array[K]:
+                        * if CT[i]>0, then I-th constraint is A[i,*]*x >= A[i,n]
+                        * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
+                        * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]
+            K       -   number of equality/inequality constraints,  K>=0;  if  not
+                        given, inferred from sizes of A and CT.
 
           -- ALGLIB --
-             Copyright 13.10.2010 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbcsetprecscale(minbcstate state,
+        public static void minlpsetlc1(minlpstate state,
+            double[,] a,
+            int[] ct,
+            int k,
             alglib.xparams _params)
         {
-            state.prectype = 3;
+            double[] al = new double[0];
+            double[] au = new double[0];
+            int n = 0;
+            int i = 0;
+
+            n = state.n;
+            alglib.ap.assert(k>=0, "MinLPSetLC1: K<0");
+            alglib.ap.assert(k==0 || alglib.ap.cols(a)>=n+1, "MinLPSetLC1: Cols(A)<N+1");
+            alglib.ap.assert(alglib.ap.rows(a)>=k, "MinLPSetLC1: Rows(A)<K");
+            alglib.ap.assert(alglib.ap.len(ct)>=k, "MinLPSetLC1: Length(CT)<K");
+            alglib.ap.assert(apserv.apservisfinitematrix(a, k, n+1, _params), "MinLPSetLC1: A contains infinite or NaN values!");
+            
+            //
+            // Handle zero K
+            //
+            if( k==0 )
+            {
+                state.m = 0;
+                return;
+            }
+            
+            //
+            // Convert constraints to two-sided storage format, call another function
+            //
+            al = new double[k];
+            au = new double[k];
+            for(i=0; i<=k-1; i++)
+            {
+                if( ct[i]>0 )
+                {
+                    al[i] = a[i,n];
+                    au[i] = Double.PositiveInfinity;
+                    continue;
+                }
+                if( ct[i]<0 )
+                {
+                    al[i] = Double.NegativeInfinity;
+                    au[i] = a[i,n];
+                    continue;
+                }
+                al[i] = a[i,n];
+                au[i] = a[i,n];
+            }
+            minlpsetlc2(state, a, al, au, k, _params);
         }
 
 
         /*************************************************************************
-        This function turns on/off reporting.
+        This function sets two-sided linear constraints AL <= A*x <= AU.
+
+        This version accepts dense matrix as  input;  internally  LP  solver  uses
+        sparse storage  anyway  (most  LP  problems  are  sparse),  but  for  your
+        convenience it may accept dense inputs. This  function  overwrites  linear
+        constraints set by previous calls (if such calls were made).
+
+        NOTE: there also exist several versions of this function:
+              * one-sided dense version which  accepts  constraints  in  the  same
+                format as one used by QP and  NLP solvers
+              * two-sided sparse version which accepts sparse matrix
+              * two-sided dense  version which allows you to add constraints row by row
+              * two-sided sparse version which allows you to add constraints row by row
 
         INPUT PARAMETERS:
-            State   -   structure which stores algorithm state
-            NeedXRep-   whether iteration reports are needed or not
-
-        If NeedXRep is True, algorithm will call rep() callback function if  it is
-        provided to MinBCOptimize().
+            State   -   structure previously allocated with minlpcreate() call.
+            A       -   linear constraints, array[K,N]. Each row of  A  represents
+                        one  constraint. One-sided  inequality   constraints, two-
+                        sided inequality  constraints,  equality  constraints  are
+                        supported (see below)
+            AL, AU  -   lower and upper bounds, array[K];
+                        * AL[i]=AU[i] => equality constraint Ai*x
+                        * AL[i]<AU[i] => two-sided constraint AL[i]<=Ai*x<=AU[i]
+                        * AL[i]=-INF  => one-sided constraint Ai*x<=AU[i]
+                        * AU[i]=+INF  => one-sided constraint AL[i]<=Ai*x
+                        * AL[i]=-INF, AU[i]=+INF => constraint is ignored
+            K       -   number of equality/inequality constraints,  K>=0;  if  not
+                        given, inferred from sizes of A, AL, AU.
 
           -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbcsetxrep(minbcstate state,
-            bool needxrep,
+        public static void minlpsetlc2(minlpstate state,
+            double[,] a,
+            double[] al,
+            double[] au,
+            int k,
             alglib.xparams _params)
         {
-            state.xrep = needxrep;
+            int i = 0;
+            int j = 0;
+            int n = 0;
+            int nz = 0;
+            int[] nrs = new int[0];
+
+            n = state.n;
+            alglib.ap.assert(k>=0, "MinLPSetLC2: K<0");
+            alglib.ap.assert(k==0 || alglib.ap.cols(a)>=n, "MinLPSetLC2: Cols(A)<N");
+            alglib.ap.assert(alglib.ap.rows(a)>=k, "MinLPSetLC2: Rows(A)<K");
+            alglib.ap.assert(alglib.ap.len(al)>=k, "MinLPSetLC2: Length(AL)<K");
+            alglib.ap.assert(alglib.ap.len(au)>=k, "MinLPSetLC2: Length(AU)<K");
+            alglib.ap.assert(apserv.apservisfinitematrix(a, k, n, _params), "MinLPSetLC2: A contains infinite or NaN values!");
+            
+            //
+            // Count actual (different from -INF<=A*x<=+INF) constraints;
+            // count non-zero elements in each row.
+            //
+            nrs = new int[k];
+            state.m = k;
+            if( state.m==0 )
+            {
+                return;
+            }
+            for(i=0; i<=k-1; i++)
+            {
+                alglib.ap.assert(math.isfinite(al[i]) || Double.IsNegativeInfinity(al[i]), "MinLPSetLC2: AL contains NAN or +INF");
+                alglib.ap.assert(math.isfinite(au[i]) || Double.IsPositiveInfinity(au[i]), "MinLPSetLC2: AU contains NAN or -INF");
+                nz = 0;
+                for(j=0; j<=n-1; j++)
+                {
+                    if( (double)(a[i,j])!=(double)(0) )
+                    {
+                        apserv.inc(ref nz, _params);
+                    }
+                }
+                nrs[i] = nz;
+            }
+            
+            //
+            // Allocate storage, copy
+            //
+            apserv.rvectorsetlengthatleast(ref state.al, state.m, _params);
+            apserv.rvectorsetlengthatleast(ref state.au, state.m, _params);
+            sparse.sparsecreatecrsbuf(state.m, n, nrs, state.a, _params);
+            for(i=0; i<=k-1; i++)
+            {
+                for(j=0; j<=n-1; j++)
+                {
+                    if( (double)(a[i,j])!=(double)(0) )
+                    {
+                        sparse.sparseset(state.a, i, j, a[i,j], _params);
+                    }
+                }
+                state.al[i] = al[i];
+                state.au[i] = au[i];
+            }
         }
 
 
         /*************************************************************************
-        This function sets maximum step length
+        This function solves LP problem.
 
         INPUT PARAMETERS:
-            State   -   structure which stores algorithm state
-            StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
-                        want to limit step length.
+            State   -   algorithm state
 
-        Use this subroutine when you optimize target function which contains exp()
-        or  other  fast  growing  functions,  and optimization algorithm makes too
-        large  steps  which  lead   to overflow. This function allows us to reject
-        steps  that  are  too  large  (and  therefore  expose  us  to the possible
-        overflow) without actually calculating function value at the x+stp*d.
+        You should use minlpresults() function to access results  after  calls  to
+        this function.
 
           -- ALGLIB --
-             Copyright 02.04.2010 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey.
         *************************************************************************/
-        public static void minbcsetstpmax(minbcstate state,
-            double stpmax,
+        public static void minlpoptimize(minlpstate state,
             alglib.xparams _params)
         {
-            alglib.ap.assert(math.isfinite(stpmax), "MinBCSetStpMax: StpMax is not finite!");
-            alglib.ap.assert((double)(stpmax)>=(double)(0), "MinBCSetStpMax: StpMax<0!");
-            state.stpmax = stpmax;
-        }
-
-
-        /*************************************************************************
-        NOTES:
-
-        1. This function has two different implementations: one which  uses  exact
-           (analytical) user-supplied gradient,  and one which uses function value
-           only  and  numerically  differentiates  function  in  order  to  obtain
-           gradient.
-
-           Depending  on  the  specific  function  used to create optimizer object
-           (either  MinBCCreate() for analytical gradient or  MinBCCreateF()
-           for numerical differentiation) you should choose appropriate variant of
-           MinBCOptimize() - one  which  accepts  function  AND gradient or one
-           which accepts function ONLY.
-
-           Be careful to choose variant of MinBCOptimize() which corresponds to
-           your optimization scheme! Table below lists different  combinations  of
-           callback (function/gradient) passed to MinBCOptimize()  and specific
-           function used to create optimizer.
-
-
-                             |         USER PASSED TO MinBCOptimize()
-           CREATED WITH      |  function only   |  function and gradient
-           ------------------------------------------------------------
-           MinBCCreateF()    |     works               FAILS
-           MinBCCreate()     |     FAILS               works
-
-           Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
-           function  and  MinBCOptimize()  version.   Attemps   to   use   such
-           combination (for  example,  to  create optimizer with MinBCCreateF()
-           and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
-           exception being thrown. Either  you  did  not pass gradient when it WAS
-           needed or you passed gradient when it was NOT needed.
-
-          -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
-        *************************************************************************/
-        public static bool minbciteration(minbcstate state,
-            alglib.xparams _params)
-        {
-            bool result = new bool();
-            int freezeidx = 0;
-            double freezeval = 0;
-            double scaleddnorm = 0;
             int n = 0;
             int m = 0;
             int i = 0;
-            int j = 0;
-            double v = 0;
-            double vv = 0;
-            double v0 = 0;
-            bool b = new bool();
-            int mcinfo = 0;
-            int itidx = 0;
-            double ginit = 0;
-            double gdecay = 0;
-            bool activationstatus = new bool();
-            double activationstep = 0;
-            int i_ = 0;
+            reviseddualsimplex.dualsimplexsettings settings = new reviseddualsimplex.dualsimplexsettings();
+            double[,] dummy = new double[0,0];
+            reviseddualsimplex.dualsimplexbasis dummybasis = new reviseddualsimplex.dualsimplexbasis();
 
+            n = state.n;
+            m = state.m;
+            clearreportfields(state, _params);
             
             //
-            // Reverse communication preparations
-            // I know it looks ugly, but it works the same way
-            // anywhere from C++ to Python.
+            // Most basic check for correctness of constraints
             //
-            // This code initializes locals by:
-            // * random values determined during code
-            //   generation - on first subroutine call
-            // * values from previous call - on subsequent calls
-            //
-            if( state.rstate.stage>=0 )
-            {
-                freezeidx = state.rstate.ia[0];
-                n = state.rstate.ia[1];
-                m = state.rstate.ia[2];
-                i = state.rstate.ia[3];
-                j = state.rstate.ia[4];
-                mcinfo = state.rstate.ia[5];
-                itidx = state.rstate.ia[6];
-                b = state.rstate.ba[0];
-                activationstatus = state.rstate.ba[1];
-                freezeval = state.rstate.ra[0];
-                scaleddnorm = state.rstate.ra[1];
-                v = state.rstate.ra[2];
-                vv = state.rstate.ra[3];
-                v0 = state.rstate.ra[4];
-                ginit = state.rstate.ra[5];
-                gdecay = state.rstate.ra[6];
-                activationstep = state.rstate.ra[7];
-            }
-            else
-            {
-                freezeidx = 359;
-                n = -58;
-                m = -919;
-                i = -909;
-                j = 81;
-                mcinfo = 255;
-                itidx = 74;
-                b = false;
-                activationstatus = true;
-                freezeval = 205;
-                scaleddnorm = -838;
-                v = 939;
-                vv = -526;
-                v0 = 763;
-                ginit = -541;
-                gdecay = -698;
-                activationstep = -900;
-            }
-            if( state.rstate.stage==0 )
-            {
-                goto lbl_0;
-            }
-            if( state.rstate.stage==1 )
-            {
-                goto lbl_1;
-            }
-            if( state.rstate.stage==2 )
-            {
-                goto lbl_2;
-            }
-            if( state.rstate.stage==3 )
-            {
-                goto lbl_3;
-            }
-            if( state.rstate.stage==4 )
-            {
-                goto lbl_4;
-            }
-            if( state.rstate.stage==5 )
-            {
-                goto lbl_5;
-            }
-            if( state.rstate.stage==6 )
-            {
-                goto lbl_6;
-            }
-            if( state.rstate.stage==7 )
-            {
-                goto lbl_7;
-            }
-            if( state.rstate.stage==8 )
-            {
-                goto lbl_8;
-            }
-            if( state.rstate.stage==9 )
-            {
-                goto lbl_9;
-            }
-            if( state.rstate.stage==10 )
-            {
-                goto lbl_10;
-            }
-            if( state.rstate.stage==11 )
-            {
-                goto lbl_11;
-            }
-            if( state.rstate.stage==12 )
-            {
-                goto lbl_12;
-            }
-            if( state.rstate.stage==13 )
-            {
-                goto lbl_13;
-            }
-            if( state.rstate.stage==14 )
-            {
-                goto lbl_14;
-            }
-            if( state.rstate.stage==15 )
-            {
-                goto lbl_15;
-            }
-            if( state.rstate.stage==16 )
-            {
-                goto lbl_16;
-            }
-            if( state.rstate.stage==17 )
-            {
-                goto lbl_17;
-            }
-            if( state.rstate.stage==18 )
-            {
-                goto lbl_18;
-            }
-            if( state.rstate.stage==19 )
-            {
-                goto lbl_19;
-            }
-            if( state.rstate.stage==20 )
-            {
-                goto lbl_20;
-            }
-            if( state.rstate.stage==21 )
-            {
-                goto lbl_21;
-            }
-            if( state.rstate.stage==22 )
-            {
-                goto lbl_22;
-            }
-            if( state.rstate.stage==23 )
-            {
-                goto lbl_23;
-            }
-            if( state.rstate.stage==24 )
-            {
-                goto lbl_24;
-            }
-            if( state.rstate.stage==25 )
-            {
-                goto lbl_25;
-            }
-            if( state.rstate.stage==26 )
-            {
-                goto lbl_26;
-            }
-            if( state.rstate.stage==27 )
-            {
-                goto lbl_27;
-            }
-            if( state.rstate.stage==28 )
-            {
-                goto lbl_28;
-            }
-            if( state.rstate.stage==29 )
-            {
-                goto lbl_29;
-            }
-            if( state.rstate.stage==30 )
-            {
-                goto lbl_30;
-            }
-            if( state.rstate.stage==31 )
-            {
-                goto lbl_31;
-            }
-            
-            //
-            // Routine body
-            //
-            
-            //
-            // Algorithm parameters:
-            // * M          number of L-BFGS corrections.
-            //              This coefficient remains fixed during iterations.
-            // * GDecay     desired decrease of constrained gradient during L-BFGS iterations.
-            //              This coefficient is decreased after each L-BFGS round until
-            //              it reaches minimum decay.
-            //
-            m = Math.Min(5, state.nmain);
-            gdecay = initialdecay;
-            
-            //
-            // Init
-            //
-            n = state.nmain;
             for(i=0; i<=n-1; i++)
             {
-                state.xc[i] = state.xstart[i];
-            }
-            if( !optserv.enforceboundaryconstraints(state.xc, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, _params) )
-            {
-                
-                //
-                // Inconsistent constraints
-                //
-                state.repterminationtype = -3;
-                result = false;
-                return result;
-            }
-            state.userterminationneeded = false;
-            state.repterminationtype = 0;
-            state.repiterationscount = 0;
-            state.repnfev = 0;
-            state.repvaridx = -1;
-            apserv.rmatrixsetlengthatleast(ref state.bufyk, m+1, n, _params);
-            apserv.rmatrixsetlengthatleast(ref state.bufsk, m+1, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.bufrho, m, _params);
-            apserv.rvectorsetlengthatleast(ref state.buftheta, m, _params);
-            apserv.rvectorsetlengthatleast(ref state.tmp0, n, _params);
-            
-            //
-            // Fill TmpPrec with current preconditioner
-            //
-            apserv.rvectorsetlengthatleast(ref state.tmpprec, n, _params);
-            for(i=0; i<=n-1; i++)
-            {
-                if( state.prectype==2 )
+                if( (double)(state.bndl[i])>(double)(state.bndu[i]) )
                 {
-                    state.tmpprec[i] = 1/state.diagh[i];
-                    continue;
+                    state.repterminationtype = -3;
+                    return;
                 }
-                if( state.prectype==3 )
+            }
+            for(i=0; i<=m-1; i++)
+            {
+                if( (double)(state.al[i])>(double)(state.au[i]) )
                 {
-                    state.tmpprec[i] = math.sqr(state.s[i]);
-                    continue;
-                }
-                state.tmpprec[i] = 1;
-            }
-            
-            //
-            //  Check correctness of user-supplied gradient
-            //
-            if( !((double)(state.diffstep)==(double)(0) && (double)(state.teststep)>(double)(0)) )
-            {
-                goto lbl_32;
-            }
-            clearrequestfields(state, _params);
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.x[i_] = state.xc[i_];
-            }
-            state.needfg = true;
-            i = 0;
-        lbl_34:
-            if( i>n-1 )
-            {
-                goto lbl_36;
-            }
-            alglib.ap.assert(!state.hasbndl[i] || (double)(state.xc[i])>=(double)(state.bndl[i]), "MinBCIteration: internal error(State.X is out of bounds)");
-            alglib.ap.assert(!state.hasbndu[i] || (double)(state.xc[i])<=(double)(state.bndu[i]), "MinBCIteration: internal error(State.X is out of bounds)");
-            v = state.x[i];
-            state.x[i] = v-state.teststep*state.s[i];
-            if( state.hasbndl[i] )
-            {
-                state.x[i] = Math.Max(state.x[i], state.bndl[i]);
-            }
-            state.xm1 = state.x[i];
-            state.rstate.stage = 0;
-            goto lbl_rcomm;
-        lbl_0:
-            state.fm1 = state.f;
-            state.gm1 = state.g[i];
-            state.x[i] = v+state.teststep*state.s[i];
-            if( state.hasbndu[i] )
-            {
-                state.x[i] = Math.Min(state.x[i], state.bndu[i]);
-            }
-            state.xp1 = state.x[i];
-            state.rstate.stage = 1;
-            goto lbl_rcomm;
-        lbl_1:
-            state.fp1 = state.f;
-            state.gp1 = state.g[i];
-            state.x[i] = (state.xm1+state.xp1)/2;
-            if( state.hasbndl[i] )
-            {
-                state.x[i] = Math.Max(state.x[i], state.bndl[i]);
-            }
-            if( state.hasbndu[i] )
-            {
-                state.x[i] = Math.Min(state.x[i], state.bndu[i]);
-            }
-            state.rstate.stage = 2;
-            goto lbl_rcomm;
-        lbl_2:
-            state.x[i] = v;
-            if( !optserv.derivativecheck(state.fm1, state.gm1, state.fp1, state.gp1, state.f, state.g[i], state.xp1-state.xm1, _params) )
-            {
-                state.repvaridx = i;
-                state.repterminationtype = -7;
-                result = false;
-                return result;
-            }
-            i = i+1;
-            goto lbl_34;
-        lbl_36:
-            state.needfg = false;
-        lbl_32:
-            
-            //
-            // Main cycle of BC-PG algorithm
-            //
-            state.repterminationtype = 0;
-            state.lastscaledgoodstep = 0;
-            state.nonmonotoniccnt = (int)Math.Round(1.5*n)+5;
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.x[i_] = state.xc[i_];
-            }
-            clearrequestfields(state, _params);
-            if( (double)(state.diffstep)!=(double)(0) )
-            {
-                goto lbl_37;
-            }
-            state.needfg = true;
-            state.rstate.stage = 3;
-            goto lbl_rcomm;
-        lbl_3:
-            state.needfg = false;
-            goto lbl_38;
-        lbl_37:
-            state.needf = true;
-            state.rstate.stage = 4;
-            goto lbl_rcomm;
-        lbl_4:
-            state.needf = false;
-        lbl_38:
-            state.fc = state.f;
-            optserv.trimprepare(state.f, ref state.trimthreshold, _params);
-            state.repnfev = state.repnfev+1;
-            if( !state.xrep )
-            {
-                goto lbl_39;
-            }
-            
-            //
-            // Report current point
-            //
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.x[i_] = state.xc[i_];
-            }
-            state.f = state.fc;
-            state.xupdated = true;
-            state.rstate.stage = 5;
-            goto lbl_rcomm;
-        lbl_5:
-            state.xupdated = false;
-        lbl_39:
-            if( state.userterminationneeded )
-            {
-                
-                //
-                // User requested termination
-                //
-                state.repterminationtype = 8;
-                result = false;
-                return result;
-            }
-        lbl_41:
-            if( false )
-            {
-                goto lbl_42;
-            }
-            
-            //
-            // Steepest descent phase
-            //
-            // (a) calculate unconstrained gradient
-            // (b) check F/G for NAN/INF, abnormally terminate algorithm if needed
-            // (c) perform one steepest descent step, activating only those constraints
-            //     which prevent us from moving outside of box-constrained area
-            //
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.x[i_] = state.xc[i_];
-            }
-            clearrequestfields(state, _params);
-            if( (double)(state.diffstep)!=(double)(0) )
-            {
-                goto lbl_43;
-            }
-            
-            //
-            // Analytic gradient
-            //
-            state.needfg = true;
-            state.rstate.stage = 6;
-            goto lbl_rcomm;
-        lbl_6:
-            state.needfg = false;
-            goto lbl_44;
-        lbl_43:
-            
-            //
-            // Numerical differentiation
-            //
-            state.needf = true;
-            state.rstate.stage = 7;
-            goto lbl_rcomm;
-        lbl_7:
-            state.fbase = state.f;
-            i = 0;
-        lbl_45:
-            if( i>n-1 )
-            {
-                goto lbl_47;
-            }
-            v = state.x[i];
-            b = false;
-            if( state.hasbndl[i] )
-            {
-                b = b || (double)(v-state.diffstep*state.s[i])<(double)(state.bndl[i]);
-            }
-            if( state.hasbndu[i] )
-            {
-                b = b || (double)(v+state.diffstep*state.s[i])>(double)(state.bndu[i]);
-            }
-            if( b )
-            {
-                goto lbl_48;
-            }
-            state.x[i] = v-state.diffstep*state.s[i];
-            state.rstate.stage = 8;
-            goto lbl_rcomm;
-        lbl_8:
-            state.fm2 = state.f;
-            state.x[i] = v-0.5*state.diffstep*state.s[i];
-            state.rstate.stage = 9;
-            goto lbl_rcomm;
-        lbl_9:
-            state.fm1 = state.f;
-            state.x[i] = v+0.5*state.diffstep*state.s[i];
-            state.rstate.stage = 10;
-            goto lbl_rcomm;
-        lbl_10:
-            state.fp1 = state.f;
-            state.x[i] = v+state.diffstep*state.s[i];
-            state.rstate.stage = 11;
-            goto lbl_rcomm;
-        lbl_11:
-            state.fp2 = state.f;
-            state.g[i] = (8*(state.fp1-state.fm1)-(state.fp2-state.fm2))/(6*state.diffstep*state.s[i]);
-            goto lbl_49;
-        lbl_48:
-            state.xm1 = v-state.diffstep*state.s[i];
-            state.xp1 = v+state.diffstep*state.s[i];
-            if( state.hasbndl[i] && (double)(state.xm1)<(double)(state.bndl[i]) )
-            {
-                state.xm1 = state.bndl[i];
-            }
-            if( state.hasbndu[i] && (double)(state.xp1)>(double)(state.bndu[i]) )
-            {
-                state.xp1 = state.bndu[i];
-            }
-            state.x[i] = state.xm1;
-            state.rstate.stage = 12;
-            goto lbl_rcomm;
-        lbl_12:
-            state.fm1 = state.f;
-            state.x[i] = state.xp1;
-            state.rstate.stage = 13;
-            goto lbl_rcomm;
-        lbl_13:
-            state.fp1 = state.f;
-            if( (double)(state.xm1)!=(double)(state.xp1) )
-            {
-                state.g[i] = (state.fp1-state.fm1)/(state.xp1-state.xm1);
-            }
-            else
-            {
-                state.g[i] = 0;
-            }
-        lbl_49:
-            state.x[i] = v;
-            i = i+1;
-            goto lbl_45;
-        lbl_47:
-            state.f = state.fbase;
-            state.needf = false;
-        lbl_44:
-            state.fc = state.f;
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.ugc[i_] = state.g[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.cgc[i_] = state.g[i_];
-            }
-            optserv.projectgradientintobc(state.xc, ref state.cgc, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, _params);
-            ginit = 0.0;
-            for(i=0; i<=n-1; i++)
-            {
-                ginit = ginit+math.sqr(state.cgc[i]*state.s[i]);
-            }
-            ginit = Math.Sqrt(ginit);
-            if( !math.isfinite(ginit) || !math.isfinite(state.fc) )
-            {
-                
-                //
-                // Abnormal termination - infinities in function/gradient
-                //
-                state.repterminationtype = -8;
-                result = false;
-                return result;
-            }
-            if( state.userterminationneeded )
-            {
-                
-                //
-                // User requested termination
-                //
-                state.repterminationtype = 8;
-                result = false;
-                return result;
-            }
-            if( (double)(ginit)<=(double)(state.epsg) )
-            {
-                
-                //
-                // Gradient is small enough.
-                // Optimization is terminated
-                //
-                state.repterminationtype = 4;
-                result = false;
-                return result;
-            }
-            for(i=0; i<=n-1; i++)
-            {
-                state.d[i] = -(state.tmpprec[i]*state.cgc[i]);
-            }
-            scaleddnorm = 0;
-            for(i=0; i<=n-1; i++)
-            {
-                scaleddnorm = scaleddnorm+math.sqr(state.d[i]/state.s[i]);
-            }
-            scaleddnorm = Math.Sqrt(scaleddnorm);
-            alglib.ap.assert((double)(scaleddnorm)>(double)(0), "MinBC: integrity check failed");
-            if( (double)(state.lastscaledgoodstep)>(double)(0) )
-            {
-                state.stp = state.lastscaledgoodstep/scaleddnorm;
-            }
-            else
-            {
-                state.stp = 1.0/scaleddnorm;
-            }
-            optserv.calculatestepbound(state.xc, state.d, 1.0, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, ref freezeidx, ref freezeval, ref state.curstpmax, _params);
-            activationstep = state.curstpmax;
-            if( freezeidx<0 || (double)(state.curstpmax)>(double)(1.0E50) )
-            {
-                state.curstpmax = 1.0E50;
-            }
-            if( (double)(state.stpmax)>(double)(0) )
-            {
-                state.curstpmax = Math.Min(state.curstpmax, state.stpmax/scaleddnorm);
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.xn[i_] = state.xc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.cgn[i_] = state.cgc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.ugn[i_] = state.ugc[i_];
-            }
-            state.fn = state.fc;
-            state.mcstage = 0;
-            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
-        lbl_50:
-            if( state.mcstage==0 )
-            {
-                goto lbl_51;
-            }
-            
-            //
-            // Copy XN to X, perform on-the-fly correction w.r.t box
-            // constraints (projection onto feasible set).
-            //
-            for(i=0; i<=n-1; i++)
-            {
-                state.x[i] = state.xn[i];
-                if( state.hasbndl[i] && (double)(state.xn[i])<(double)(state.bndl[i]) )
-                {
-                    state.x[i] = state.bndl[i];
-                }
-                if( state.hasbndu[i] && (double)(state.xn[i])>(double)(state.bndu[i]) )
-                {
-                    state.x[i] = state.bndu[i];
+                    state.repterminationtype = -3;
+                    return;
                 }
             }
             
             //
-            // Gradient, either user-provided or numerical differentiation
+            // Call current solver
             //
-            clearrequestfields(state, _params);
-            if( (double)(state.diffstep)!=(double)(0) )
-            {
-                goto lbl_52;
-            }
-            
-            //
-            // Analytic gradient
-            //
-            state.needfg = true;
-            state.rstate.stage = 14;
-            goto lbl_rcomm;
-        lbl_14:
-            state.needfg = false;
-            state.repnfev = state.repnfev+1;
-            goto lbl_53;
-        lbl_52:
-            
-            //
-            // Numerical differentiation
-            //
-            state.needf = true;
-            state.rstate.stage = 15;
-            goto lbl_rcomm;
-        lbl_15:
-            state.fbase = state.f;
-            i = 0;
-        lbl_54:
-            if( i>n-1 )
-            {
-                goto lbl_56;
-            }
-            v = state.x[i];
-            b = false;
-            if( state.hasbndl[i] )
-            {
-                b = b || (double)(v-state.diffstep*state.s[i])<(double)(state.bndl[i]);
-            }
-            if( state.hasbndu[i] )
-            {
-                b = b || (double)(v+state.diffstep*state.s[i])>(double)(state.bndu[i]);
-            }
-            if( b )
-            {
-                goto lbl_57;
-            }
-            state.x[i] = v-state.diffstep*state.s[i];
-            state.rstate.stage = 16;
-            goto lbl_rcomm;
-        lbl_16:
-            state.fm2 = state.f;
-            state.x[i] = v-0.5*state.diffstep*state.s[i];
-            state.rstate.stage = 17;
-            goto lbl_rcomm;
-        lbl_17:
-            state.fm1 = state.f;
-            state.x[i] = v+0.5*state.diffstep*state.s[i];
-            state.rstate.stage = 18;
-            goto lbl_rcomm;
-        lbl_18:
-            state.fp1 = state.f;
-            state.x[i] = v+state.diffstep*state.s[i];
-            state.rstate.stage = 19;
-            goto lbl_rcomm;
-        lbl_19:
-            state.fp2 = state.f;
-            state.g[i] = (8*(state.fp1-state.fm1)-(state.fp2-state.fm2))/(6*state.diffstep*state.s[i]);
-            state.repnfev = state.repnfev+4;
-            goto lbl_58;
-        lbl_57:
-            state.xm1 = v-state.diffstep*state.s[i];
-            state.xp1 = v+state.diffstep*state.s[i];
-            if( state.hasbndl[i] && (double)(state.xm1)<(double)(state.bndl[i]) )
-            {
-                state.xm1 = state.bndl[i];
-            }
-            if( state.hasbndu[i] && (double)(state.xp1)>(double)(state.bndu[i]) )
-            {
-                state.xp1 = state.bndu[i];
-            }
-            state.x[i] = state.xm1;
-            state.rstate.stage = 20;
-            goto lbl_rcomm;
-        lbl_20:
-            state.fm1 = state.f;
-            state.x[i] = state.xp1;
-            state.rstate.stage = 21;
-            goto lbl_rcomm;
-        lbl_21:
-            state.fp1 = state.f;
-            if( (double)(state.xm1)!=(double)(state.xp1) )
-            {
-                state.g[i] = (state.fp1-state.fm1)/(state.xp1-state.xm1);
-            }
-            else
-            {
-                state.g[i] = 0;
-            }
-            state.repnfev = state.repnfev+2;
-        lbl_58:
-            state.x[i] = v;
-            i = i+1;
-            goto lbl_54;
-        lbl_56:
-            state.f = state.fbase;
-            state.needf = false;
-        lbl_53:
-            
-            //
-            // Back to MCSRCH
-            //
-            optserv.trimfunction(ref state.f, ref state.g, n, state.trimthreshold, _params);
-            state.fn = state.f;
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.cgn[i_] = state.g[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.ugn[i_] = state.g[i_];
-            }
-            for(i=0; i<=n-1; i++)
-            {
-                if( (double)(state.d[i])==(double)(0) )
-                {
-                    state.cgn[i] = 0;
-                }
-            }
-            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
-            goto lbl_50;
-        lbl_51:
-            v = state.fn;
-            for(i=0; i<=n-1; i++)
-            {
-                v = 0.1*v+state.ugn[i];
-            }
-            if( !math.isfinite(v) )
+            if( state.algokind==1 )
             {
                 
                 //
-                // Abnormal termination - infinities in function/gradient
+                // Dual simplex method
                 //
-                state.repterminationtype = -8;
-                result = false;
-                return result;
-            }
-            if( mcinfo!=1 && mcinfo!=5 )
-            {
+                reviseddualsimplex.dsssettingsinit(settings, _params);
+                reviseddualsimplex.dssinit(n, state.dss, _params);
+                reviseddualsimplex.dsssetcost(state.dss, state.c, _params);
+                reviseddualsimplex.dsssetbc(state.dss, state.bndl, state.bndu, _params);
+                reviseddualsimplex.dsssetlcx(state.dss, dummy, state.a, 1, state.al, state.au, m, dummybasis, alllogicalsbasis, _params);
+                reviseddualsimplex.dssoptimize(state.dss, settings, _params);
                 
                 //
-                // We can not find step which decreases function value. We have
-                // two possibilities:
-                // (a) numerical properties of the function do not allow us to
-                //     find good step.
-                // (b) we are close to activation of some constraint, and it is
-                //     so close that step which activates it leads to change in
-                //     target function which is smaller than numerical noise.
+                // Export results
                 //
-                // Optimization algorithm must be able to handle case (b), because
-                // inability to handle it will cause failure when algorithm
-                // started very close to boundary of the feasible area.
-                //
-                // In order to correctly handle such cases we allow limited amount
-                // of small steps which increase function value.
-                //
-                if( (freezeidx>=0 && (double)(scaleddnorm*state.curstpmax)<=(double)(maxnonmonotoniclen)) && state.nonmonotoniccnt>0 )
-                {
-                    
-                    //
-                    // We enforce non-monotonic step:
-                    // * Stp    := CurStpMax
-                    // * MCINFO := 5
-                    // * XN     := XC+CurStpMax*D
-                    // * non-monotonic counter is decreased
-                    //
-                    // NOTE: UGN/CGN are not updated because step is so short that we assume that
-                    //       GN is approximately equal to GC.
-                    //
-                    state.stp = state.curstpmax;
-                    mcinfo = 5;
-                    v = state.curstpmax;
-                    for(i_=0; i_<=n-1;i_++)
-                    {
-                        state.xn[i_] = state.xc[i_];
-                    }
-                    for(i_=0; i_<=n-1;i_++)
-                    {
-                        state.xn[i_] = state.xn[i_] + v*state.d[i_];
-                    }
-                    state.nonmonotoniccnt = state.nonmonotoniccnt-1;
-                }
-                else
-                {
-                    
-                    //
-                    // Numerical properties of the function does not allow
-                    // us to solve problem. Algorithm is terminated
-                    //
-                    state.repterminationtype = 7;
-                    result = false;
-                    return result;
-                }
-            }
-            if( state.userterminationneeded )
-            {
-                
-                //
-                // User requested termination
-                //
-                state.repterminationtype = 8;
-                result = false;
-                return result;
-            }
-            alglib.ap.assert(mcinfo!=5 || (double)(state.stp)==(double)(state.curstpmax), "MinBC: integrity check failed");
-            optserv.postprocessboundedstep(ref state.xn, state.xc, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, freezeidx, freezeval, state.stp, activationstep, _params);
-            state.fp = state.fc;
-            state.fc = state.fn;
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.xp[i_] = state.xc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.xc[i_] = state.xn[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.cgc[i_] = state.cgn[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.ugc[i_] = state.ugn[i_];
-            }
-            if( !state.xrep )
-            {
-                goto lbl_59;
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.x[i_] = state.xc[i_];
-            }
-            clearrequestfields(state, _params);
-            state.xupdated = true;
-            state.rstate.stage = 22;
-            goto lbl_rcomm;
-        lbl_22:
-            state.xupdated = false;
-        lbl_59:
-            state.repiterationscount = state.repiterationscount+1;
-            if( mcinfo==1 )
-            {
-                v = 0;
+                apserv.rvectorsetlengthatleast(ref state.xs, n, _params);
+                apserv.rvectorsetlengthatleast(ref state.ys, m, _params);
+                apserv.ivectorsetlengthatleast(ref state.cs, n+m, _params);
                 for(i=0; i<=n-1; i++)
                 {
-                    v = v+math.sqr((state.xc[i]-state.xp[i])/state.s[i]);
+                    state.xs[i] = state.dss.repx[i];
                 }
-                v = Math.Sqrt(v);
-                if( (double)(v)<=(double)(state.epsx) )
+                for(i=0; i<=m-1; i++)
                 {
-                    
-                    //
-                    // Step is small enough
-                    //
-                    state.repterminationtype = 2;
-                    result = false;
-                    return result;
+                    state.ys[i] = state.dss.repy[i];
                 }
-                if( (double)(Math.Abs(state.fp-state.fc))<=(double)(state.epsf*Math.Max(Math.Abs(state.fc), Math.Max(Math.Abs(state.fp), 1.0))) )
+                for(i=0; i<=n+m-1; i++)
                 {
-                    
-                    //
-                    // Function change is small enough
-                    //
-                    state.repterminationtype = 1;
-                    result = false;
-                    return result;
+                    state.cs[i] = state.dss.repstats[i];
                 }
-            }
-            if( state.maxits>0 && state.repiterationscount>=state.maxits )
-            {
-                
-                //
-                // Iteration counter exceeded limit
-                //
-                state.repterminationtype = 5;
-                result = false;
-                return result;
+                state.repf = state.dss.repf;
+                state.repprimalerror = state.dss.repprimalerror;
+                state.repdualerror = state.dss.repdualerror;
+                state.repiterationscount = state.dss.repiterationscount;
+                state.repterminationtype = state.dss.repterminationtype;
+                return;
             }
             
             //
-            // LBFGS stage:
-            // * during LBFGS iterations we activate new constraints, but never
-            //   deactivate already active ones.
-            // * we perform at most N iterations of LBFGS before re-evaluating
-            //   active set and restarting LBFGS.
+            // Integrity check failed - unknown solver
             //
-            // About termination:
-            // * LBFGS iterations can be terminated because of two reasons:
-            //   * "termination" - non-zero termination code in RepTerminationType,
-            //     which means that optimization is done
-            //   * "restart" - zero RepTerminationType, which means that we
-            //     have to re-evaluate active set and resume LBFGS stage.
-            // * one more option is "refresh" - to continue LBFGS iterations,
-            //   but with all BFGS updates (Sk/Yk pairs) being dropped;
-            //   it happens after changes in active set
-            //
-            ginit = 0.0;
-            for(i=0; i<=n-1; i++)
-            {
-                state.cgc[i] = state.ugc[i];
-                if( state.hasbndl[i] && (double)(state.xc[i])==(double)(state.bndl[i]) )
-                {
-                    state.cgc[i] = 0;
-                }
-                if( state.hasbndu[i] && (double)(state.xc[i])==(double)(state.bndu[i]) )
-                {
-                    state.cgc[i] = 0;
-                }
-                ginit = ginit+math.sqr(state.cgc[i]*state.s[i]);
-            }
-            ginit = Math.Sqrt(ginit);
-            state.bufsize = 0;
-            itidx = 0;
-        lbl_61:
-            if( itidx>n-1 )
-            {
-                goto lbl_63;
-            }
-            
-            //
-            // At the beginning of each iteration:
-            // * XC stores current point
-            // * FC stores current function value
-            // * UGC stores current unconstrained gradient
-            // * CGC stores current constrained gradient
-            // * D stores constrained step direction (calculated at this block)
-            //
-            // 1. Calculate search direction D according to L-BFGS algorithm
-            //    using constrained preconditioner to perform inner multiplication.
-            // 2. Evaluate scaled length of direction D; restart LBFGS if D is zero
-            //    (it may be possible that we found minimum, but it is also possible
-            //    that some constraints need deactivation)
-            // 3. If D is non-zero, try to use previous scaled step length as initial estimate for new step.
-            // 4. Calculate bound on step length.
-            //
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.work[i_] = state.cgc[i_];
-            }
-            for(i=state.bufsize-1; i>=0; i--)
-            {
-                v = 0.0;
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    v += state.bufsk[i,i_]*state.work[i_];
-                }
-                state.buftheta[i] = v;
-                vv = v*state.bufrho[i];
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    state.work[i_] = state.work[i_] - vv*state.bufyk[i,i_];
-                }
-            }
-            for(i=0; i<=n-1; i++)
-            {
-                state.work[i] = state.tmpprec[i]*state.work[i];
-            }
-            for(i=0; i<=state.bufsize-1; i++)
-            {
-                v = 0.0;
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    v += state.bufyk[i,i_]*state.work[i_];
-                }
-                vv = state.bufrho[i]*(-v+state.buftheta[i]);
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    state.work[i_] = state.work[i_] + vv*state.bufsk[i,i_];
-                }
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.d[i_] = -state.work[i_];
-            }
-            b = false;
-            for(i=0; i<=n-1; i++)
-            {
-                b = b || ((state.hasbndl[i] && (double)(state.xc[i])==(double)(state.bndl[i])) && (double)(state.d[i])!=(double)(0));
-                b = b || ((state.hasbndu[i] && (double)(state.xc[i])==(double)(state.bndu[i])) && (double)(state.d[i])!=(double)(0));
-            }
-            alglib.ap.assert(!b, "MinBC: integrity check failed (q)");
-            scaleddnorm = 0;
-            for(i=0; i<=n-1; i++)
-            {
-                scaleddnorm = scaleddnorm+math.sqr(state.d[i]/state.s[i]);
-            }
-            scaleddnorm = Math.Sqrt(scaleddnorm);
-            if( (double)(scaleddnorm)==(double)(0) )
-            {
-                
-                //
-                // Search direction is zero.
-                // Skip back to steepest descent phase.
-                //
-                goto lbl_63;
-            }
-            if( (double)(state.lastscaledgoodstep)>(double)(0) )
-            {
-                state.stp = state.lastscaledgoodstep/scaleddnorm;
-            }
-            else
-            {
-                state.stp = 1.0/scaleddnorm;
-            }
-            state.curstpmax = 1.0E50;
-            if( (double)(state.stpmax)>(double)(0) )
-            {
-                state.curstpmax = Math.Min(state.curstpmax, state.stpmax/scaleddnorm);
-            }
-            
-            //
-            // Minimize G(t) = F(CONSTRAIN(XC + t*D)), with t being scalar, XC and D being vectors.
-            //
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.xn[i_] = state.xc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.cgn[i_] = state.cgc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.ugn[i_] = state.ugc[i_];
-            }
-            state.fn = state.fc;
-            state.mcstage = 0;
-            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
-        lbl_64:
-            if( state.mcstage==0 )
-            {
-                goto lbl_65;
-            }
-            
-            //
-            // Copy XN to X, perform on-the-fly correction w.r.t box
-            // constraints (projection onto feasible set).
-            //
-            for(i=0; i<=n-1; i++)
-            {
-                state.x[i] = state.xn[i];
-                if( state.hasbndl[i] && (double)(state.xn[i])<=(double)(state.bndl[i]) )
-                {
-                    state.x[i] = state.bndl[i];
-                }
-                if( state.hasbndu[i] && (double)(state.xn[i])>=(double)(state.bndu[i]) )
-                {
-                    state.x[i] = state.bndu[i];
-                }
-            }
-            
-            //
-            // Gradient, either user-provided or numerical differentiation
-            //
-            clearrequestfields(state, _params);
-            if( (double)(state.diffstep)!=(double)(0) )
-            {
-                goto lbl_66;
-            }
-            
-            //
-            // Analytic gradient
-            //
-            state.needfg = true;
-            state.rstate.stage = 23;
-            goto lbl_rcomm;
-        lbl_23:
-            state.needfg = false;
-            state.repnfev = state.repnfev+1;
-            goto lbl_67;
-        lbl_66:
-            
-            //
-            // Numerical differentiation
-            //
-            state.needf = true;
-            state.rstate.stage = 24;
-            goto lbl_rcomm;
-        lbl_24:
-            state.fbase = state.f;
-            i = 0;
-        lbl_68:
-            if( i>n-1 )
-            {
-                goto lbl_70;
-            }
-            v = state.x[i];
-            b = false;
-            if( state.hasbndl[i] )
-            {
-                b = b || (double)(v-state.diffstep*state.s[i])<(double)(state.bndl[i]);
-            }
-            if( state.hasbndu[i] )
-            {
-                b = b || (double)(v+state.diffstep*state.s[i])>(double)(state.bndu[i]);
-            }
-            if( b )
-            {
-                goto lbl_71;
-            }
-            state.x[i] = v-state.diffstep*state.s[i];
-            state.rstate.stage = 25;
-            goto lbl_rcomm;
-        lbl_25:
-            state.fm2 = state.f;
-            state.x[i] = v-0.5*state.diffstep*state.s[i];
-            state.rstate.stage = 26;
-            goto lbl_rcomm;
-        lbl_26:
-            state.fm1 = state.f;
-            state.x[i] = v+0.5*state.diffstep*state.s[i];
-            state.rstate.stage = 27;
-            goto lbl_rcomm;
-        lbl_27:
-            state.fp1 = state.f;
-            state.x[i] = v+state.diffstep*state.s[i];
-            state.rstate.stage = 28;
-            goto lbl_rcomm;
-        lbl_28:
-            state.fp2 = state.f;
-            state.g[i] = (8*(state.fp1-state.fm1)-(state.fp2-state.fm2))/(6*state.diffstep*state.s[i]);
-            state.repnfev = state.repnfev+4;
-            goto lbl_72;
-        lbl_71:
-            state.xm1 = v-state.diffstep*state.s[i];
-            state.xp1 = v+state.diffstep*state.s[i];
-            if( state.hasbndl[i] && (double)(state.xm1)<(double)(state.bndl[i]) )
-            {
-                state.xm1 = state.bndl[i];
-            }
-            if( state.hasbndu[i] && (double)(state.xp1)>(double)(state.bndu[i]) )
-            {
-                state.xp1 = state.bndu[i];
-            }
-            state.x[i] = state.xm1;
-            state.rstate.stage = 29;
-            goto lbl_rcomm;
-        lbl_29:
-            state.fm1 = state.f;
-            state.x[i] = state.xp1;
-            state.rstate.stage = 30;
-            goto lbl_rcomm;
-        lbl_30:
-            state.fp1 = state.f;
-            if( (double)(state.xm1)!=(double)(state.xp1) )
-            {
-                state.g[i] = (state.fp1-state.fm1)/(state.xp1-state.xm1);
-            }
-            else
-            {
-                state.g[i] = 0;
-            }
-            state.repnfev = state.repnfev+2;
-        lbl_72:
-            state.x[i] = v;
-            i = i+1;
-            goto lbl_68;
-        lbl_70:
-            state.f = state.fbase;
-            state.needf = false;
-        lbl_67:
-            
-            //
-            // Back to MCSRCH
-            //
-            optserv.trimfunction(ref state.f, ref state.g, n, state.trimthreshold, _params);
-            state.fn = state.f;
-            for(i=0; i<=n-1; i++)
-            {
-                state.ugn[i] = state.g[i];
-                state.cgn[i] = state.g[i];
-                if( state.hasbndl[i] && (double)(state.xn[i])<=(double)(state.bndl[i]) )
-                {
-                    state.cgn[i] = 0;
-                }
-                if( state.hasbndu[i] && (double)(state.xn[i])>=(double)(state.bndu[i]) )
-                {
-                    state.cgn[i] = 0;
-                }
-            }
-            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
-            goto lbl_64;
-        lbl_65:
-            for(i=0; i<=n-1; i++)
-            {
-                if( state.hasbndl[i] && (double)(state.xn[i])<=(double)(state.bndl[i]) )
-                {
-                    state.xn[i] = state.bndl[i];
-                }
-                if( state.hasbndu[i] && (double)(state.xn[i])>=(double)(state.bndu[i]) )
-                {
-                    state.xn[i] = state.bndu[i];
-                }
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.bufsk[state.bufsize,i_] = -state.xc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.bufyk[state.bufsize,i_] = -state.cgc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.bufsk[state.bufsize,i_] = state.bufsk[state.bufsize,i_] + state.xn[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.bufyk[state.bufsize,i_] = state.bufyk[state.bufsize,i_] + state.cgn[i_];
-            }
-            
-            //
-            // Handle special situations:
-            // * check for presence of NAN/INF in function/gradient
-            // * handle failure of line search
-            //
-            v = state.fn;
-            for(i=0; i<=n-1; i++)
-            {
-                v = 0.1*v+state.ugn[i];
-            }
-            if( !math.isfinite(v) )
-            {
-                
-                //
-                // Abnormal termination - infinities in function/gradient
-                //
-                state.repterminationtype = -8;
-                result = false;
-                return result;
-            }
-            if( state.userterminationneeded )
-            {
-                
-                //
-                // User requested termination
-                //
-                state.repterminationtype = 8;
-                result = false;
-                return result;
-            }
-            if( mcinfo!=1 )
-            {
-                
-                //
-                // Terminate LBFGS phase
-                //
-                goto lbl_63;
-            }
-            
-            //
-            // Current point is updated:
-            // * move XC/FC/GC to XP/FP/GP
-            // * move XN/FN/GN to XC/FC/GC
-            // * report current point and update iterations counter
-            // * push new pair SK/YK to LBFGS buffer
-            // * update length of the good step
-            //
-            activationstatus = false;
-            for(i=0; i<=n-1; i++)
-            {
-                if( (state.hasbndl[i] && (double)(state.xn[i])==(double)(state.bndl[i])) && (double)(state.xn[i])!=(double)(state.xc[i]) )
-                {
-                    activationstatus = true;
-                }
-                if( (state.hasbndu[i] && (double)(state.xn[i])==(double)(state.bndu[i])) && (double)(state.xn[i])!=(double)(state.xc[i]) )
-                {
-                    activationstatus = true;
-                }
-            }
-            state.fp = state.fc;
-            state.fc = state.fn;
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.xp[i_] = state.xc[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.xc[i_] = state.xn[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.cgc[i_] = state.cgn[i_];
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.ugc[i_] = state.ugn[i_];
-            }
-            if( !state.xrep )
-            {
-                goto lbl_73;
-            }
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.x[i_] = state.xc[i_];
-            }
-            clearrequestfields(state, _params);
-            state.xupdated = true;
-            state.rstate.stage = 31;
-            goto lbl_rcomm;
-        lbl_31:
-            state.xupdated = false;
-        lbl_73:
-            state.repiterationscount = state.repiterationscount+1;
-            if( state.bufsize==m )
-            {
-                
-                //
-                // Buffer is full, shift contents by one row
-                //
-                for(i=0; i<=state.bufsize-1; i++)
-                {
-                    for(i_=0; i_<=n-1;i_++)
-                    {
-                        state.bufsk[i,i_] = state.bufsk[i+1,i_];
-                    }
-                    for(i_=0; i_<=n-1;i_++)
-                    {
-                        state.bufyk[i,i_] = state.bufyk[i+1,i_];
-                    }
-                }
-                for(i=0; i<=state.bufsize-2; i++)
-                {
-                    state.bufrho[i] = state.bufrho[i+1];
-                    state.buftheta[i] = state.buftheta[i+1];
-                }
-            }
-            else
-            {
-                
-                //
-                // Buffer is not full, increase buffer size by 1
-                //
-                state.bufsize = state.bufsize+1;
-            }
-            v = 0.0;
-            for(i_=0; i_<=n-1;i_++)
-            {
-                v += state.bufyk[state.bufsize-1,i_]*state.bufsk[state.bufsize-1,i_];
-            }
-            vv = 0.0;
-            for(i_=0; i_<=n-1;i_++)
-            {
-                vv += state.bufyk[state.bufsize-1,i_]*state.bufyk[state.bufsize-1,i_];
-            }
-            if( (double)(v)==(double)(0) || (double)(vv)==(double)(0) )
-            {
-                
-                //
-                // Strange internal error in LBFGS - either YK=0
-                // (which should not have been) or (SK,YK)=0 (again,
-                // unexpected). It should not take place because
-                // MCINFO=1, which signals "good" step. But just
-                // to be sure we have special branch of code which
-                // restarts LBFGS
-                //
-                goto lbl_63;
-            }
-            state.bufrho[state.bufsize-1] = 1/v;
-            alglib.ap.assert(state.bufsize<=m, "MinBC: internal error");
-            v = 0;
-            vv = 0;
-            for(i=0; i<=n-1; i++)
-            {
-                v = v+math.sqr((state.xc[i]-state.xp[i])/state.s[i]);
-                vv = vv+math.sqr(state.xc[i]-state.xp[i]);
-            }
-            updateestimateofgoodstep(ref state.lastscaledgoodstep, Math.Sqrt(v), _params);
-            
-            //
-            // Check MaxIts-based stopping condition.
-            //
-            if( state.maxits>0 && state.repiterationscount>=state.maxits )
-            {
-                state.repterminationtype = 5;
-                result = false;
-                return result;
-            }
-            
-            //
-            // Smooth reset (LBFGS memory model is refreshed) or hard restart:
-            // * LBFGS model is refreshed, if line search was performed with activation of constraints
-            // * algorithm is restarted if scaled gradient decreased below GDecay
-            //
-            if( activationstatus )
-            {
-                state.bufsize = 0;
-                goto lbl_62;
-            }
-            v = 0.0;
-            for(i=0; i<=n-1; i++)
-            {
-                v = v+math.sqr(state.cgc[i]*state.s[i]);
-            }
-            if( (double)(Math.Sqrt(v))<(double)(gdecay*ginit) )
-            {
-                goto lbl_63;
-            }
-        lbl_62:
-            itidx = itidx+1;
-            goto lbl_61;
-        lbl_63:
-            
-            //
-            // Decrease decay coefficient. Subsequent L-BFGS stages will
-            // have more stringent stopping criteria.
-            //
-            gdecay = Math.Max(gdecay*decaycorrection, mindecay);
-            goto lbl_41;
-        lbl_42:
-            result = false;
-            return result;
-            
-            //
-            // Saving state
-            //
-        lbl_rcomm:
-            result = true;
-            state.rstate.ia[0] = freezeidx;
-            state.rstate.ia[1] = n;
-            state.rstate.ia[2] = m;
-            state.rstate.ia[3] = i;
-            state.rstate.ia[4] = j;
-            state.rstate.ia[5] = mcinfo;
-            state.rstate.ia[6] = itidx;
-            state.rstate.ba[0] = b;
-            state.rstate.ba[1] = activationstatus;
-            state.rstate.ra[0] = freezeval;
-            state.rstate.ra[1] = scaleddnorm;
-            state.rstate.ra[2] = v;
-            state.rstate.ra[3] = vv;
-            state.rstate.ra[4] = v0;
-            state.rstate.ra[5] = ginit;
-            state.rstate.ra[6] = gdecay;
-            state.rstate.ra[7] = activationstep;
-            return result;
+            alglib.ap.assert(false, "MinQPOptimize: integrity check failed - unknown solver");
         }
 
 
         /*************************************************************************
-        BC results
+        LP solver results
 
         INPUT PARAMETERS:
             State   -   algorithm state
 
         OUTPUT PARAMETERS:
-            X       -   array[0..N-1], solution
-            Rep     -   optimization report. You should check Rep.TerminationType
-                        in  order  to  distinguish  successful  termination  from
-                        unsuccessful one:
-                        * -8    internal integrity control  detected  infinite or
-                                NAN   values   in   function/gradient.   Abnormal
-                                termination signalled.
-                        * -7   gradient verification failed.
-                               See MinBCSetGradientCheck() for more information.
-                        * -3   inconsistent constraints.
-                        *  1   relative function improvement is no more than EpsF.
-                        *  2   scaled step is no more than EpsX.
-                        *  4   scaled gradient norm is no more than EpsG.
-                        *  5   MaxIts steps was taken
-                        *  8   terminated by user who called minbcrequesttermination().
-                               X contains point which was "current accepted"  when
-                               termination request was submitted.
-                        More information about fields of this  structure  can  be
-                        found in the comments on MinBCReport datatype.
-           
+            X       -   array[N], solution. Filled by zeros on failure.
+            Rep     -   optimization report. You should check Rep.TerminationType,
+                        which contains completion code, and you may check  another
+                        fields which contain another information  about  algorithm
+                        functioning.
+                        
+                        Failure codes returned by algorithm are:
+                        * -4    LP problem is primal unbounded (dual infeasible)
+                        * -3    LP problem is primal infeasible (dual unbounded)
+                        
+                        Success codes:
+                        *  1..4 successful completion
+                        *  5    MaxIts steps was taken
+
           -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
+             Copyright 11.01.2011 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbcresults(minbcstate state,
+        public static void minlpresults(minlpstate state,
             ref double[] x,
-            minbcreport rep,
+            minlpreport rep,
             alglib.xparams _params)
         {
             x = new double[0];
 
-            minbcresultsbuf(state, ref x, rep, _params);
+            minlpresultsbuf(state, ref x, rep, _params);
         }
 
 
         /*************************************************************************
-        BC results
+        LP results
 
-        Buffered implementation of MinBCResults() which uses pre-allocated buffer
+        Buffered implementation of MinLPResults() which uses pre-allocated  buffer
         to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
         intended to be used in the inner cycles of performance critical algorithms
         where array reallocation penalty is too large to be ignored.
 
           -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
+             Copyright 11.01.2011 by Bochkanov Sergey
         *************************************************************************/
-        public static void minbcresultsbuf(minbcstate state,
+        public static void minlpresultsbuf(minlpstate state,
             ref double[] x,
-            minbcreport rep,
+            minlpreport rep,
             alglib.xparams _params)
         {
             int i = 0;
-            int i_ = 0;
 
-            if( alglib.ap.len(x)<state.nmain )
+            if( alglib.ap.len(x)<state.n )
             {
-                x = new double[state.nmain];
+                x = new double[state.n];
             }
+            rep.y = new double[state.m];
+            rep.stats = new int[state.n+state.m];
+            rep.f = state.repf;
+            rep.primalerror = state.repprimalerror;
+            rep.dualerror = state.repdualerror;
             rep.iterationscount = state.repiterationscount;
-            rep.nfev = state.repnfev;
-            rep.varidx = state.repvaridx;
             rep.terminationtype = state.repterminationtype;
             if( state.repterminationtype>0 )
             {
-                for(i_=0; i_<=state.nmain-1;i_++)
+                for(i=0; i<=state.n-1; i++)
                 {
-                    x[i_] = state.xc[i_];
+                    x[i] = state.xs[i];
+                }
+                for(i=0; i<=state.m-1; i++)
+                {
+                    rep.y[i] = state.ys[i];
+                }
+                for(i=0; i<=state.n+state.m-1; i++)
+                {
+                    rep.stats[i] = state.cs[i];
                 }
             }
             else
             {
-                for(i=0; i<=state.nmain-1; i++)
+                for(i=0; i<=state.n-1; i++)
                 {
-                    x[i] = Double.NaN;
+                    x[i] = 0;
+                }
+                for(i=0; i<=state.m-1; i++)
+                {
+                    rep.y[i] = 0;
+                }
+                for(i=0; i<=state.n+state.m-1; i++)
+                {
+                    rep.stats[i] = 0;
                 }
             }
         }
 
 
         /*************************************************************************
-        This subroutine restarts algorithm from new point.
-        All optimization parameters (including constraints) are left unchanged.
-
-        This  function  allows  to  solve multiple  optimization  problems  (which
-        must have  same number of dimensions) without object reallocation penalty.
-
-        INPUT PARAMETERS:
-            State   -   structure previously allocated with MinBCCreate call.
-            X       -   new starting point.
+        Clear report fields prior to the optimization.
 
           -- ALGLIB --
-             Copyright 28.11.2010 by Bochkanov Sergey
+             Copyright 19.07.2018 by Bochkanov Sergey.
         *************************************************************************/
-        public static void minbcrestartfrom(minbcstate state,
-            double[] x,
+        private static void clearreportfields(minlpstate state,
             alglib.xparams _params)
         {
-            int n = 0;
-            int i_ = 0;
-
-            n = state.nmain;
-            
-            //
-            // First, check for errors in the inputs
-            //
-            alglib.ap.assert(alglib.ap.len(x)>=n, "MinBCRestartFrom: Length(X)<N");
-            alglib.ap.assert(apserv.isfinitevector(x, n, _params), "MinBCRestartFrom: X contains infinite or NaN values!");
-            
-            //
-            // Set XC
-            //
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.xstart[i_] = x[i_];
-            }
-            
-            //
-            // prepare RComm facilities
-            //
-            state.rstate.ia = new int[6+1];
-            state.rstate.ba = new bool[1+1];
-            state.rstate.ra = new double[7+1];
-            state.rstate.stage = -1;
-            clearrequestfields(state, _params);
-        }
-
-
-        /*************************************************************************
-        This subroutine submits request for termination of running  optimizer.  It
-        should be called from user-supplied callback when user decides that it  is
-        time to "smoothly" terminate optimization process.  As  result,  optimizer
-        stops at point which was "current accepted" when termination  request  was
-        submitted and returns error code 8 (successful termination).
-
-        INPUT PARAMETERS:
-            State   -   optimizer structure
-
-        NOTE: after  request  for  termination  optimizer  may   perform   several
-              additional calls to user-supplied callbacks. It does  NOT  guarantee
-              to stop immediately - it just guarantees that these additional calls
-              will be discarded later.
-
-        NOTE: calling this function on optimizer which is NOT running will have no
-              effect.
-              
-        NOTE: multiple calls to this function are possible. First call is counted,
-              subsequent calls are silently ignored.
-
-          -- ALGLIB --
-             Copyright 08.10.2014 by Bochkanov Sergey
-        *************************************************************************/
-        public static void minbcrequesttermination(minbcstate state,
-            alglib.xparams _params)
-        {
-            state.userterminationneeded = true;
-        }
-
-
-        /*************************************************************************
-        This  subroutine  turns  on  verification  of  the  user-supplied analytic
-        gradient:
-        * user calls this subroutine before optimization begins
-        * MinBCOptimize() is called
-        * prior to  actual  optimization, for each component  of  parameters being
-          optimized X[i] algorithm performs following steps:
-          * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
-            where X[i] is i-th component of the initial point and S[i] is a  scale
-            of i-th parameter
-          * if needed, steps are bounded with respect to constraints on X[]
-          * F(X) is evaluated at these trial points
-          * we perform one more evaluation in the middle point of the interval
-          * we  build  cubic  model using function values and derivatives at trial
-            points and we compare its prediction with actual value in  the  middle
-            point
-          * in case difference between prediction and actual value is higher  than
-            some predetermined threshold, algorithm stops with completion code -7;
-            Rep.VarIdx is set to index of the parameter with incorrect derivative.
-        * after verification is over, algorithm proceeds to the actual optimization.
-
-        NOTE 1: verification  needs  N (parameters count) gradient evaluations. It
-                is very costly and you should use  it  only  for  low  dimensional
-                problems,  when  you  want  to  be  sure  that  you've   correctly
-                calculated  analytic  derivatives.  You  should  not use it in the
-                production code (unless you want to check derivatives provided  by
-                some third party).
-
-        NOTE 2: you  should  carefully  choose  TestStep. Value which is too large
-                (so large that function behaviour is significantly non-cubic) will
-                lead to false alarms. You may use  different  step  for  different
-                parameters by means of setting scale with MinBCSetScale().
-
-        NOTE 3: this function may lead to false positives. In case it reports that
-                I-th  derivative was calculated incorrectly, you may decrease test
-                step  and  try  one  more  time  - maybe your function changes too
-                sharply  and  your  step  is  too  large for such rapidly chanding
-                function.
-
-        INPUT PARAMETERS:
-            State       -   structure used to store algorithm state
-            TestStep    -   verification step:
-                            * TestStep=0 turns verification off
-                            * TestStep>0 activates verification
-
-          -- ALGLIB --
-             Copyright 15.06.2012 by Bochkanov Sergey
-        *************************************************************************/
-        public static void minbcsetgradientcheck(minbcstate state,
-            double teststep,
-            alglib.xparams _params)
-        {
-            alglib.ap.assert(math.isfinite(teststep), "MinBCSetGradientCheck: TestStep contains NaN or Infinite");
-            alglib.ap.assert((double)(teststep)>=(double)(0), "MinBCSetGradientCheck: invalid argument TestStep(TestStep<0)");
-            state.teststep = teststep;
-        }
-
-
-        /*************************************************************************
-        Clears request fileds (to be sure that we don't forget to clear something)
-        *************************************************************************/
-        private static void clearrequestfields(minbcstate state,
-            alglib.xparams _params)
-        {
-            state.needf = false;
-            state.needfg = false;
-            state.xupdated = false;
-        }
-
-
-        /*************************************************************************
-        Internal initialization subroutine.
-        *************************************************************************/
-        private static void minbcinitinternal(int n,
-            double[] x,
-            double diffstep,
-            minbcstate state,
-            alglib.xparams _params)
-        {
-            int i = 0;
-            double[,] c = new double[0,0];
-            int[] ct = new int[0];
-
-            
-            //
-            // Initialize
-            //
-            state.teststep = 0;
-            state.nmain = n;
-            state.diffstep = diffstep;
-            apserv.rvectorsetlengthatleast(ref state.bndl, n, _params);
-            apserv.bvectorsetlengthatleast(ref state.hasbndl, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.bndu, n, _params);
-            apserv.bvectorsetlengthatleast(ref state.hasbndu, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.xstart, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.xc, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.cgc, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.ugc, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.xn, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.cgn, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.ugn, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.xp, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.d, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.s, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.x, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.g, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.work, n, _params);
-            for(i=0; i<=n-1; i++)
-            {
-                state.bndl[i] = Double.NegativeInfinity;
-                state.hasbndl[i] = false;
-                state.bndu[i] = Double.PositiveInfinity;
-                state.hasbndu[i] = false;
-                state.s[i] = 1.0;
-            }
-            minbcsetcond(state, 0.0, 0.0, 0.0, 0, _params);
-            minbcsetxrep(state, false, _params);
-            minbcsetstpmax(state, 0.0, _params);
-            minbcsetprecdefault(state, _params);
-            minbcrestartfrom(state, x, _params);
-        }
-
-
-        /*************************************************************************
-        This subroutine updates estimate of the good step length given:
-        1) previous estimate
-        2) new length of the good step
-
-        It makes sure that estimate does not change too rapidly - ratio of new and
-        old estimates will be at least 0.01, at most 100.0
-
-        In case previous estimate of good step is zero (no estimate), new estimate
-        is used unconditionally.
-
-          -- ALGLIB --
-             Copyright 16.01.2013 by Bochkanov Sergey
-        *************************************************************************/
-        private static void updateestimateofgoodstep(ref double estimate,
-            double newstep,
-            alglib.xparams _params)
-        {
-            if( (double)(estimate)==(double)(0) )
-            {
-                estimate = newstep;
-                return;
-            }
-            if( (double)(newstep)<(double)(estimate*0.01) )
-            {
-                estimate = estimate*0.01;
-                return;
-            }
-            if( (double)(newstep)>(double)(estimate*100) )
-            {
-                estimate = estimate*100;
-                return;
-            }
-            estimate = newstep;
+            state.repf = 0.0;
+            state.repprimalerror = 0.0;
+            state.repdualerror = 0.0;
+            state.repiterationscount = 0;
+            state.repterminationtype = 0;
         }
 
 
     }
     public class nlcslp
     {
+        /*************************************************************************
+        This object stores temporaries of SLP subsolver.
+        *************************************************************************/
+        public class minslpsubsolver : apobject
+        {
+            public reviseddualsimplex.dualsimplexstate dss;
+            public reviseddualsimplex.dualsimplexsettings dsssettings;
+            public reviseddualsimplex.dualsimplexbasis lastbasis;
+            public bool basispresent;
+            public double[,] curd;
+            public int curdcnt;
+            public double[] curb;
+            public double[] curbndl;
+            public double[] curbndu;
+            public double[] cural;
+            public double[] curau;
+            public sparse.sparsematrix sparselc;
+            public int hessiantype;
+            public double[,] h;
+            public double[,] curhd;
+            public double[,] densedummy;
+            public sparse.sparsematrix sparsedummy;
+            public double[] tmp0;
+            public double[] tmp1;
+            public double[] sk;
+            public double[] yk;
+            public minslpsubsolver()
+            {
+                init();
+            }
+            public override void init()
+            {
+                dss = new reviseddualsimplex.dualsimplexstate();
+                dsssettings = new reviseddualsimplex.dualsimplexsettings();
+                lastbasis = new reviseddualsimplex.dualsimplexbasis();
+                curd = new double[0,0];
+                curb = new double[0];
+                curbndl = new double[0];
+                curbndu = new double[0];
+                cural = new double[0];
+                curau = new double[0];
+                sparselc = new sparse.sparsematrix();
+                h = new double[0,0];
+                curhd = new double[0,0];
+                densedummy = new double[0,0];
+                sparsedummy = new sparse.sparsematrix();
+                tmp0 = new double[0];
+                tmp1 = new double[0];
+                sk = new double[0];
+                yk = new double[0];
+            }
+            public override alglib.apobject make_copy()
+            {
+                minslpsubsolver _result = new minslpsubsolver();
+                _result.dss = (reviseddualsimplex.dualsimplexstate)dss.make_copy();
+                _result.dsssettings = (reviseddualsimplex.dualsimplexsettings)dsssettings.make_copy();
+                _result.lastbasis = (reviseddualsimplex.dualsimplexbasis)lastbasis.make_copy();
+                _result.basispresent = basispresent;
+                _result.curd = (double[,])curd.Clone();
+                _result.curdcnt = curdcnt;
+                _result.curb = (double[])curb.Clone();
+                _result.curbndl = (double[])curbndl.Clone();
+                _result.curbndu = (double[])curbndu.Clone();
+                _result.cural = (double[])cural.Clone();
+                _result.curau = (double[])curau.Clone();
+                _result.sparselc = (sparse.sparsematrix)sparselc.make_copy();
+                _result.hessiantype = hessiantype;
+                _result.h = (double[,])h.Clone();
+                _result.curhd = (double[,])curhd.Clone();
+                _result.densedummy = (double[,])densedummy.Clone();
+                _result.sparsedummy = (sparse.sparsematrix)sparsedummy.make_copy();
+                _result.tmp0 = (double[])tmp0.Clone();
+                _result.tmp1 = (double[])tmp1.Clone();
+                _result.sk = (double[])sk.Clone();
+                _result.yk = (double[])yk.Clone();
+                return _result;
+            }
+        };
+
+
         /*************************************************************************
         This object stores temporaries of SLP solver.
         *************************************************************************/
@@ -32101,6 +35989,7 @@ public partial class alglib
             public double[] scaledbndu;
             public double epsx;
             public int maxits;
+            public int hessiantype;
             public double[] x;
             public double[] fi;
             public double[,] j;
@@ -32109,17 +35998,7 @@ public partial class alglib
             public bool xupdated;
             public double trustrad;
             public double deltamax;
-            public double[,] h;
-            public double[,] curd;
-            public int curdcnt;
-            public minbleic.minbleicstate blcsolver;
-            public minbleic.minbleicreport blcrep;
-            public double[] curbndl;
-            public double[] curbndu;
-            public double[,] curlc;
-            public int[] curlct;
-            public int primarylccnt;
-            public double[] b;
+            public minslpsubsolver subsolver;
             public double[] d;
             public linmin.linminstate mcstate;
             public int mcstage;
@@ -32127,22 +36006,16 @@ public partial class alglib
             public double nu;
             public int mcinfo;
             public int mcnfev;
-            public double descentanddecreasegain;
-            public double descentgain;
-            public double currentgain;
-            public int fstagnationcnt;
             public int xstagnationcnt;
+            public int nondescentcnt;
             public double[] prevx;
             public double[] step0x;
-            public double[] step1x;
             public double[] stepkx;
             public double[] stepkxn;
             public double[] step0fi;
-            public double[] step1fi;
             public double[] stepkfi;
             public double[] stepkfin;
             public double[,] step0j;
-            public double[,] step1j;
             public double[,] stepkj;
             public double[,] stepkjn;
             public double stepklagval;
@@ -32150,37 +36023,15 @@ public partial class alglib
             public double[] stepklaggrad;
             public double[] stepknlaggrad;
             public double[] stepklagmult;
-            public double step0meritf;
-            public double step1meritf;
-            public double stepkmeritf;
-            public double step0meritdf;
-            public double step1meritdf;
-            public double stepkmeritdf;
-            public double[] maxlag;
             public double[] rho;
-            public double[] d0;
-            public double stp0;
             public double[] tmp0;
-            public double[] tmp1;
-            public double[] tmp2;
-            public double[] tmp3;
-            public double[] tmp4;
-            public double[] sk;
-            public double[] yk;
             public double[] sclagtmp0;
             public double[] sclagtmp1;
-            public double[] dlmtmp0;
-            public double[] dlmtmp1;
-            public double[] dlmtmp2;
-            public double[] dlmtmp3;
-            public double[] dlmtmpsvy;
-            public double[] dlmtmpb;
-            public double[] dlmtmpg;
-            public double[] dlmtmpxd;
-            public double[] dlmtmpqrnorms;
-            public double[,] dlmtmplag;
-            public double[,] dlmtmpqr;
-            public int[] dlmtmplagidx;
+            public double[] mftmp0;
+            public int repsimplexiterations;
+            public int repsimplexiterations1;
+            public int repsimplexiterations2;
+            public int repsimplexiterations3;
             public int repinneriterationscount;
             public int repouteriterationscount;
             public int repterminationtype;
@@ -32199,57 +36050,27 @@ public partial class alglib
                 x = new double[0];
                 fi = new double[0];
                 j = new double[0,0];
-                h = new double[0,0];
-                curd = new double[0,0];
-                blcsolver = new minbleic.minbleicstate();
-                blcrep = new minbleic.minbleicreport();
-                curbndl = new double[0];
-                curbndu = new double[0];
-                curlc = new double[0,0];
-                curlct = new int[0];
-                b = new double[0];
+                subsolver = new minslpsubsolver();
                 d = new double[0];
                 mcstate = new linmin.linminstate();
                 prevx = new double[0];
                 step0x = new double[0];
-                step1x = new double[0];
                 stepkx = new double[0];
                 stepkxn = new double[0];
                 step0fi = new double[0];
-                step1fi = new double[0];
                 stepkfi = new double[0];
                 stepkfin = new double[0];
                 step0j = new double[0,0];
-                step1j = new double[0,0];
                 stepkj = new double[0,0];
                 stepkjn = new double[0,0];
                 stepklaggrad = new double[0];
                 stepknlaggrad = new double[0];
                 stepklagmult = new double[0];
-                maxlag = new double[0];
                 rho = new double[0];
-                d0 = new double[0];
                 tmp0 = new double[0];
-                tmp1 = new double[0];
-                tmp2 = new double[0];
-                tmp3 = new double[0];
-                tmp4 = new double[0];
-                sk = new double[0];
-                yk = new double[0];
                 sclagtmp0 = new double[0];
                 sclagtmp1 = new double[0];
-                dlmtmp0 = new double[0];
-                dlmtmp1 = new double[0];
-                dlmtmp2 = new double[0];
-                dlmtmp3 = new double[0];
-                dlmtmpsvy = new double[0];
-                dlmtmpb = new double[0];
-                dlmtmpg = new double[0];
-                dlmtmpxd = new double[0];
-                dlmtmpqrnorms = new double[0];
-                dlmtmplag = new double[0,0];
-                dlmtmpqr = new double[0,0];
-                dlmtmplagidx = new int[0];
+                mftmp0 = new double[0];
                 rstate = new rcommstate();
             }
             public override alglib.apobject make_copy()
@@ -32267,6 +36088,7 @@ public partial class alglib
                 _result.scaledbndu = (double[])scaledbndu.Clone();
                 _result.epsx = epsx;
                 _result.maxits = maxits;
+                _result.hessiantype = hessiantype;
                 _result.x = (double[])x.Clone();
                 _result.fi = (double[])fi.Clone();
                 _result.j = (double[,])j.Clone();
@@ -32275,17 +36097,7 @@ public partial class alglib
                 _result.xupdated = xupdated;
                 _result.trustrad = trustrad;
                 _result.deltamax = deltamax;
-                _result.h = (double[,])h.Clone();
-                _result.curd = (double[,])curd.Clone();
-                _result.curdcnt = curdcnt;
-                _result.blcsolver = (minbleic.minbleicstate)blcsolver.make_copy();
-                _result.blcrep = (minbleic.minbleicreport)blcrep.make_copy();
-                _result.curbndl = (double[])curbndl.Clone();
-                _result.curbndu = (double[])curbndu.Clone();
-                _result.curlc = (double[,])curlc.Clone();
-                _result.curlct = (int[])curlct.Clone();
-                _result.primarylccnt = primarylccnt;
-                _result.b = (double[])b.Clone();
+                _result.subsolver = (minslpsubsolver)subsolver.make_copy();
                 _result.d = (double[])d.Clone();
                 _result.mcstate = (linmin.linminstate)mcstate.make_copy();
                 _result.mcstage = mcstage;
@@ -32293,22 +36105,16 @@ public partial class alglib
                 _result.nu = nu;
                 _result.mcinfo = mcinfo;
                 _result.mcnfev = mcnfev;
-                _result.descentanddecreasegain = descentanddecreasegain;
-                _result.descentgain = descentgain;
-                _result.currentgain = currentgain;
-                _result.fstagnationcnt = fstagnationcnt;
                 _result.xstagnationcnt = xstagnationcnt;
+                _result.nondescentcnt = nondescentcnt;
                 _result.prevx = (double[])prevx.Clone();
                 _result.step0x = (double[])step0x.Clone();
-                _result.step1x = (double[])step1x.Clone();
                 _result.stepkx = (double[])stepkx.Clone();
                 _result.stepkxn = (double[])stepkxn.Clone();
                 _result.step0fi = (double[])step0fi.Clone();
-                _result.step1fi = (double[])step1fi.Clone();
                 _result.stepkfi = (double[])stepkfi.Clone();
                 _result.stepkfin = (double[])stepkfin.Clone();
                 _result.step0j = (double[,])step0j.Clone();
-                _result.step1j = (double[,])step1j.Clone();
                 _result.stepkj = (double[,])stepkj.Clone();
                 _result.stepkjn = (double[,])stepkjn.Clone();
                 _result.stepklagval = stepklagval;
@@ -32316,37 +36122,15 @@ public partial class alglib
                 _result.stepklaggrad = (double[])stepklaggrad.Clone();
                 _result.stepknlaggrad = (double[])stepknlaggrad.Clone();
                 _result.stepklagmult = (double[])stepklagmult.Clone();
-                _result.step0meritf = step0meritf;
-                _result.step1meritf = step1meritf;
-                _result.stepkmeritf = stepkmeritf;
-                _result.step0meritdf = step0meritdf;
-                _result.step1meritdf = step1meritdf;
-                _result.stepkmeritdf = stepkmeritdf;
-                _result.maxlag = (double[])maxlag.Clone();
                 _result.rho = (double[])rho.Clone();
-                _result.d0 = (double[])d0.Clone();
-                _result.stp0 = stp0;
                 _result.tmp0 = (double[])tmp0.Clone();
-                _result.tmp1 = (double[])tmp1.Clone();
-                _result.tmp2 = (double[])tmp2.Clone();
-                _result.tmp3 = (double[])tmp3.Clone();
-                _result.tmp4 = (double[])tmp4.Clone();
-                _result.sk = (double[])sk.Clone();
-                _result.yk = (double[])yk.Clone();
                 _result.sclagtmp0 = (double[])sclagtmp0.Clone();
                 _result.sclagtmp1 = (double[])sclagtmp1.Clone();
-                _result.dlmtmp0 = (double[])dlmtmp0.Clone();
-                _result.dlmtmp1 = (double[])dlmtmp1.Clone();
-                _result.dlmtmp2 = (double[])dlmtmp2.Clone();
-                _result.dlmtmp3 = (double[])dlmtmp3.Clone();
-                _result.dlmtmpsvy = (double[])dlmtmpsvy.Clone();
-                _result.dlmtmpb = (double[])dlmtmpb.Clone();
-                _result.dlmtmpg = (double[])dlmtmpg.Clone();
-                _result.dlmtmpxd = (double[])dlmtmpxd.Clone();
-                _result.dlmtmpqrnorms = (double[])dlmtmpqrnorms.Clone();
-                _result.dlmtmplag = (double[,])dlmtmplag.Clone();
-                _result.dlmtmpqr = (double[,])dlmtmpqr.Clone();
-                _result.dlmtmplagidx = (int[])dlmtmplagidx.Clone();
+                _result.mftmp0 = (double[])mftmp0.Clone();
+                _result.repsimplexiterations = repsimplexiterations;
+                _result.repsimplexiterations1 = repsimplexiterations1;
+                _result.repsimplexiterations2 = repsimplexiterations2;
+                _result.repsimplexiterations3 = repsimplexiterations3;
                 _result.repinneriterationscount = repinneriterationscount;
                 _result.repouteriterationscount = repouteriterationscount;
                 _result.repterminationtype = repterminationtype;
@@ -32358,24 +36142,19 @@ public partial class alglib
 
 
 
-        public const int slpmaxinnerits = 25;
-        public const double slpstpclosetozero = 0.01;
+        public const double slpstpclosetozero = 0.05;
         public const double slpdeltadecrease = 0.20;
-        public const double significantstep = 0.25;
         public const double slpdeltaincrease = 0.80;
         public const double slpstpclosetoone = 0.95;
         public const double slpgtol = 0.4;
-        public const double dlctolerance = 1.0E-8;
-        public const double initlambdagain = 2.0;
-        public const double maxlambdagain = 1.0E6;
-        public const double lambdadefault = 10.0;
-        public const double qrreg = 1.0E-9;
-        public const double bigc = 10000.0;
-        public const double bfgstol = 1.0E-7;
+        public const double bigc = 500.0;
+        public const double bfgstol = 1.0E-5;
+        public const double meritfunctiongain = 2.0;
         public const double augmentationfactor = 100.0;
         public const double inittrustrad = 0.1;
         public const double stagnationepsf = 1.0E-12;
-        public const int stagnationlimit = 2;
+        public const int stagnationlimit = 3;
+        public const int nondescentlimit = 5;
 
 
         public static void minslpinitbuf(double[] bndl,
@@ -32407,11 +36186,16 @@ public partial class alglib
             state.nlic = nlic;
             
             //
+            // Settings
+            //
+            state.hessiantype = 2;
+            
+            //
             // Prepare RCOMM state
             //
             state.rstate.ia = new int[8+1];
             state.rstate.ba = new bool[0+1];
-            state.rstate.ra = new double[5+1];
+            state.rstate.ra = new double[6+1];
             state.rstate.stage = -1;
             state.needfij = false;
             state.xupdated = false;
@@ -32424,38 +36208,25 @@ public partial class alglib
             //
             apserv.rvectorsetlengthatleast(ref state.prevx, n, _params);
             apserv.rvectorsetlengthatleast(ref state.step0x, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.step1x, n, _params);
             apserv.rvectorsetlengthatleast(ref state.stepkx, n, _params);
             apserv.rvectorsetlengthatleast(ref state.stepkxn, n, _params);
             apserv.rvectorsetlengthatleast(ref state.step0fi, 1+nlec+nlic, _params);
-            apserv.rvectorsetlengthatleast(ref state.step1fi, 1+nlec+nlic, _params);
             apserv.rvectorsetlengthatleast(ref state.stepkfi, 1+nlec+nlic, _params);
             apserv.rvectorsetlengthatleast(ref state.stepkfin, 1+nlec+nlic, _params);
             apserv.rmatrixsetlengthatleast(ref state.step0j, 1+nlec+nlic, n, _params);
-            apserv.rmatrixsetlengthatleast(ref state.step1j, 1+nlec+nlic, n, _params);
             apserv.rmatrixsetlengthatleast(ref state.stepkj, 1+nlec+nlic, n, _params);
             apserv.rmatrixsetlengthatleast(ref state.stepkjn, 1+nlec+nlic, n, _params);
             apserv.rvectorsetlengthatleast(ref state.stepklaggrad, n, _params);
             apserv.rvectorsetlengthatleast(ref state.stepknlaggrad, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.maxlag, n+nec+nic+nlec+nlic, _params);
             apserv.rvectorsetlengthatleast(ref state.rho, nec+nic+nlec+nlic, _params);
-            apserv.rvectorsetlengthatleast(ref state.stepklagmult, n+nec+nic+nlec+nlic, _params);
+            apserv.rvectorsetlengthatleast(ref state.stepklagmult, nec+nic+nlec+nlic, _params);
             apserv.bvectorsetlengthatleast(ref state.hasbndl, n, _params);
             apserv.bvectorsetlengthatleast(ref state.hasbndu, n, _params);
             apserv.rvectorsetlengthatleast(ref state.scaledbndl, n, _params);
             apserv.rvectorsetlengthatleast(ref state.scaledbndu, n, _params);
             apserv.rmatrixsetlengthatleast(ref state.scaledcleic, nec+nic, n+1, _params);
-            apserv.rmatrixsetlengthatleast(ref state.curlc, nec+nic+nlec+nlic+n, nslack+1, _params);
-            apserv.ivectorsetlengthatleast(ref state.curlct, nec+nic+nlec+nlic+n, _params);
-            apserv.rvectorsetlengthatleast(ref state.d0, n, _params);
-            apserv.rmatrixsetlengthatleast(ref state.curd, n, n, _params);
-            apserv.rmatrixsetlengthatleast(ref state.h, n, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.curbndl, nslack, _params);
-            apserv.rvectorsetlengthatleast(ref state.curbndu, nslack, _params);
             apserv.rvectorsetlengthatleast(ref state.d, nslack, _params);
-            apserv.rvectorsetlengthatleast(ref state.b, nslack, _params);
-            apserv.rvectorsetlengthatleast(ref state.sk, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.yk, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.tmp0, nslack, _params);
             
             //
             // Prepare scaled problem
@@ -32522,6 +36293,10 @@ public partial class alglib
             //
             // Report fields
             //
+            state.repsimplexiterations = 0;
+            state.repsimplexiterations1 = 0;
+            state.repsimplexiterations2 = 0;
+            state.repsimplexiterations3 = 0;
             state.repterminationtype = 0;
             state.repinneriterationscount = 0;
             state.repouteriterationscount = 0;
@@ -32533,8 +36308,7 @@ public partial class alglib
             //   so we won't treat large steps as insignificant
             //
             alglib.ap.assert((double)(slpstpclosetozero)<(double)(slpdeltadecrease), "MinSLP: integrity check failed");
-            alglib.ap.assert((double)(slpdeltadecrease)<(double)(significantstep), "MinSLP: integrity check failed");
-            alglib.ap.assert((double)(significantstep)<(double)(slpdeltaincrease), "MinSLP: integrity check failed");
+            alglib.ap.assert((double)(slpdeltadecrease)<(double)(slpdeltaincrease), "MinSLP: integrity check failed");
             alglib.ap.assert((double)(slpdeltaincrease)<(double)(slpstpclosetoone), "MinSLP: integrity check failed");
         }
 
@@ -32574,11 +36348,12 @@ public partial class alglib
             int innerk = 0;
             double v = 0;
             double vv = 0;
-            double v0 = 0;
-            double v1 = 0;
-            double v2 = 0;
-            double v3 = 0;
-            bool sufficientdecrease = new bool();
+            double mx = 0;
+            bool lpstagesuccess = new bool();
+            double gammamax = 0;
+            double fscale = 0;
+            double f0 = 0;
+            double f1 = 0;
             int i_ = 0;
 
             
@@ -32603,13 +36378,14 @@ public partial class alglib
                 i = state.rstate.ia[6];
                 j = state.rstate.ia[7];
                 innerk = state.rstate.ia[8];
-                sufficientdecrease = state.rstate.ba[0];
+                lpstagesuccess = state.rstate.ba[0];
                 v = state.rstate.ra[0];
                 vv = state.rstate.ra[1];
-                v0 = state.rstate.ra[2];
-                v1 = state.rstate.ra[3];
-                v2 = state.rstate.ra[4];
-                v3 = state.rstate.ra[5];
+                mx = state.rstate.ra[2];
+                gammamax = state.rstate.ra[3];
+                fscale = state.rstate.ra[4];
+                f0 = state.rstate.ra[5];
+                f1 = state.rstate.ra[6];
             }
             else
             {
@@ -32622,13 +36398,14 @@ public partial class alglib
                 i = 74;
                 j = -788;
                 innerk = 809;
-                sufficientdecrease = true;
+                lpstagesuccess = true;
                 v = -838;
                 vv = 939;
-                v0 = -526;
-                v1 = 763;
-                v2 = -541;
-                v3 = -698;
+                mx = -526;
+                gammamax = 763;
+                fscale = -541;
+                f0 = -698;
+                f1 = -900;
             }
             if( state.rstate.stage==0 )
             {
@@ -32666,33 +36443,13 @@ public partial class alglib
             // * BLEIC solver
             // * initial linearized constraints
             //
-            state.fstagnationcnt = 0;
             state.xstagnationcnt = 0;
             state.trustrad = inittrustrad;
-            for(i=0; i<=n-1; i++)
-            {
-                for(j=0; j<=n-1; j++)
-                {
-                    state.h[i,j] = 0;
-                }
-                state.h[i,i] = 1;
-            }
-            apserv.rvectorsetlengthatleast(ref state.tmp0, nslack, _params);
-            for(i=0; i<=nslack-1; i++)
-            {
-                state.tmp0[i] = 0;
-            }
-            minbleic.minbleiccreate(nslack, state.tmp0, state.blcsolver, _params);
-            state.primarylccnt = nec+nic+nlec+nlic;
-            for(i=0; i<=n+nec+nic+nlec+nlic-1; i++)
-            {
-                state.stepklagmult[i] = 0.0;
-                state.maxlag[i] = 0.0;
-            }
             for(i=0; i<=nec+nic+nlec+nlic-1; i++)
             {
                 state.rho[i] = 0.0;
             }
+            gammamax = 0.0;
             
             //
             // Prepare rcomm interface
@@ -32719,12 +36476,12 @@ public partial class alglib
                 result = false;
                 return result;
             }
-            updatelagrangemaximums(state, state.step0x, state.step0fi, state.step0j, state.maxlag, _params);
             
             //
             // Perform outer (NLC) iterations
             //
             tracebeginning(_params);
+            initlpsubsolver(state, state.subsolver, state.hessiantype, _params);
         lbl_4:
             if( false )
             {
@@ -32732,7 +36489,7 @@ public partial class alglib
             }
             
             //
-            // Update vector Rho[] of penalty coefficients:
+            // Update vector Rho[] of quadratic penalty coefficients:
             // * for Rho[i] corresponding to linear constraints we use gradient
             //   norm at current point times augmentation factor (in 100-1000 range).
             //   Everything is simple because linear constraints are normalized.
@@ -32756,20 +36513,23 @@ public partial class alglib
             {
                 v += state.step0j[0,i_]*state.step0j[0,i_];
             }
-            v = apserv.coalesce(Math.Sqrt(v), 1.0, _params);
+            fscale = Math.Max(Math.Sqrt(v), gammamax);
             for(i=0; i<=nec+nic-1; i++)
             {
-                state.rho[i] = Math.Max(state.rho[i], augmentationfactor*v);
+                state.rho[i] = Math.Max(state.rho[i], augmentationfactor*fscale);
             }
-            for(i=0; i<=nlec+nlic-1; i++)
+            if( (double)(fscale)>(double)(0) )
             {
-                vv = 0.0;
-                for(i_=0; i_<=n-1;i_++)
+                for(i=0; i<=nlec+nlic-1; i++)
                 {
-                    vv += state.step0j[1+i,i_]*state.step0j[1+i,i_];
+                    vv = 0.0;
+                    for(i_=0; i_<=n-1;i_++)
+                    {
+                        vv += state.step0j[1+i,i_]*state.step0j[1+i,i_];
+                    }
+                    vv = Math.Max(Math.Sqrt(vv), fscale);
+                    state.rho[nec+nic+i] = Math.Max(state.rho[nec+nic+i], augmentationfactor*(fscale/vv));
                 }
-                vv = Math.Max(Math.Sqrt(vv), 1.0);
-                state.rho[nec+nic+i] = Math.Max(state.rho[nec+nic+i], augmentationfactor*v/vv);
             }
             
             //
@@ -32777,7 +36537,6 @@ public partial class alglib
             //
             // During this process we maintain information about several points:
             // * point #0, initial one, with "step0" prefix
-            // * point #1, after the first step of current LP session, with "step1" prefix
             // * point #K, last one of current LP session, with "stepk" prefix
             // * additionally we have point #KN, current candidate during line search at step K.
             //
@@ -32786,17 +36545,13 @@ public partial class alglib
             // * function vector Fi (target function + nonlinear constraints)
             // * scaled Jacobian J
             //
-            state.curdcnt = 0;
-            for(i=0; i<=n-1; i++)
-            {
-                state.d0[i] = 0.0;
-            }
-            state.stp0 = 0.0;
-            slpcopystate(state, state.step0x, state.step0fi, state.step0j, state.step1x, state.step1fi, state.step1j, _params);
+            state.nondescentcnt = 0;
+            lpstagesuccess = true;
+            lpsubproblemrestart(state, state.subsolver, _params);
             slpcopystate(state, state.step0x, state.step0fi, state.step0j, state.stepkx, state.stepkfi, state.stepkj, _params);
             innerk = 1;
         lbl_6:
-            if( innerk>apserv.imin2(slpmaxinnerits, n, _params) )
+            if( innerk>n )
             {
                 goto lbl_8;
             }
@@ -32805,184 +36560,40 @@ public partial class alglib
             // Formulate LP subproblem and solve it
             //
             tracelpstart(_params);
+            if( !lpsubproblemsolve(state, state.subsolver, state.stepkx, state.stepkfi, state.stepkj, innerk, state.d, state.stepklagmult, _params) )
+            {
+                
+                //
+                // LP solver failed due to numerical errors; exit
+                //
+                tracelpfailure(_params);
+                if( innerk==1 )
+                {
+                    lpstagesuccess = false;
+                }
+                goto lbl_8;
+            }
             v = 0;
             for(i=0; i<=n-1; i++)
             {
-                state.b[i] = state.stepkj[0,i];
-                v = v+math.sqr(state.stepkj[0,i]);
+                v = v+math.sqr(state.d[i]);
             }
-            v = Math.Sqrt(v);
-            for(i=n; i<=nslack-1; i++)
-            {
-                state.b[i] = bigc*v;
-            }
-            for(i=0; i<=nslack-1; i++)
-            {
-                state.d[i] = 0.0;
-            }
-            for(i=0; i<=n-1; i++)
-            {
-                state.curbndl[i] = -state.trustrad;
-                state.curbndu[i] = state.trustrad;
-                if( state.hasbndl[i] )
-                {
-                    state.curbndl[i] = Math.Max(state.curbndl[i], state.scaledbndl[i]-state.stepkx[i]);
-                }
-                if( state.hasbndu[i] )
-                {
-                    state.curbndu[i] = Math.Min(state.curbndu[i], state.scaledbndu[i]-state.stepkx[i]);
-                }
-            }
-            for(i=0; i<=nec-1; i++)
-            {
-                v = -state.scaledcleic[i,n];
-                for(j=0; j<=n-1; j++)
-                {
-                    state.curlc[i,j] = state.scaledcleic[i,j];
-                    v = v+state.stepkx[j]*state.scaledcleic[i,j];
-                }
-                for(j=n; j<=nslack-1; j++)
-                {
-                    state.curlc[i,j] = 0;
-                }
-                state.curlc[i,n+2*i+0] = -1;
-                state.curlc[i,n+2*i+1] = 1;
-                state.curlc[i,nslack] = -v;
-                state.curlct[i] = 0;
-                state.d[n+2*i+0] = Math.Max(v, 0);
-                state.d[n+2*i+1] = Math.Max(-v, 0);
-                state.curbndl[n+2*i+0] = 0;
-                state.curbndl[n+2*i+1] = 0;
-                state.curbndu[n+2*i+0] = Math.Abs(v);
-                state.curbndu[n+2*i+1] = Math.Abs(v);
-            }
-            for(i=0; i<=nlec-1; i++)
-            {
-                vv = 0;
-                for(j=0; j<=n-1; j++)
-                {
-                    vv = vv+math.sqr(state.stepkj[1+i,j]);
-                }
-                vv = 1/apserv.coalesce(Math.Sqrt(vv), 1, _params);
-                v = vv*state.stepkfi[1+i];
-                for(j=0; j<=n-1; j++)
-                {
-                    state.curlc[nec+i,j] = vv*state.stepkj[1+i,j];
-                }
-                for(j=n; j<=nslack-1; j++)
-                {
-                    state.curlc[nec+i,j] = 0;
-                }
-                state.curlc[nec+i,n+2*(nec+i)+0] = -1;
-                state.curlc[nec+i,n+2*(nec+i)+1] = 1;
-                state.curlc[nec+i,nslack] = -v;
-                state.curlct[nec+i] = 0;
-                state.d[n+2*(nec+i)+0] = Math.Max(v, 0);
-                state.d[n+2*(nec+i)+1] = Math.Max(-v, 0);
-                state.curbndl[n+2*(nec+i)+0] = 0;
-                state.curbndl[n+2*(nec+i)+1] = 0;
-                state.curbndu[n+2*(nec+i)+0] = Math.Abs(v);
-                state.curbndu[n+2*(nec+i)+1] = Math.Abs(v);
-            }
-            for(i=0; i<=nic-1; i++)
-            {
-                v = -state.scaledcleic[nec+i,n];
-                for(j=0; j<=n-1; j++)
-                {
-                    state.curlc[nec+nlec+i,j] = state.scaledcleic[nec+i,j];
-                    v = v+state.stepkx[j]*state.scaledcleic[nec+i,j];
-                }
-                for(j=n; j<=nslack-1; j++)
-                {
-                    state.curlc[nec+nlec+i,j] = 0;
-                }
-                state.curlc[nec+nlec+i,n+2*(nec+nlec)+i] = -1;
-                state.curlc[nec+nlec+i,nslack] = -v;
-                state.curlct[nec+nlec+i] = -1;
-                state.d[n+2*(nec+nlec)+i] = Math.Max(v, 0);
-                state.curbndl[n+2*(nec+nlec)+i] = 0;
-                state.curbndu[n+2*(nec+nlec)+i] = Math.Max(v, 0);
-            }
-            for(i=0; i<=nlic-1; i++)
-            {
-                vv = 0;
-                for(j=0; j<=n-1; j++)
-                {
-                    vv = vv+math.sqr(state.stepkj[1+nlec+i,j]);
-                }
-                vv = 1/apserv.coalesce(Math.Sqrt(vv), 1, _params);
-                v = vv*state.stepkfi[1+nlec+i];
-                for(j=0; j<=n-1; j++)
-                {
-                    state.curlc[nec+nlec+nic+i,j] = vv*state.stepkj[1+nlec+i,j];
-                }
-                for(j=n; j<=nslack-1; j++)
-                {
-                    state.curlc[nec+nlec+nic+i,j] = 0;
-                }
-                state.curlc[nec+nlec+nic+i,n+2*(nec+nlec)+nic+i] = -1;
-                state.curlc[nec+nlec+nic+i,nslack] = -v;
-                state.curlct[nec+nlec+nic+i] = -1;
-                state.d[n+2*(nec+nlec)+nic+i] = Math.Max(v, 0);
-                state.curbndl[n+2*(nec+nlec)+nic+i] = 0;
-                state.curbndu[n+2*(nec+nlec)+nic+i] = Math.Max(v, 0);
-            }
-            ablas.rmatrixgemm(state.curdcnt, n, n, 1.0, state.curd, 0, 0, 0, state.h, 0, 0, 0, 0.0, state.curlc, state.primarylccnt, 0, _params);
-            for(i=0; i<=state.curdcnt-1; i++)
-            {
-                for(j=n; j<=nslack; j++)
-                {
-                    state.curlc[state.primarylccnt+i,j] = 0.0;
-                }
-                state.curlct[state.primarylccnt+i] = 0;
-            }
-            minbleic.minbleicsetcond(state.blcsolver, 0.0, 0.0, Math.Max(1.0E-6*state.trustrad, 0.01*state.epsx), 5*nslack, _params);
-            minbleic.minbleicsetbc(state.blcsolver, state.curbndl, state.curbndu, _params);
-            minbleic.minbleicsetlc(state.blcsolver, state.curlc, state.curlct, state.primarylccnt+state.curdcnt, _params);
-            minbleic.minbleicrestartfrom(state.blcsolver, state.d, _params);
-            while( minbleic.minbleiciteration(state.blcsolver, _params) )
-            {
-                if( state.blcsolver.needfg )
-                {
-                    state.blcsolver.f = 0;
-                    for(i=0; i<=nslack-1; i++)
-                    {
-                        state.blcsolver.f = state.blcsolver.f+state.b[i]*state.blcsolver.x[i];
-                        state.blcsolver.g[i] = state.b[i];
-                    }
-                    continue;
-                }
-                alglib.ap.assert(false, "MinNLC.SLP: integrity check failed");
-            }
-            minbleic.minbleicresultsbuf(state.blcsolver, ref state.d, state.blcrep, _params);
-            if( state.blcrep.terminationtype<=0 )
+            if( (double)(v)==(double)(0) )
             {
                 
                 //
-                // LP solver failed
+                // Zero step is suggested (maybe we arrived exactly to the solution), stop iterations
                 //
-                tracelpfailure(_params);
+                slpcopystate(state, state.stepkx, state.stepkfi, state.stepkj, state.stepkxn, state.stepkfin, state.stepkjn, _params);
+                state.stp = 0;
+                state.mcinfo = 0;
+                tracelpstep(state, _params);
                 goto lbl_8;
-            }
-            if( innerk==1 )
-            {
-                
-                //
-                // Store first direction
-                //
-                for(i=0; i<=n-1; i++)
-                {
-                    state.d0[i] = state.d[i];
-                }
             }
             
             //
-            // 1. Determine Lagrange multipliers for the problem
-            //
-            //    TODO: use estimates returned by LP subsolver
-            //
-            // 2. Perform line search to minimize Lagrangian along D.
-            // 3. Post-normalize StepKXN with respect to box constraints.
+            // Perform line search to minimize Lagrangian along D.
+            // Post-normalize StepKXN with respect to box constraints.
             //
             // MCSRCH can fail in the following cases:
             // * rounding errors prevent optimization
@@ -32990,14 +36601,37 @@ public partial class alglib
             // In the latter case we proceed to minimization of merit function.
             //
             apserv.rvectorsetlengthatleast(ref state.tmp0, n, _params);
-            determinelagrangemultipliers(state, state.stepkx, state.d, state.stepkfi, state.stepkj, state.stepklagmult, state.maxlag, _params);
             lagrangianfg(state, state.stepkx, state.stepkfi, state.stepkj, state.stepklagmult, ref state.stepklagval, state.stepklaggrad, _params);
             slpcopystate(state, state.stepkx, state.stepkfi, state.stepkj, state.stepkxn, state.stepkfin, state.stepkjn, _params);
+            v = 0;
             for(i=0; i<=n-1; i++)
             {
                 state.stepknlaggrad[i] = state.stepklaggrad[i];
+                v = v+state.d[i]*state.stepklaggrad[i];
+            }
+            if( (double)(v)>=(double)(0) )
+            {
+                
+                //
+                // Non-descent direction D was specified; it may happen because LP subproblem favors
+                // directions which decrease L1 penalty and default augmentation of Lagrangian involves
+                // only L2 term.
+                //
+                // We make several retries with conjugate directions before giving up.
+                //
+                tracelpnondescent(_params);
+                apserv.inc(ref state.nondescentcnt, _params);
+                if( state.nondescentcnt>nondescentlimit )
+                {
+                    goto lbl_8;
+                }
+                else
+                {
+                    goto lbl_7;
+                }
             }
             state.stepknlagval = state.stepklagval;
+            state.mcnfev = 0;
             state.mcstage = 0;
             state.stp = 1.0;
             linmin.mcsrch(n, ref state.stepkxn, ref state.stepknlagval, ref state.stepknlaggrad, state.d, ref state.stp, 1.0, slpgtol, ref state.mcinfo, ref state.mcnfev, ref state.tmp0, state.mcstate, ref state.mcstage, _params);
@@ -33044,54 +36678,38 @@ public partial class alglib
                 //
                 // Line search failed miserably, terminate
                 //
+                if( innerk==1 )
+                {
+                    lpstagesuccess = false;
+                }
                 goto lbl_8;
+            }
+            if( state.mcinfo==1 )
+            {
+                lpsubproblemupdatehessian(state, state.subsolver, state.stepkx, state.stepklaggrad, state.stepkxn, state.stepknlaggrad, _params);
+            }
+            
+            //
+            // Update GammaMax - estimate of the function Hessian norm
+            //
+            v = 0;
+            vv = 0;
+            mx = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                mx = Math.Max(mx, Math.Abs(state.stepkxn[i]-state.stepkx[i]));
+                v = v+math.sqr(state.stepkxn[i]-state.stepkx[i]);
+                vv = vv+(state.stepkjn[0,i]-state.stepkj[0,i])*(state.stepkxn[i]-state.stepkx[i]);
+            }
+            if( (double)(mx)>(double)(bfgstol) )
+            {
+                gammamax = Math.Max(gammamax, Math.Abs(vv/v));
             }
             
             //
             // Update current point
             //
-            alglib.ap.assert(state.curdcnt<n, "MinNLC.SLP: integrity check failed");
-            apserv.rvectorsetlengthatleast(ref state.tmp0, n, _params);
-            for(i=0; i<=n-1; i++)
-            {
-                state.sk[i] = state.stepkxn[i]-state.stepkx[i];
-                state.yk[i] = state.stepknlaggrad[i]-state.stepklaggrad[i];
-                state.curd[state.curdcnt,i] = state.sk[i];
-            }
-            if( innerk==1 )
-            {
-                slpcopystate(state, state.stepkxn, state.stepkfin, state.stepkjn, state.step1x, state.step1fi, state.step1j, _params);
-                state.stp0 = state.stp;
-            }
             slpcopystate(state, state.stepkxn, state.stepkfin, state.stepkjn, state.stepkx, state.stepkfi, state.stepkj, _params);
-            updatelagrangemaximums(state, state.stepkx, state.stepkfi, state.stepkj, state.maxlag, _params);
-            apserv.inc(ref state.curdcnt, _params);
-            v = 0;
-            v0 = 0;
-            v1 = 0;
-            v2 = 0;
-            for(i=0; i<=n-1; i++)
-            {
-                v = v+state.sk[i]*state.yk[i];
-                v0 = v0+state.sk[i]*state.sk[i];
-                v1 = v1+state.yk[i]*state.yk[i];
-                v2 = v2+state.stepklaggrad[i]*state.stepklaggrad[i];
-            }
-            if( ((state.mcinfo==1 && (double)(Math.Sqrt(v0))>(double)(Math.Max(state.epsx, bfgstol))) && (double)(Math.Sqrt(v1))>(double)(bfgstol*Math.Sqrt(v2))) && (double)(v)>(double)(bfgstol*Math.Sqrt(v0)*Math.Sqrt(v1)) )
-            {
-                
-                //
-                // Update Hessian if following criteria hold:
-                // * MCINFO=1 (good step)
-                // * step length is large enough
-                // * |Yk| is large enough when compared with |G|
-                // * (Sk,Yk) is large enough when compared with |S| and |G|
-                //
-                vv = ablas.rmatrixsyvmv(n, state.h, 0, 0, true, state.sk, 0, state.tmp0, _params);
-                ablas.rmatrixgemv(n, n, 1.0, state.h, 0, 0, 0, state.sk, 0, 0.0, state.tmp0, 0, _params);
-                ablas.rmatrixger(n, n, state.h, 0, 0, 1/v, state.yk, 0, state.yk, 0, _params);
-                ablas.rmatrixger(n, n, state.h, 0, 0, -(1/vv), state.tmp0, 0, state.tmp0, 0, _params);
-            }
             apserv.inc(ref state.repinneriterationscount, _params);
             
             //
@@ -33101,8 +36719,7 @@ public partial class alglib
             {
                 
                 //
-                // Step is too close to zero, terminate iterations due to
-                // possibility of numerical errors influencing results
+                // Step is too close to zero, terminate iterations.
                 //
                 goto lbl_8;
             }
@@ -33129,187 +36746,81 @@ public partial class alglib
                 //
                 goto lbl_8;
             }
-            v = 0;
             for(i=n; i<=nslack-1; i++)
             {
-                v = Math.Max(v, state.d[i]);
-            }
-            if( (double)(v)>(double)(0) )
-            {
-                
-                //
-                // Some relaxation variable is non-zero;
-                // break - it means that we are far away from the feasible area.
-                //
-                goto lbl_8;
-            }
-            if( innerk==1 && (double)(state.stp)<(double)(slpstpclosetoone) )
-            {
-                
-                //
-                // First iteration, step is less than 1.
-                //
-                // Test that first step resulted in sufficient decrease
-                // of both merit function and its derivative.
-                //
-                // Strictly speaking, this test can be skipped without
-                // compromising stability of the algorithm. It is purely
-                // performance-related: we try to perform early detection
-                // of bad LP steps which do not decrease merit function.
-                // Such steps will be rejected later at merit test, so
-                // it is better to terminate early.
-                //
-                // NOTE: we perform quick test for two values of lambda-gain:
-                //       initial gain and maximum gain. If both of them won't
-                //       give us sufficient decrease, we terminate.
-                //
-                sufficientdecrease = false;
-                v = state.currentgain;
-                state.currentgain = initlambdagain;
-                meritfunctionfdfalongd0(state, state.step0x, state.step0fi, state.step0j, ref v0, ref v2, ref state.tmp0, ref state.tmp1, _params);
-                meritfunctionfdfalongd0(state, state.step1x, state.step1fi, state.step1j, ref v1, ref v3, ref state.tmp0, ref state.tmp1, _params);
-                sufficientdecrease = sufficientdecrease || ((double)(v1)<(double)(v0) && (double)(v3)>=(double)(slpgtol*v2));
-                state.currentgain = maxlambdagain;
-                meritfunctionfdfalongd0(state, state.step0x, state.step0fi, state.step0j, ref v0, ref v2, ref state.tmp0, ref state.tmp1, _params);
-                meritfunctionfdfalongd0(state, state.step1x, state.step1fi, state.step1j, ref v1, ref v3, ref state.tmp0, ref state.tmp1, _params);
-                sufficientdecrease = sufficientdecrease || ((double)(v1)<(double)(v0) && (double)(v3)>=(double)(slpgtol*v2));
-                state.currentgain = v;
-                if( !sufficientdecrease )
-                {
-                    goto lbl_8;
-                }
-            }
-            innerk = innerk+1;
-            goto lbl_6;
-        lbl_8:
-            
-            //
-            // Test for sufficient decrease of merit function.
-            //
-            // This test is slightly different from one given by original authors
-            // of the algorithm; the intention is to make it more robust against
-            // rounding noise.
-            //
-            // Authors recommend to select small multiplicative factor (gain )for
-            // upper bounds on Lagrange multipliers; however, our experience suggests
-            // to perform several iterations of gain increase; contrary to their
-            // article, it is not guaranteed that any gain>1 will result in descent
-            // direction.
-            //
-            state.currentgain = initlambdagain;
-            state.descentanddecreasegain = 0;
-            state.descentgain = 0;
-            while( true )
-            {
-                
-                //
-                // Calculate merit function subject to current gain level for Lagrange estimates
-                //
-                meritfunctionfdfalongd0(state, state.step0x, state.step0fi, state.step0j, ref state.step0meritf, ref state.step0meritdf, ref state.tmp0, ref state.tmp1, _params);
-                meritfunctionfdfalongd0(state, state.step1x, state.step1fi, state.step1j, ref state.step1meritf, ref state.step1meritdf, ref state.tmp0, ref state.tmp1, _params);
-                meritfunctionfdfalongd0(state, state.stepkx, state.stepkfi, state.stepkj, ref state.stepkmeritf, ref state.stepkmeritdf, ref state.tmp0, ref state.tmp1, _params);
-                
-                //
-                // Remember minimal gain level which decreases derivative
-                //
-                // NOTE: although original authors tell that ANY gain>1
-                //       will work, numerical tests indicate that we have
-                //       to specify sufficiently large gain to get stable
-                //       convergence - but not too large to get fast
-                //       convergence.
-                //
-                if( (double)(state.step0meritdf)<(double)(0) && (double)(state.descentgain)==(double)(0) )
-                {
-                    state.descentgain = 10+10*state.currentgain;
-                }
-                
-                //
-                // Test various stopping criteria for gain search
-                //
-                if( (double)(state.step0meritdf)<(double)(0) )
-                {
-                    if( (double)(state.step1meritf)<(double)(state.step0meritf) && ((double)(state.stp0)>=(double)(slpstpclosetoone) || (double)(state.step1meritdf)>=(double)(slpgtol*state.step0meritdf)) )
-                    {
-                        
-                        //
-                        // We found gain value which: (a) makes D0 descent direction,
-                        // and (b) decreases merit function in the point #1.
-                        //
-                        alglib.ap.assert((double)(state.descentgain)>(double)(0), "MinSLP: integrity check failed");
-                        state.descentanddecreasegain = state.currentgain;
-                        break;
-                    }
-                    if( (double)(state.currentgain)>(double)(maxlambdagain) )
-                    {
-                        
-                        //
-                        // We found gain which makes D0 descent direction, but
-                        // were unable to decrease merit function in the final
-                        // point.
-                        //
-                        // Well, makind D0 descent direction is better than nothing,
-                        // we have to terminate anyway
-                        //
-                        alglib.ap.assert((double)(state.descentgain)>(double)(0), "MinSLP: integrity check failed");
-                        break;
-                    }
-                }
-                if( (double)(state.currentgain)>(double)(maxlambdagain) )
+                if( state.d[i]>0 )
                 {
                     
                     //
-                    // We we unable to find gain which satisfies even one condition;
-                    // terminate.
+                    // Some relaxation variable is non-zero;
+                    // break - it means that we are far away from the feasible area.
                     //
                     break;
                 }
-                state.currentgain = state.currentgain*5;
             }
-            if( (double)(state.descentanddecreasegain)==(double)(0) && (double)(state.descentgain)==(double)(0) )
+        lbl_7:
+            innerk = innerk+1;
+            goto lbl_6;
+        lbl_8:
+            if( !lpstagesuccess )
             {
                 
                 //
-                // Can not find descent direction, terminate (zero step = EpsX criteria)
+                // Can not find descent direction for Lagrangian, try to decrease trust radius
+                //
+                if( (double)(state.trustrad)>(double)(state.epsx) )
+                {
+                    state.trustrad = 0.5*state.trustrad;
+                    goto lbl_4;
+                }
+                
+                //
+                // Terminate (zero step = EpsX criteria)
                 //
                 state.repterminationtype = 2;
                 goto lbl_5;
             }
-            state.currentgain = apserv.coalesce(state.descentanddecreasegain, state.descentgain, _params);
-            meritfunctionfdfalongd0(state, state.step0x, state.step0fi, state.step0j, ref state.step0meritf, ref state.step0meritdf, ref state.tmp0, ref state.tmp1, _params);
-            meritfunctionfdfalongd0(state, state.step1x, state.step1fi, state.step1j, ref state.step1meritf, ref state.step1meritdf, ref state.tmp0, ref state.tmp1, _params);
-            meritfunctionfdfalongd0(state, state.stepkx, state.stepkfi, state.stepkj, ref state.stepkmeritf, ref state.stepkmeritdf, ref state.tmp0, ref state.tmp1, _params);
-            if( (double)(state.descentanddecreasegain)!=(double)(0) )
+            
+            //
+            // Perform Armijo-style line search which tries to decrease
+            // L1-penalized merit function.
+            //
+            // This step is essential because previous step (which minimizes
+            // Lagrangian) may fail to produce descent direction (solution of
+            // LP subproblem favors decrease in L1 penalty, not L2).
+            //
+            f0 = meritfunction(state, state.step0x, state.step0fi, state.step0j, state.stepklagmult, _params);
+            f1 = meritfunction(state, state.stepkx, state.stepkfi, state.stepkj, state.stepklagmult, _params);
+            if( (double)(f1)<(double)(f0) )
             {
                 goto lbl_11;
             }
             
             //
-            // No sufficient decrease in the merit function.
-            // Perform backtracking line search in direction given by D0.
+            // Merit function does not decrease, perform "polishing" of results with merit function minimization
             //
-            // Try to find step which decreases merit function;
-            // we do not put any advanced restrictions on its
-            // decrease, and do not put restrictions on sufficient
-            // decrease of its derivative. Simply finding large
-            // step which decreases function is enough for us.
+            lpsubproblemrestart(state, state.subsolver, _params);
+            tracelpstart(_params);
+            innerk = 1;
+            if( !lpsubproblemsolve(state, state.subsolver, state.stepkx, state.stepkfi, state.stepkj, innerk, state.d, state.stepklagmult, _params) )
+            {
+                goto lbl_13;
+            }
+            
             //
-            // NOTE: it is important to limit step by 1.0 in
-            //       order to avoid violation of box constraints.
-            //       LP phase made sure that constraints are
-            //       satisfied as long as 0<=Stp<=1.0, and we
-            //       must use it.
+            // LP solver produced search direction. Try to decrease merit function in this direction
             //
-            alglib.ap.assert((double)(significantstep)<(double)(1), "MinSLP: integrity check failed");
-            state.stp = Math.Max(0.5, significantstep);
+            state.stp = Math.Min(0.5, 0.999*slpdeltaincrease);
             state.nu = 0.5;
-        lbl_13:
+            f0 = meritfunction(state, state.stepkx, state.stepkfi, state.stepkj, state.stepklagmult, _params);
+        lbl_15:
             if( false )
             {
-                goto lbl_14;
+                goto lbl_16;
             }
             for(i=0; i<=n-1; i++)
             {
-                state.stepkxn[i] = state.step0x[i]+state.stp*state.d0[i];
+                state.stepkxn[i] = state.stepkx[i]+state.stp*state.d[i];
             }
             slpsendx(state, state.stepkxn, _params);
             state.needfij = true;
@@ -33327,25 +36838,30 @@ public partial class alglib
                 result = false;
                 return result;
             }
-            meritfunctionfdfalongd0(state, state.stepkxn, state.stepkfin, state.stepkjn, ref v0, ref v1, ref state.tmp0, ref state.tmp1, _params);
-            if( (double)(v0)<(double)(state.step0meritf) )
+            f1 = meritfunction(state, state.stepkxn, state.stepkfin, state.stepkjn, state.stepklagmult, _params);
+            if( (double)(f1)<(double)(f0) )
             {
                 
                 //
                 // Step is found!
                 //
-                goto lbl_14;
+                goto lbl_16;
             }
-            if( (double)(state.stp)<(double)(math.machineepsilon) )
+            if( (double)(state.stp)<(double)(0.001) )
             {
+                
+                //
+                // Step is shorter than 0.001 times current search direction,
+                // it means that no good step can be found.
+                //
                 state.stp = 0;
-                slpcopystate(state, state.step0x, state.step0fi, state.step0j, state.stepkxn, state.stepkfin, state.stepkjn, _params);
-                goto lbl_14;
+                slpcopystate(state, state.stepkx, state.stepkfi, state.stepkj, state.stepkxn, state.stepkfin, state.stepkjn, _params);
+                goto lbl_16;
             }
             state.stp = state.nu*state.stp;
             state.nu = Math.Max(0.1, 0.5*state.nu);
-            goto lbl_13;
-        lbl_14:
+            goto lbl_15;
+        lbl_16:
             for(i=0; i<=n-1; i++)
             {
                 if( state.hasbndl[i] )
@@ -33358,15 +36874,14 @@ public partial class alglib
                 }
             }
             slpcopystate(state, state.stepkxn, state.stepkfin, state.stepkjn, state.stepkx, state.stepkfi, state.stepkj, _params);
-            slpcopystate(state, state.stepkxn, state.stepkfin, state.stepkjn, state.step1x, state.step1fi, state.step1j, _params);
-            meritfunctionfdfalongd0(state, state.step0x, state.step0fi, state.step0j, ref state.step0meritf, ref state.step0meritdf, ref state.tmp0, ref state.tmp1, _params);
-            meritfunctionfdfalongd0(state, state.step1x, state.step1fi, state.step1j, ref state.step1meritf, ref state.step1meritdf, ref state.tmp0, ref state.tmp1, _params);
-            meritfunctionfdfalongd0(state, state.stepkx, state.stepkfi, state.stepkj, ref state.stepkmeritf, ref state.stepkmeritdf, ref state.tmp0, ref state.tmp1, _params);
             tracemeritsearch(state, _params);
-            goto lbl_12;
+        lbl_13:
         lbl_11:
-            tracemeritacceptance(state, _params);
-        lbl_12:
+            
+            //
+            // Multistep is done
+            //
+            tracemultistep(state, _params);
             
             //
             // Update trust region
@@ -33378,7 +36893,7 @@ public partial class alglib
             }
             if( (double)(state.deltamax)<=(double)(slpdeltadecrease) )
             {
-                state.trustrad = state.trustrad*Math.Max(state.deltamax/slpdeltadecrease, 0.01);
+                state.trustrad = state.trustrad*Math.Max(state.deltamax/slpdeltadecrease, 0.1);
             }
             if( (double)(state.deltamax)>=(double)(slpdeltaincrease) )
             {
@@ -33412,14 +36927,6 @@ public partial class alglib
             {
                 state.xstagnationcnt = 0;
             }
-            if( (double)(Math.Abs(state.stepkmeritf-state.step0meritf))<=(double)(stagnationepsf*Math.Max(Math.Abs(state.stepkmeritf), Math.Abs(state.step0meritf))) )
-            {
-                apserv.inc(ref state.fstagnationcnt, _params);
-            }
-            else
-            {
-                state.fstagnationcnt = 0;
-            }
             tracenlpstep(state, _params);
             slpcopystate(state, state.stepkx, state.stepkfi, state.stepkj, state.step0x, state.step0fi, state.step0j, _params);
             if( state.xstagnationcnt>=stagnationlimit )
@@ -33430,11 +36937,6 @@ public partial class alglib
             if( state.maxits>0 && state.repouteriterationscount>=state.maxits )
             {
                 state.repterminationtype = 5;
-                goto lbl_5;
-            }
-            if( state.fstagnationcnt>=stagnationlimit )
-            {
-                state.repterminationtype = 7;
                 goto lbl_5;
             }
             goto lbl_4;
@@ -33457,13 +36959,686 @@ public partial class alglib
             state.rstate.ia[6] = i;
             state.rstate.ia[7] = j;
             state.rstate.ia[8] = innerk;
-            state.rstate.ba[0] = sufficientdecrease;
+            state.rstate.ba[0] = lpstagesuccess;
             state.rstate.ra[0] = v;
             state.rstate.ra[1] = vv;
-            state.rstate.ra[2] = v0;
-            state.rstate.ra[3] = v1;
-            state.rstate.ra[4] = v2;
-            state.rstate.ra[5] = v3;
+            state.rstate.ra[2] = mx;
+            state.rstate.ra[3] = gammamax;
+            state.rstate.ra[4] = fscale;
+            state.rstate.ra[5] = f0;
+            state.rstate.ra[6] = f1;
+            return result;
+        }
+
+
+        /*************************************************************************
+        This function initializes SLP subproblem.
+        Should be called once in the beginning of the optimization.
+
+        INPUT PARAMETERS:
+            SState          -   solver state
+            Subsolver       -   SLP subproblem to initialize
+            HessianType     -   0 for identity Hessian, 1 for BFGS update
+                                
+                                
+        RETURN VALUE:
+            True on success
+            False on failure of the LP solver (unexpected... but possible due to numerical errors)
+                                
+
+          -- ALGLIB --
+             Copyright 05.03.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void initlpsubsolver(minslpstate sstate,
+            minslpsubsolver subsolver,
+            int hessiantype,
+            alglib.xparams _params)
+        {
+            int n = 0;
+            int nslack = 0;
+            int nec = 0;
+            int nic = 0;
+            int nlec = 0;
+            int nlic = 0;
+            int lccnt = 0;
+            int nnz = 0;
+            int rnnz = 0;
+            int offs = 0;
+            int i = 0;
+            int j = 0;
+            int offsslackec = 0;
+            int offsslackic = 0;
+
+            n = sstate.n;
+            nec = sstate.nec;
+            nic = sstate.nic;
+            nlec = sstate.nlec;
+            nlic = sstate.nlic;
+            nslack = n+2*(nec+nlec)+(nic+nlic);
+            lccnt = nec+nic+nlec+nlic;
+            
+            //
+            // Create simplex solver, use "most violated" pricing algorithm
+            // (with hot restart we perform just a few iterations anyway, so
+            // the price of recalculating DSS weights does not pay out).
+            //
+            reviseddualsimplex.dsssettingsinit(subsolver.dsssettings, _params);
+            subsolver.dsssettings.pricing = 0;
+            reviseddualsimplex.dssinit(nslack, subsolver.dss, _params);
+            
+            //
+            // Allocate temporaries
+            //
+            apserv.rvectorsetlengthatleast(ref subsolver.cural, lccnt+n, _params);
+            apserv.rvectorsetlengthatleast(ref subsolver.curau, lccnt+n, _params);
+            apserv.rmatrixsetlengthatleast(ref subsolver.curd, n, n, _params);
+            apserv.rmatrixsetlengthatleast(ref subsolver.curhd, n, n, _params);
+            apserv.rvectorsetlengthatleast(ref subsolver.curbndl, nslack, _params);
+            apserv.rvectorsetlengthatleast(ref subsolver.curbndu, nslack, _params);
+            apserv.rvectorsetlengthatleast(ref subsolver.curb, nslack, _params);
+            apserv.rvectorsetlengthatleast(ref subsolver.sk, n, _params);
+            apserv.rvectorsetlengthatleast(ref subsolver.yk, n, _params);
+            
+            //
+            // Initial state
+            //
+            subsolver.basispresent = false;
+            subsolver.curdcnt = 0;
+            subsolver.hessiantype = hessiantype;
+            if( hessiantype==1 || hessiantype==2 )
+            {
+                
+                //
+                // Prepare Hessian matrix
+                //
+                apserv.rmatrixsetlengthatleast(ref subsolver.h, n, n, _params);
+                for(i=0; i<=n-1; i++)
+                {
+                    for(j=0; j<=n-1; j++)
+                    {
+                        subsolver.h[i,j] = 0;
+                    }
+                    subsolver.h[i,i] = 1;
+                }
+            }
+            
+            //
+            // Linear constraints do not change across subiterations, that's
+            // why we allocate storage for them at the start of the program.
+            //
+            // NOTE: we expect to have from LCCnt to LCCnt+N rows in the matrix,
+            //       so we preallocate RIfx, DIdx, UIdx taking it into account.
+            //
+            offsslackec = n;
+            offsslackic = n+2*nec+2*nlec;
+            nnz = 0;
+            for(i=0; i<=nec+nic-1; i++)
+            {
+                for(j=0; j<=n-1; j++)
+                {
+                    if( sstate.scaledcleic[i,j]!=0.0 )
+                    {
+                        nnz = nnz+1;
+                    }
+                }
+            }
+            nnz = nnz+2*nec+nic;
+            apserv.ivectorsetlengthatleast(ref subsolver.sparselc.ridx, lccnt+n+1, _params);
+            apserv.rvectorsetlengthatleast(ref subsolver.sparselc.vals, nnz, _params);
+            apserv.ivectorsetlengthatleast(ref subsolver.sparselc.idx, nnz, _params);
+            apserv.ivectorsetlengthatleast(ref subsolver.sparselc.didx, lccnt+n, _params);
+            apserv.ivectorsetlengthatleast(ref subsolver.sparselc.uidx, lccnt+n, _params);
+            offs = 0;
+            subsolver.sparselc.ridx[0] = 0;
+            for(i=0; i<=nec+nic-1; i++)
+            {
+                rnnz = 0;
+                for(j=0; j<=n-1; j++)
+                {
+                    if( sstate.scaledcleic[i,j]!=0.0 )
+                    {
+                        
+                        //
+                        // Primary part of the matrix
+                        //
+                        subsolver.sparselc.vals[offs] = sstate.scaledcleic[i,j];
+                        subsolver.sparselc.idx[offs] = j;
+                        offs = offs+1;
+                        rnnz = rnnz+1;
+                    }
+                }
+                if( i<nec )
+                {
+                    
+                    //
+                    // Slack variables for equality constraints
+                    //
+                    subsolver.sparselc.vals[offs+0] = -1;
+                    subsolver.sparselc.vals[offs+1] = 1;
+                    subsolver.sparselc.idx[offs+0] = offsslackec+2*i+0;
+                    subsolver.sparselc.idx[offs+1] = offsslackec+2*i+1;
+                    offs = offs+2;
+                    rnnz = rnnz+2;
+                }
+                else
+                {
+                    
+                    //
+                    // Slack variables for inequality constraints
+                    //
+                    subsolver.sparselc.vals[offs] = -1;
+                    subsolver.sparselc.idx[offs] = offsslackic+(i-nec);
+                    offs = offs+1;
+                    rnnz = rnnz+1;
+                }
+                subsolver.sparselc.ridx[i+1] = subsolver.sparselc.ridx[i]+rnnz;
+            }
+        }
+
+
+        /*************************************************************************
+        Restarts LP subproblem (cleans the matrix of internally stored directions)
+
+        INPUT PARAMETERS:
+            SState          -   solver state
+            Subsolver       -   SLP subproblem to initialize
+
+          -- ALGLIB --
+             Copyright 05.03.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void lpsubproblemrestart(minslpstate sstate,
+            minslpsubsolver subsolver,
+            alglib.xparams _params)
+        {
+            subsolver.curdcnt = 0;
+        }
+
+
+        /*************************************************************************
+        Updates Hessian estimate
+
+        INPUT PARAMETERS:
+            SState          -   solver state
+            Subsolver       -   SLP subproblem to initialize
+                                
+
+          -- ALGLIB --
+             Copyright 05.03.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static void lpsubproblemupdatehessian(minslpstate sstate,
+            minslpsubsolver subsolver,
+            double[] x0,
+            double[] g0,
+            double[] x1,
+            double[] g1,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int n = 0;
+            double vv = 0;
+            double v = 0;
+            double v0 = 0;
+            double v1 = 0;
+            double v2 = 0;
+            double gk = 0;
+            double sk = 0;
+            double yk = 0;
+
+            n = sstate.n;
+            if( subsolver.hessiantype==1 || subsolver.hessiantype==2 )
+            {
+                apserv.rvectorsetlengthatleast(ref subsolver.tmp0, n, _params);
+                v = 0;
+                v0 = 0;
+                v1 = 0;
+                v2 = 0;
+                for(i=0; i<=n-1; i++)
+                {
+                    sk = x1[i]-x0[i];
+                    yk = g1[i]-g0[i];
+                    gk = g0[i];
+                    v = v+sk*yk;
+                    v0 = v0+sk*sk;
+                    v1 = v1+yk*yk;
+                    v2 = v2+gk*gk;
+                    subsolver.sk[i] = sk;
+                    subsolver.yk[i] = yk;
+                }
+                if( ((double)(Math.Sqrt(v0))>(double)(Math.Max(sstate.epsx, bfgstol)) && (double)(Math.Sqrt(v1))>(double)(bfgstol*Math.Sqrt(v2))) && (double)(v)>(double)(bfgstol*Math.Sqrt(v0)*Math.Sqrt(v1)) )
+                {
+                    
+                    //
+                    // Update Hessian if following criteria hold:
+                    // * MCINFO=1 (good step)
+                    // * step length is large enough
+                    // * |Yk| is large enough when compared with |G|
+                    // * (Sk,Yk) is large enough when compared with |S| and |G|
+                    //
+                    vv = ablas.rmatrixsyvmv(n, subsolver.h, 0, 0, true, subsolver.sk, 0, subsolver.tmp0, _params);
+                    ablas.rmatrixgemv(n, n, 1.0, subsolver.h, 0, 0, 0, subsolver.sk, 0, 0.0, subsolver.tmp0, 0, _params);
+                    ablas.rmatrixger(n, n, subsolver.h, 0, 0, 1/v, subsolver.yk, 0, subsolver.yk, 0, _params);
+                    ablas.rmatrixger(n, n, subsolver.h, 0, 0, -(1/vv), subsolver.tmp0, 0, subsolver.tmp0, 0, _params);
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        This function solves LP subproblem given by initial point X, function vector Fi
+        and Jacobian Jac, and returns estimates of Lagrangian multipliers and search direction D[].
+
+          -- ALGLIB --
+             Copyright 05.03.2018 by Bochkanov Sergey
+        *************************************************************************/
+        private static bool lpsubproblemsolve(minslpstate state,
+            minslpsubsolver subsolver,
+            double[] x,
+            double[] fi,
+            double[,] jac,
+            int innerk,
+            double[] d,
+            double[] lagmult,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            int n = 0;
+            int nslack = 0;
+            int nec = 0;
+            int nic = 0;
+            int nlec = 0;
+            int nlic = 0;
+            int i = 0;
+            int j = 0;
+            double v = 0;
+            double vv = 0;
+            int basisinittype = 0;
+            int lccnt = 0;
+            int offsec = 0;
+            int offsic = 0;
+            int offsnlec = 0;
+            int offsnlic = 0;
+            int offsslackec = 0;
+            int offsslacknlec = 0;
+            int offsslackic = 0;
+            int offsslacknlic = 0;
+            int offs = 0;
+            int nnz = 0;
+            int rnnz = 0;
+            int j0 = 0;
+            int j1 = 0;
+
+            n = state.n;
+            nec = state.nec;
+            nic = state.nic;
+            nlec = state.nlec;
+            nlic = state.nlic;
+            nslack = n+2*(nec+nlec)+(nic+nlic);
+            lccnt = nec+nic+nlec+nlic;
+            
+            //
+            // Locations of slack variables
+            //
+            offsslackec = n;
+            offsslacknlec = n+2*nec;
+            offsslackic = n+2*nec+2*nlec;
+            offsslacknlic = n+2*(nec+nlec)+nic;
+            
+            //
+            // Prepare temporary structures
+            //
+            apserv.rvectorgrowto(ref subsolver.cural, lccnt+subsolver.curdcnt, _params);
+            apserv.rvectorgrowto(ref subsolver.curau, lccnt+subsolver.curdcnt, _params);
+            
+            //
+            // Prepare default solution: all zeros
+            //
+            result = true;
+            for(i=0; i<=nslack-1; i++)
+            {
+                d[i] = 0.0;
+            }
+            for(i=0; i<=lccnt-1; i++)
+            {
+                lagmult[i] = 0;
+            }
+            
+            //
+            // Decide where to store different types of constraints
+            //
+            offsec = 0;
+            offsic = offsec+nec;
+            offsnlec = offsic+nic;
+            offsnlic = offsnlec+nlec;
+            
+            //
+            // Linear term B
+            //
+            // NOTE: elements [N,NSlack) are equal to bigC + perturbation to improve numeric properties of LP problem
+            //
+            for(i=0; i<=n-1; i++)
+            {
+                subsolver.curb[i] = jac[0,i];
+            }
+            v = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                v = v+math.sqr(jac[0,i]);
+            }
+            v = apserv.coalesce(Math.Sqrt(v), 1.0, _params);
+            for(i=n; i<=nslack-1; i++)
+            {
+                subsolver.curb[i] = (bigc+1.0/(1+i))*v;
+            }
+            
+            //
+            // Trust radius constraints for primary variables
+            //
+            for(i=0; i<=n-1; i++)
+            {
+                subsolver.curbndl[i] = -state.trustrad;
+                subsolver.curbndu[i] = state.trustrad;
+                if( state.hasbndl[i] )
+                {
+                    subsolver.curbndl[i] = Math.Max(subsolver.curbndl[i], state.scaledbndl[i]-x[i]);
+                }
+                if( state.hasbndu[i] )
+                {
+                    subsolver.curbndu[i] = Math.Min(subsolver.curbndu[i], state.scaledbndu[i]-x[i]);
+                }
+            }
+            
+            //
+            // Linear equality/inequality constraints
+            //
+            // NOTE: we already initialized beginning of the sparselc with
+            //       linear constraints, we just have to update right parts
+            //       and box constraints on the slack variables
+            //
+            apserv.rvectorsetlengthatleast(ref subsolver.tmp0, nslack, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                subsolver.tmp0[i] = x[i];
+            }
+            for(i=n; i<=nslack-1; i++)
+            {
+                subsolver.tmp0[i] = 0;
+            }
+            for(i=0; i<=nec+nic-1; i++)
+            {
+                
+                //
+                // Calculate product of X[] (extended with zeros up to NSlack elements)
+                // and I-th row of sparselc matrix.
+                //
+                v = -state.scaledcleic[i,n];
+                j0 = subsolver.sparselc.ridx[i];
+                j1 = subsolver.sparselc.ridx[i+1]-1;
+                for(j=j0; j<=j1; j++)
+                {
+                    v = v+subsolver.sparselc.vals[j]*subsolver.tmp0[subsolver.sparselc.idx[j]];
+                }
+                
+                //
+                // Equality and inequality constraints are handled differently
+                //
+                if( i<nec )
+                {
+                    subsolver.cural[i] = -v;
+                    subsolver.curau[i] = -v;
+                    subsolver.curbndl[offsslackec+2*i+0] = 0;
+                    subsolver.curbndl[offsslackec+2*i+1] = 0;
+                    subsolver.curbndu[offsslackec+2*i+0] = Math.Abs(v);
+                    subsolver.curbndu[offsslackec+2*i+1] = Math.Abs(v);
+                }
+                else
+                {
+                    subsolver.cural[i] = Double.NegativeInfinity;
+                    subsolver.curau[i] = -v;
+                    subsolver.curbndl[offsslackic+(i-nec)] = 0;
+                    subsolver.curbndu[offsslackic+(i-nec)] = Math.Max(v, 0);
+                }
+            }
+            
+            //
+            // Nonlinear equality/inequality constraints
+            //
+            nnz = 0;
+            for(i=0; i<=nlec+nlic-1; i++)
+            {
+                for(j=0; j<=n-1; j++)
+                {
+                    if( jac[1+i,j]!=0.0 )
+                    {
+                        nnz = nnz+1;
+                    }
+                }
+            }
+            nnz = nnz+2*nlec+nlic;
+            apserv.rvectorgrowto(ref subsolver.sparselc.vals, subsolver.sparselc.ridx[nec+nic]+nnz, _params);
+            apserv.ivectorgrowto(ref subsolver.sparselc.idx, subsolver.sparselc.ridx[nec+nic]+nnz, _params);
+            offs = subsolver.sparselc.ridx[nec+nic];
+            for(i=0; i<=nlec+nlic-1; i++)
+            {
+                
+                //
+                // Calculate scale coefficient
+                //
+                vv = 0;
+                for(j=0; j<=n-1; j++)
+                {
+                    v = jac[1+i,j];
+                    vv = vv+v*v;
+                }
+                vv = 1/apserv.coalesce(Math.Sqrt(vv), 1, _params);
+                
+                //
+                // Copy scaled row
+                //
+                rnnz = 0;
+                for(j=0; j<=n-1; j++)
+                {
+                    if( jac[1+i,j]!=0.0 )
+                    {
+                        subsolver.sparselc.vals[offs] = vv*jac[1+i,j];
+                        subsolver.sparselc.idx[offs] = j;
+                        offs = offs+1;
+                        rnnz = rnnz+1;
+                    }
+                }
+                if( i<nlec )
+                {
+                    
+                    //
+                    // Add slack terms for equality constraints
+                    //
+                    subsolver.sparselc.vals[offs+0] = -1;
+                    subsolver.sparselc.vals[offs+1] = 1;
+                    subsolver.sparselc.idx[offs+0] = offsslacknlec+2*i+0;
+                    subsolver.sparselc.idx[offs+1] = offsslacknlec+2*i+1;
+                    offs = offs+2;
+                    rnnz = rnnz+2;
+                }
+                else
+                {
+                    
+                    //
+                    // Add slack terms for inequality constraints
+                    //
+                    subsolver.sparselc.vals[offs] = -1;
+                    subsolver.sparselc.idx[offs] = offsslacknlic+(i-nlec);
+                    offs = offs+1;
+                    rnnz = rnnz+1;
+                }
+                subsolver.sparselc.ridx[nec+nic+i+1] = subsolver.sparselc.ridx[nec+nic+i]+rnnz;
+                
+                //
+                // Set box constraints on slack variables and bounds on linear equality/inequality constraints
+                //
+                v = vv*fi[1+i];
+                if( i<nlec )
+                {
+                    
+                    //
+                    // Equality constraint
+                    //
+                    subsolver.cural[nec+nic+i] = -v;
+                    subsolver.curau[nec+nic+i] = -v;
+                    subsolver.curbndl[offsslacknlec+2*i+0] = 0;
+                    subsolver.curbndl[offsslacknlec+2*i+1] = 0;
+                    subsolver.curbndu[offsslacknlec+2*i+0] = Math.Abs(v);
+                    subsolver.curbndu[offsslacknlec+2*i+1] = Math.Abs(v);
+                }
+                else
+                {
+                    
+                    //
+                    // Inequality constraint
+                    //
+                    subsolver.cural[nec+nic+i] = Double.NegativeInfinity;
+                    subsolver.curau[nec+nic+i] = -v;
+                    subsolver.curbndl[offsslacknlic+(i-nlec)] = 0;
+                    subsolver.curbndu[offsslacknlic+(i-nlec)] = Math.Max(v, 0);
+                }
+            }
+            
+            //
+            // Conjugacy constraints
+            //
+            nnz = subsolver.curdcnt*n;
+            apserv.rvectorgrowto(ref subsolver.sparselc.vals, subsolver.sparselc.ridx[lccnt]+nnz, _params);
+            apserv.ivectorgrowto(ref subsolver.sparselc.idx, subsolver.sparselc.ridx[lccnt]+nnz, _params);
+            offs = subsolver.sparselc.ridx[lccnt];
+            for(i=0; i<=subsolver.curdcnt-1; i++)
+            {
+                
+                //
+                // Copy N elements of CurHD
+                //
+                // NOTE: we expect product of D and H to be dense, so we copy all N elements
+                //
+                v = 0;
+                for(j=0; j<=n-1; j++)
+                {
+                    vv = subsolver.curhd[i,j];
+                    v = v+vv*vv;
+                }
+                v = 1.0/apserv.coalesce(Math.Sqrt(v), 1.0, _params);
+                for(j=0; j<=n-1; j++)
+                {
+                    vv = subsolver.curhd[i,j];
+                    subsolver.sparselc.vals[offs] = v*vv;
+                    subsolver.sparselc.idx[offs] = j;
+                    offs = offs+1;
+                }
+                subsolver.sparselc.ridx[lccnt+i+1] = subsolver.sparselc.ridx[lccnt+i]+n;
+                
+                //
+                // Set bounds on linear constraints
+                //
+                subsolver.cural[lccnt+i] = 0;
+                subsolver.curau[lccnt+i] = 0;
+            }
+            
+            //
+            // Finalize sparse matrix structure
+            //
+            subsolver.sparselc.ninitialized = subsolver.sparselc.ridx[lccnt+subsolver.curdcnt];
+            subsolver.sparselc.m = lccnt+subsolver.curdcnt;
+            subsolver.sparselc.n = nslack;
+            subsolver.sparselc.matrixtype = 1;
+            sparse.sparseinitduidx(subsolver.sparselc, _params);
+            
+            //
+            // Solve linear program
+            //
+            apserv.rvectorsetlengthatleast(ref subsolver.tmp0, nslack, _params);
+            for(i=0; i<=nslack-1; i++)
+            {
+                subsolver.tmp0[i] = state.trustrad;
+            }
+            reviseddualsimplex.dsssetscale(subsolver.dss, subsolver.tmp0, _params);
+            reviseddualsimplex.dsssetcost(subsolver.dss, subsolver.curb, _params);
+            reviseddualsimplex.dsssetbc(subsolver.dss, subsolver.curbndl, subsolver.curbndu, _params);
+            if( innerk==1 && subsolver.basispresent )
+            {
+                basisinittype = 2;
+            }
+            else
+            {
+                basisinittype = 1;
+            }
+            reviseddualsimplex.dsssetlcx(subsolver.dss, subsolver.densedummy, subsolver.sparselc, 1, subsolver.cural, subsolver.curau, lccnt+subsolver.curdcnt, subsolver.lastbasis, basisinittype, _params);
+            reviseddualsimplex.dssoptimize(subsolver.dss, subsolver.dsssettings, _params);
+            state.repsimplexiterations = state.repsimplexiterations+subsolver.dss.repiterationscount;
+            state.repsimplexiterations1 = state.repsimplexiterations1+subsolver.dss.repiterationscount1;
+            state.repsimplexiterations2 = state.repsimplexiterations2+subsolver.dss.repiterationscount2;
+            state.repsimplexiterations3 = state.repsimplexiterations3+subsolver.dss.repiterationscount3;
+            if( subsolver.dss.repterminationtype<=0 )
+            {
+                
+                //
+                // LP solver failed due to numerical errors; exit
+                //
+                result = false;
+                return result;
+            }
+            if( innerk==1 )
+            {
+                
+                //
+                // Store basis
+                //
+                reviseddualsimplex.dssexportbasis(subsolver.dss, subsolver.lastbasis, _params);
+                subsolver.basispresent = true;
+            }
+            
+            //
+            // Extract direction D[] and Lagrange multipliers
+            //
+            for(i=0; i<=nslack-1; i++)
+            {
+                d[i] = subsolver.dss.repx[i];
+            }
+            for(i=0; i<=lccnt-1; i++)
+            {
+                lagmult[i] = -subsolver.dss.primary.d[nslack+i];
+            }
+            
+            //
+            // Update matrix of products H*Dprev
+            //
+            alglib.ap.assert(subsolver.curdcnt<alglib.ap.rows(subsolver.curd), "SLP: CurD is too small");
+            for(i=0; i<=n-1; i++)
+            {
+                
+                //
+                // Store direction and default conjugacy constraint d'*I*Dprev=0
+                //
+                subsolver.curd[subsolver.curdcnt,i] = d[i];
+                subsolver.curhd[subsolver.curdcnt,i] = d[i];
+            }
+            apserv.inc(ref subsolver.curdcnt, _params);
+            if( state.hessiantype==1 )
+            {
+                
+                //
+                // Conjugacy constraint d*H*Dprev=0, full recomputation of (H*Dprev)
+                //
+                ablas.rmatrixgemm(subsolver.curdcnt, n, n, 1.0, subsolver.curd, 0, 0, 0, subsolver.h, 0, 0, 0, 0.0, subsolver.curhd, 0, 0, _params);
+            }
+            if( state.hessiantype==2 )
+            {
+                
+                //
+                // Conjugacy constraint d*H*Dprev=0, only last row of (H*Dprev) is recomputed
+                //
+                apserv.rvectorsetlengthatleast(ref subsolver.tmp0, n, _params);
+                ablas.rmatrixgemv(n, n, 1.0, subsolver.h, 0, 0, 0, d, 0, 0.0, subsolver.tmp0, 0, _params);
+                for(j=0; j<=n-1; j++)
+                {
+                    subsolver.curhd[subsolver.curdcnt-1,j] = subsolver.tmp0[j];
+                }
+            }
             return result;
         }
 
@@ -33481,12 +37656,12 @@ public partial class alglib
             n = state.n;
             for(i=0; i<=n-1; i++)
             {
-                if( state.hasbndl[i] && (double)(xs[i])<=(double)(state.scaledbndl[i]) )
+                if( state.hasbndl[i] && xs[i]<=state.scaledbndl[i] )
                 {
                     state.x[i] = state.scaledbndl[i];
                     continue;
                 }
-                if( state.hasbndu[i] && (double)(xs[i])>=(double)(state.scaledbndu[i]) )
+                if( state.hasbndu[i] && xs[i]>=state.scaledbndu[i] )
                 {
                     state.x[i] = state.scaledbndu[i];
                     continue;
@@ -33577,7 +37752,7 @@ public partial class alglib
             double[] x,
             double[] fi,
             double[,] j,
-            double[] lag,
+            double[] lagmult,
             ref double f,
             double[] g,
             alglib.xparams _params)
@@ -33591,6 +37766,7 @@ public partial class alglib
             double v = 0;
             double vlag = 0;
             double vact = 0;
+            double rhoi = 0;
 
             f = 0;
 
@@ -33619,19 +37795,12 @@ public partial class alglib
             {
                 v = state.sclagtmp0[i]-state.scaledcleic[i,n];
                 vact = 1.0;
-                if( i>=nec && (double)(v)<(double)(0) )
+                if( i>=nec && v<0 )
                 {
                     v = 0;
                     vact = 0;
                 }
-                if( i<nec )
-                {
-                    vlag = lag[n+i];
-                }
-                else
-                {
-                    vlag = lag[n+nec+nlec+(i-nec)];
-                }
+                vlag = lagmult[i];
                 state.sclagtmp1[i] = 0;
                 
                 //
@@ -33641,10 +37810,11 @@ public partial class alglib
                 state.sclagtmp1[i] = state.sclagtmp1[i]+vlag*vact;
                 
                 //
-                // augmentation term
+                // Quadratic augmentation term
                 //
-                f = f+0.5*state.rho[i]*v*v;
-                state.sclagtmp1[i] = state.sclagtmp1[i]+state.rho[i]*v;
+                rhoi = apserv.coalesce(state.rho[i], 1.0, _params);
+                f = f+0.5*rhoi*v*v;
+                state.sclagtmp1[i] = state.sclagtmp1[i]+rhoi*v;
             }
             ablas.rmatrixgemv(n, nec+nic, 1.0, state.scaledcleic, 0, 0, 1, state.sclagtmp1, 0, 1.0, g, 0, _params);
             
@@ -33656,19 +37826,12 @@ public partial class alglib
             {
                 v = fi[1+i];
                 vact = 1.0;
-                if( i>=nlec && (double)(v)<(double)(0) )
+                if( i>=nlec && v<0 )
                 {
                     v = 0;
                     vact = 0;
                 }
-                if( i<nlec )
-                {
-                    vlag = lag[n+nec+i];
-                }
-                else
-                {
-                    vlag = lag[n+nec+nlec+nic+(i-nlec)];
-                }
+                vlag = lagmult[nec+nic+i];
                 state.sclagtmp1[i] = 0;
                 
                 //
@@ -33680,30 +37843,25 @@ public partial class alglib
                 //
                 // Augmentation term
                 //
-                f = f+0.5*state.rho[nec+nic+i]*v*v;
-                state.sclagtmp1[i] = state.sclagtmp1[i]+state.rho[nec+nic+i]*v;
+                rhoi = apserv.coalesce(state.rho[nec+nic+i], 1.0, _params);
+                f = f+0.5*rhoi*v*v;
+                state.sclagtmp1[i] = state.sclagtmp1[i]+rhoi*v;
             }
             ablas.rmatrixgemv(n, nlec+nlic, 1.0, j, 1, 0, 1, state.sclagtmp1, 0, 1.0, g, 0, _params);
         }
 
 
         /*************************************************************************
-        This function calculates merit function and its directional derivative
-        along State.D0, with:
-        * Lagrange multiplier maximums stored in State.MaxLag
-        * penalty coefficient stored in State.Rho
-        * Lambda-gain factor stored in State.CurrentGain
+        This function calculates L1-penalized merit function.
         *************************************************************************/
-        private static void meritfunctionfdfalongd0(minslpstate state,
+        private static double meritfunction(minslpstate state,
             double[] x,
             double[] fi,
             double[,] j,
-            ref double f,
-            ref double df,
-            ref double[] tmp0,
-            ref double[] tmp1,
+            double[] lagmult,
             alglib.xparams _params)
         {
+            double result = 0;
             int i = 0;
             int n = 0;
             int nec = 0;
@@ -33711,7 +37869,6 @@ public partial class alglib
             int nlec = 0;
             int nlic = 0;
             double v = 0;
-            double lambdamax = 0;
 
             n = state.n;
             nec = state.nec;
@@ -33722,80 +37879,47 @@ public partial class alglib
             //
             // Merit function: primary term
             //
-            f = fi[0];
-            df = 0.0;
-            for(i=0; i<=n-1; i++)
-            {
-                df = df+j[0,i]*state.d0[i];
-            }
+            result = fi[0];
             
             //
             // Merit function: augmentation and penalty for linear constraints
             //
-            apserv.rvectorsetlengthatleast(ref tmp0, nec+nic, _params);
-            apserv.rvectorsetlengthatleast(ref tmp1, nec+nic, _params);
-            ablas.rmatrixgemv(nec+nic, n, 1.0, state.scaledcleic, 0, 0, 0, x, 0, 0.0, tmp0, 0, _params);
-            ablas.rmatrixgemv(nec+nic, n, 1.0, state.scaledcleic, 0, 0, 0, state.d0, 0, 0.0, tmp1, 0, _params);
+            apserv.rvectorsetlengthatleast(ref state.mftmp0, nec+nic, _params);
+            ablas.rmatrixgemv(nec+nic, n, 1.0, state.scaledcleic, 0, 0, 0, x, 0, 0.0, state.mftmp0, 0, _params);
             for(i=0; i<=nec+nic-1; i++)
             {
-                v = tmp0[i]-state.scaledcleic[i,n];
+                v = state.mftmp0[i]-state.scaledcleic[i,n];
                 if( i<nec )
                 {
                     
                     //
-                    // augmentation term
+                    // Augmentation term
                     //
-                    f = f+0.5*state.rho[i]*v*v;
-                    df = df+state.rho[i]*v*tmp1[i];
+                    result = result+0.5*state.rho[i]*v*v;
                     
                     //
-                    // Penalty term
+                    // L1 penalty term
                     //
-                    lambdamax = apserv.coalesce(state.currentgain*state.maxlag[n+i], lambdadefault, _params);
-                    f = f+lambdamax*Math.Abs(v);
-                    if( (double)(v)>(double)(0) )
-                    {
-                        df = df+lambdamax*tmp1[i];
-                    }
-                    if( (double)(v)==(double)(0) )
-                    {
-                        df = df+Math.Abs(lambdamax*tmp1[i]);
-                    }
-                    if( (double)(v)<(double)(0) )
-                    {
-                        df = df-lambdamax*tmp1[i];
-                    }
+                    result = result+meritfunctiongain*Math.Abs(lagmult[i]*v);
                 }
                 else
                 {
                     
                     //
-                    // augmentation term
+                    // Augmentation term
                     //
-                    f = f+0.5*state.rho[i]*math.sqr(Math.Max(v, 0));
-                    df = df+state.rho[i]*Math.Max(v, 0)*tmp1[i];
+                    result = result+0.5*state.rho[i]*math.sqr(Math.Max(v, 0));
                     
                     //
-                    // Penalty term
+                    // L1 penalty term
                     //
-                    lambdamax = apserv.coalesce(state.currentgain*state.maxlag[n+nec+nlec+(i-nec)], lambdadefault, _params);
-                    f = f+lambdamax*Math.Max(v, 0);
-                    if( (double)(v)>(double)(0) )
-                    {
-                        df = df+lambdamax*tmp1[i];
-                    }
-                    if( (double)(v)==(double)(0) )
-                    {
-                        df = df+Math.Max(lambdamax*tmp1[i], 0);
-                    }
+                    result = result+meritfunctiongain*Math.Max(lagmult[i]*v, 0);
                 }
             }
             
             //
             // Merit function: augmentation and penalty for nonlinear constraints
             //
-            apserv.rvectorsetlengthatleast(ref tmp1, nlec+nlic, _params);
-            ablas.rmatrixgemv(nlec+nlic, n, 1.0, j, 1, 0, 0, state.d0, 0, 0.0, tmp1, 0, _params);
             for(i=0; i<=nlec+nlic-1; i++)
             {
                 v = fi[1+i];
@@ -33805,26 +37929,12 @@ public partial class alglib
                     //
                     // Augmentation term
                     //
-                    f = f+0.5*state.rho[nec+nic+i]*v*v;
-                    df = df+state.rho[nec+nic+i]*v*tmp1[i];
+                    result = result+0.5*state.rho[nec+nic+i]*v*v;
                     
                     //
-                    // Penalty term
+                    // L1 Penalty term
                     //
-                    lambdamax = apserv.coalesce(state.currentgain*state.maxlag[n+nec+i], lambdadefault, _params);
-                    f = f+lambdamax*Math.Abs(v);
-                    if( (double)(v)>(double)(0) )
-                    {
-                        df = df+lambdamax*tmp1[i];
-                    }
-                    if( (double)(v)==(double)(0) )
-                    {
-                        df = df+Math.Abs(lambdamax*tmp1[i]);
-                    }
-                    if( (double)(v)<(double)(0) )
-                    {
-                        df = df-lambdamax*tmp1[i];
-                    }
+                    result = result+meritfunctiongain*Math.Abs(lagmult[nec+nic+i]*v);
                 }
                 else
                 {
@@ -33832,422 +37942,15 @@ public partial class alglib
                     //
                     // Augmentation term
                     //
-                    f = f+0.5*state.rho[nec+nic+i]*math.sqr(Math.Max(v, 0));
-                    df = df+state.rho[nec+nic+i]*Math.Max(v, 0)*tmp1[i];
+                    result = result+0.5*state.rho[nec+nic+i]*math.sqr(Math.Max(v, 0));
                     
                     //
                     // Penalty term
                     //
-                    lambdamax = apserv.coalesce(state.currentgain*state.maxlag[n+nec+nlec+nic+(i-nlec)], lambdadefault, _params);
-                    f = f+lambdamax*Math.Max(v, 0);
-                    if( (double)(v)>(double)(0) )
-                    {
-                        df = df+lambdamax*tmp1[i];
-                    }
-                    if( (double)(v)==(double)(0) )
-                    {
-                        df = df+Math.Max(lambdamax*tmp1[i], 0);
-                    }
+                    result = result+meritfunctiongain*Math.Max(lagmult[nec+nic+i]*v, 0);
                 }
             }
-        }
-
-
-        /*************************************************************************
-        This function determines Lagrange coefficients at point X+D.
-        Fi/Jac store information about function vector and Jacobian at X (not X+D!).
-
-        Input value of Lag[] is ignored.
-
-        MaxLag[] is updated by MaxLag:=max(MaxLag,abs(Lag)); nevertheless, such
-        update is just additional cautionary measure; main update is provided by
-        UpdateLagrangeMaximums() function.
-        *************************************************************************/
-        private static void determinelagrangemultipliers(minslpstate state,
-            double[] x,
-            double[] d,
-            double[] fi,
-            double[,] jac,
-            double[] lag,
-            double[] maxlag,
-            alglib.xparams _params)
-        {
-            int i = 0;
-            int j = 0;
-            int n = 0;
-            int nec = 0;
-            int nic = 0;
-            int nlec = 0;
-            int nlic = 0;
-            double v = 0;
-            double vv = 0;
-            bool bflag = new bool();
-            int nactivebc = 0;
-            int lagcols = 0;
-            int i_ = 0;
-            int i1_ = 0;
-
-            n = state.n;
-            nec = state.nec;
-            nic = state.nic;
-            nlec = state.nlec;
-            nlic = state.nlic;
-            
-            //
-            // Precompute some quantities
-            //
-            apserv.rvectorsetlengthatleast(ref state.dlmtmp0, nec+nic, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmp1, nec+nic, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmp2, nlec+nlic, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmpg, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmpb, n, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmpxd, n, _params);
-            for(i=0; i<=n-1; i++)
-            {
-                state.dlmtmpxd[i] = x[i]+d[i];
-                state.dlmtmpg[i] = jac[0,i];
-            }
-            ablas.rmatrixgemv(nec+nic, n, 1.0, state.scaledcleic, 0, 0, 0, state.dlmtmpxd, 0, 0.0, state.dlmtmp0, 0, _params);
-            ablas.rmatrixgemv(nec+nic, n, 1.0, state.scaledcleic, 0, 0, 0, state.dlmtmpg, 0, 0.0, state.dlmtmp1, 0, _params);
-            ablas.rmatrixgemv(nlec+nlic, n, 1.0, jac, 1, 0, 0, state.dlmtmpg, 0, 0.0, state.dlmtmp2, 0, _params);
-            
-            //
-            // Initial values of Lagrange multipliers
-            //
-            for(i=0; i<=n+nec+nlec+nic+nlic-1; i++)
-            {
-                lag[i] = 0;
-            }
-            
-            //
-            // Lagrange coefficients LAMBDA[i] are determined as least squares
-            // solution to the linear system
-            //
-            //                  [                           ]
-            //     grad(f) + SUM[ LAMBDA[i]*grad(CONSTR[i]) ]
-            //                  [                           ]
-            //
-            // This system has NActiveConstraints columns. However, we may get
-            // significant savings if we account for sparsity of the columns
-            // corresponding to box constraints. Thus, we have:
-            //
-            //     [1   |                  ]   [       ]   [          ]
-            //     [    |                  ]   [       ]   [          ]
-            //     [ 1  |                  ]   [       ]   [          ]
-            //     [  1 | constr. Jacobian ] * [ LAMDA ] = [ -grad(f) ]
-            //     [    |                  ]   [       ]   [          ]
-            //     [   1|                  ]   [       ]   [          ]
-            //     [    |                  ]   [       ]   [          ]
-            //
-            // here first NActiveBC columns are subset of identity matrix
-            // (scattered and irregular). After applying row permutation P
-            // which sorts rows, we get:
-            //
-            //     [1   |       ]   [       ]   [            ]
-            //     [ 1  |       ]   [       ]   [            ]
-            //     [  1 |       ]   [       ]   [            ]
-            //     [   1| P*JAC ] * [ LAMDA ] = [ -P*grad(f) ]
-            //     [    |       ]   [       ]   [            ]
-            //     [    |       ]   [       ]   [            ]
-            //     [    |       ]   [       ]   [            ]
-            //
-            // furthermore, dividing P*JAC info [C ; D]^T, we get
-            //
-            //     [1   |    ]   [         ]   [            ]
-            //     [ 1  |  C ]   [ LAMBDA0 ]   [            ]
-            //     [  1 |    ]   [         ]   [            ]
-            //     [   1|    ] * [---------] = [ -P*grad(f) ]
-            //     [----|----]   [         ]   [            ]
-            //     [    |    ]   [ LAMBDA1 ]   [            ]
-            //     [    |  D ]   [         ]   [            ]
-            //     [    |    ]   [         ]   [            ]
-            //
-            // here leading identity matrix has size NActiveBC*NActiveBC,
-            // C has size NActiveBC*LagCols, D has size (N-NActiveBC)*LagCols.
-            //
-            // Because we do not search for true least squares solution, we
-            // can perform fast and efficient two-step solve:
-            // * perform regularized QR factorization of D and get LAMBDA1
-            // * get LAMBDA0 by substitution and subtraction
-            //
-            // Our first step is to generate matrices C and D
-            //
-            apserv.rmatrixsetlengthatleast(ref state.dlmtmplag, n, nec+nlec+nic+nlic, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmpb, n, _params);
-            apserv.ivectorsetlengthatleast(ref state.dlmtmplagidx, nec+nlec+nic+nlic+n, _params);
-            for(i=0; i<=n-1; i++)
-            {
-                state.dlmtmpb[i] = -jac[0,i];
-            }
-            lagcols = 0;
-            for(i=0; i<=nec-1; i++)
-            {
-                maxlag[n+i] = Math.Max(maxlag[n+i], Math.Abs(state.dlmtmp1[i]));
-                for(j=0; j<=n-1; j++)
-                {
-                    state.dlmtmplag[j,lagcols] = state.scaledcleic[i,j];
-                }
-                state.dlmtmplagidx[lagcols] = n+i;
-                lagcols = lagcols+1;
-            }
-            for(i=0; i<=nlec-1; i++)
-            {
-                vv = 0.0;
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    vv += jac[1+i,i_]*jac[1+i,i_];
-                }
-                maxlag[n+nec+i] = Math.Max(maxlag[n+nec+i], Math.Abs(state.dlmtmp2[i])/apserv.coalesce(vv, 1, _params));
-                for(j=0; j<=n-1; j++)
-                {
-                    state.dlmtmplag[j,lagcols] = jac[1+i,j];
-                }
-                state.dlmtmplagidx[lagcols] = n+nec+i;
-                lagcols = lagcols+1;
-            }
-            for(i=0; i<=nic-1; i++)
-            {
-                if( (double)(state.dlmtmp0[nec+i]-state.scaledcleic[nec+i,n])>=(double)(-dlctolerance) )
-                {
-                    for(j=0; j<=n-1; j++)
-                    {
-                        state.dlmtmplag[j,lagcols] = state.scaledcleic[nec+i,j];
-                    }
-                    state.dlmtmplagidx[lagcols] = n+nec+nlec+i;
-                    lagcols = lagcols+1;
-                    maxlag[n+nec+nlec+i] = Math.Max(maxlag[n+nec+nlec+i], Math.Abs(state.dlmtmp1[nec+i]));
-                }
-            }
-            for(i=0; i<=nlic-1; i++)
-            {
-                v = 0.0;
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    v += jac[1+nlec+i,i_]*d[i_];
-                }
-                vv = 0.0;
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    vv += jac[1+nlec+i,i_]*jac[1+nlec+i,i_];
-                }
-                v = v+fi[1+nlec+i];
-                if( (double)(v/apserv.coalesce(Math.Sqrt(vv), 1, _params))>=(double)(-dlctolerance) )
-                {
-                    for(j=0; j<=n-1; j++)
-                    {
-                        state.dlmtmplag[j,lagcols] = jac[1+nlec+i,j];
-                    }
-                    state.dlmtmplagidx[lagcols] = n+nec+nlec+nic+i;
-                    lagcols = lagcols+1;
-                    maxlag[n+nec+nlec+nic+i] = Math.Max(maxlag[n+nec+nlec+nic+i], Math.Abs(state.dlmtmp2[nlec+i])/apserv.coalesce(vv, 1, _params));
-                }
-            }
-            nactivebc = 0;
-            for(i=0; i<=n-1; i++)
-            {
-                bflag = false;
-                if( state.hasbndl[i] && (double)(state.dlmtmpxd[i])<=(double)(state.scaledbndl[i]+dlctolerance) )
-                {
-                    bflag = true;
-                    maxlag[i] = Math.Max(maxlag[i], jac[0,i]);
-                }
-                if( state.hasbndu[i] && (double)(state.dlmtmpxd[i])>=(double)(state.scaledbndu[i]-dlctolerance) )
-                {
-                    bflag = true;
-                    maxlag[i] = Math.Max(maxlag[i], -jac[0,i]);
-                }
-                if( bflag )
-                {
-                    apserv.swaprows(state.dlmtmplag, nactivebc, i, lagcols, _params);
-                    apserv.swapelements(state.dlmtmpb, nactivebc, i, _params);
-                    state.dlmtmplagidx[lagcols+nactivebc] = i;
-                    nactivebc = nactivebc+1;
-                }
-            }
-            if( nactivebc==0 && lagcols==0 )
-            {
-                
-                //
-                // No constraint candidates
-                //
-                return;
-            }
-            
-            //
-            // Now, leading NActiveBC rows of lagrangian matrix contain
-            // C, and subsequent N-NActiveBC rows contain D.
-            //
-            // Our next step is to generate regularized problem
-            //
-            //     [     ]                 [   ]
-            //     [  D  ]                 [...]
-            //     [     ]   [         ]   [   ]
-            //     [-----] * [ LAMBDA1 ] = [---]
-            //     [     ]   [         ]   [   ]
-            //     [reg*I]                 [ 0 ]
-            //     [     ]                 [   ]
-            //
-            // and solve it via QR decomposition
-            //
-            // NOTE: for the purpose of efficiency we merge right part of
-            //       the system with the primary matrix and perform joint
-            //       QR decomposition.
-            //
-            //
-            apserv.rvectorsetlengthatleast(ref state.dlmtmpsvy, lagcols+nactivebc, _params);
-            for(i=0; i<=lagcols+nactivebc-1; i++)
-            {
-                state.dlmtmpsvy[i] = 0;
-            }
-            if( nactivebc<n && lagcols>0 )
-            {
-                apserv.rvectorsetlengthatleast(ref state.dlmtmpqrnorms, lagcols, _params);
-                for(i=0; i<=lagcols-1; i++)
-                {
-                    state.dlmtmpqrnorms[i] = 0;
-                }
-                apserv.rmatrixsetlengthatleast(ref state.dlmtmpqr, n-nactivebc+lagcols, lagcols+1, _params);
-                for(i=0; i<=n-nactivebc-1; i++)
-                {
-                    for(j=0; j<=lagcols-1; j++)
-                    {
-                        v = state.dlmtmplag[nactivebc+i,j];
-                        state.dlmtmpqr[i,j] = v;
-                        state.dlmtmpqrnorms[j] = state.dlmtmpqrnorms[j]+v*v;
-                    }
-                    state.dlmtmpqr[i,lagcols] = state.dlmtmpb[nactivebc+i];
-                }
-                for(i=0; i<=lagcols-1; i++)
-                {
-                    for(j=0; j<=lagcols-1; j++)
-                    {
-                        state.dlmtmpqr[n-nactivebc+i,j] = 0;
-                    }
-                    state.dlmtmpqr[n-nactivebc+i,i] = qrreg*apserv.coalesce(Math.Sqrt(state.dlmtmpqrnorms[i]), 1, _params);
-                    state.dlmtmpqr[n-nactivebc+i,lagcols] = 0;
-                }
-                ortfac.rmatrixqr(ref state.dlmtmpqr, n-nactivebc+lagcols, lagcols+1, ref state.dlmtmp3, _params);
-                i1_ = (0) - (nactivebc);
-                for(i_=nactivebc; i_<=nactivebc+lagcols-1;i_++)
-                {
-                    state.dlmtmpsvy[i_] = state.dlmtmpqr[i_+i1_,lagcols];
-                }
-                ablas.rmatrixtrsv(lagcols, state.dlmtmpqr, 0, 0, true, false, 0, state.dlmtmpsvy, nactivebc, _params);
-            }
-            if( nactivebc>0 )
-            {
-                for(i_=0; i_<=nactivebc-1;i_++)
-                {
-                    state.dlmtmpsvy[i_] = state.dlmtmpb[i_];
-                }
-                ablas.rmatrixgemv(nactivebc, lagcols, -1.0, state.dlmtmplag, 0, 0, 0, state.dlmtmpsvy, nactivebc, 1.0, state.dlmtmpsvy, 0, _params);
-            }
-            for(i=0; i<=lagcols-1; i++)
-            {
-                lag[state.dlmtmplagidx[i]] = state.dlmtmpsvy[nactivebc+i];
-            }
-            for(i=0; i<=nactivebc-1; i++)
-            {
-                lag[state.dlmtmplagidx[lagcols+i]] = state.dlmtmpsvy[i];
-            }
-            for(i=0; i<=nic+nlic-1; i++)
-            {
-                lag[n+nec+nlec+i] = Math.Max(lag[n+nec+nlec+i], 0);
-            }
-        }
-
-
-        /*************************************************************************
-        This function determines Lagrange coefficients at point X+D.
-        Fi/Jac store information about function vector and Jacobian at X (not X+D!).
-
-        NOTE: this function shares temporaries with DetermineLagrangeMultipliers().
-        *************************************************************************/
-        private static void updatelagrangemaximums(minslpstate state,
-            double[] x,
-            double[] fi,
-            double[,] jac,
-            double[] maxlag,
-            alglib.xparams _params)
-        {
-            int i = 0;
-            int n = 0;
-            int nec = 0;
-            int nic = 0;
-            int nlec = 0;
-            int nlic = 0;
-            double v = 0;
-            double vv = 0;
-            int i_ = 0;
-
-            n = state.n;
-            nec = state.nec;
-            nic = state.nic;
-            nlec = state.nlec;
-            nlic = state.nlic;
-            
-            //
-            // Precompute some quantities
-            //
-            apserv.rvectorsetlengthatleast(ref state.dlmtmp0, nec+nic, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmp1, nec+nic, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmp2, nlec+nlic, _params);
-            apserv.rvectorsetlengthatleast(ref state.dlmtmpg, n, _params);
-            for(i_=0; i_<=n-1;i_++)
-            {
-                state.dlmtmpg[i_] = jac[0,i_];
-            }
-            ablas.rmatrixgemv(nec+nic, n, 1.0, state.scaledcleic, 0, 0, 0, x, 0, 0.0, state.dlmtmp0, 0, _params);
-            ablas.rmatrixgemv(nec+nic, n, 1.0, state.scaledcleic, 0, 0, 0, state.dlmtmpg, 0, 0.0, state.dlmtmp1, 0, _params);
-            ablas.rmatrixgemv(nlec+nlic, n, 1.0, jac, 1, 0, 0, state.dlmtmpg, 0, 0.0, state.dlmtmp2, 0, _params);
-            
-            //
-            // Update maximums
-            //
-            for(i=0; i<=n-1; i++)
-            {
-                if( state.hasbndl[i] && (double)(x[i])<=(double)(state.scaledbndl[i]+dlctolerance) )
-                {
-                    maxlag[i] = Math.Max(maxlag[i], jac[0,i]);
-                }
-                if( state.hasbndu[i] && (double)(x[i])>=(double)(state.scaledbndu[i]-dlctolerance) )
-                {
-                    maxlag[i] = Math.Max(maxlag[i], -jac[0,i]);
-                }
-            }
-            for(i=0; i<=nec-1; i++)
-            {
-                maxlag[n+i] = Math.Max(maxlag[n+i], Math.Abs(state.dlmtmp1[i]));
-            }
-            for(i=0; i<=nlec-1; i++)
-            {
-                vv = 0.0;
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    vv += jac[1+i,i_]*jac[1+i,i_];
-                }
-                maxlag[n+nec+i] = Math.Max(maxlag[n+nec+i], Math.Abs(state.dlmtmp2[i])/apserv.coalesce(vv, 1, _params));
-            }
-            for(i=0; i<=nic-1; i++)
-            {
-                v = state.dlmtmp0[nec+i]-state.scaledcleic[nec+i,n];
-                if( (double)(v)>=(double)(-dlctolerance) )
-                {
-                    maxlag[n+nec+nlec+i] = Math.Max(maxlag[n+nec+nlec+i], Math.Abs(state.dlmtmp1[nec+i]));
-                }
-            }
-            for(i=0; i<=nlic-1; i++)
-            {
-                vv = 0.0;
-                for(i_=0; i_<=n-1;i_++)
-                {
-                    vv += jac[1+nlec+i,i_]*jac[1+nlec+i,i_];
-                }
-                if( (double)(fi[1+nlec+i]/apserv.coalesce(Math.Sqrt(vv), 1, _params))>=(double)(-dlctolerance) )
-                {
-                    maxlag[n+nec+nlec+nic+i] = Math.Max(maxlag[n+nec+nlec+nic+i], Math.Abs(state.dlmtmp2[nlec+i])/apserv.coalesce(vv, 1, _params));
-                }
-            }
+            return result;
         }
 
 
@@ -34266,6 +37969,11 @@ public partial class alglib
         }
 
 
+        private static void tracelpnondescent(alglib.xparams _params)
+        {
+        }
+
+
         private static void tracelpstep(minslpstate state,
             alglib.xparams _params)
         {
@@ -34278,7 +37986,7 @@ public partial class alglib
         }
 
 
-        private static void tracemeritacceptance(minslpstate state,
+        private static void tracemultistep(minslpstate state,
             alglib.xparams _params)
         {
         }
@@ -37691,26 +41399,2543 @@ public partial class alglib
             n = state.n;
             for(i=0; i<=n-1; i++)
             {
-                if( state.hasbndl[i] && (double)(xs[i])<=(double)(scaledbndl[i]) )
+                if( state.hasbndl[i] && xs[i]<=scaledbndl[i] )
                 {
                     xu[i] = state.bndl[i];
                     continue;
                 }
-                if( state.hasbndu[i] && (double)(xs[i])>=(double)(scaledbndu[i]) )
+                if( state.hasbndu[i] && xs[i]>=scaledbndu[i] )
                 {
                     xu[i] = state.bndu[i];
                     continue;
                 }
                 xu[i] = xs[i]*state.s[i];
-                if( state.hasbndl[i] )
+                if( state.hasbndl[i] && xu[i]<state.bndl[i] )
                 {
-                    xu[i] = Math.Max(xu[i], state.bndl[i]);
+                    xu[i] = state.bndl[i];
                 }
-                if( state.hasbndu[i] )
+                if( state.hasbndu[i] && xu[i]>state.bndu[i] )
                 {
-                    xu[i] = Math.Min(xu[i], state.bndu[i]);
+                    xu[i] = state.bndu[i];
                 }
             }
+        }
+
+
+    }
+    public class minbc
+    {
+        /*************************************************************************
+        This object stores nonlinear optimizer state.
+        You should use functions provided by MinBC subpackage to work with this
+        object
+        *************************************************************************/
+        public class minbcstate : apobject
+        {
+            public int nmain;
+            public double epsg;
+            public double epsf;
+            public double epsx;
+            public int maxits;
+            public bool xrep;
+            public double stpmax;
+            public double diffstep;
+            public double[] s;
+            public int prectype;
+            public double[] diagh;
+            public double[] x;
+            public double f;
+            public double[] g;
+            public bool needf;
+            public bool needfg;
+            public bool xupdated;
+            public bool userterminationneeded;
+            public double teststep;
+            public rcommstate rstate;
+            public double[] xc;
+            public double[] ugc;
+            public double[] cgc;
+            public double[] xn;
+            public double[] ugn;
+            public double[] cgn;
+            public double[] xp;
+            public double fc;
+            public double fn;
+            public double fp;
+            public double[] d;
+            public double lastscaledgoodstep;
+            public bool[] hasbndl;
+            public bool[] hasbndu;
+            public double[] bndl;
+            public double[] bndu;
+            public int repiterationscount;
+            public int repnfev;
+            public int repvaridx;
+            public int repterminationtype;
+            public double[] xstart;
+            public double fbase;
+            public double fm2;
+            public double fm1;
+            public double fp1;
+            public double fp2;
+            public double xm1;
+            public double xp1;
+            public double gm1;
+            public double gp1;
+            public double[] tmpprec;
+            public double[] tmp0;
+            public int nfev;
+            public int mcstage;
+            public double stp;
+            public double curstpmax;
+            public double[] work;
+            public linmin.linminstate lstate;
+            public double trimthreshold;
+            public int nonmonotoniccnt;
+            public double[,] bufyk;
+            public double[,] bufsk;
+            public double[] bufrho;
+            public double[] buftheta;
+            public int bufsize;
+            public minbcstate()
+            {
+                init();
+            }
+            public override void init()
+            {
+                s = new double[0];
+                diagh = new double[0];
+                x = new double[0];
+                g = new double[0];
+                rstate = new rcommstate();
+                xc = new double[0];
+                ugc = new double[0];
+                cgc = new double[0];
+                xn = new double[0];
+                ugn = new double[0];
+                cgn = new double[0];
+                xp = new double[0];
+                d = new double[0];
+                hasbndl = new bool[0];
+                hasbndu = new bool[0];
+                bndl = new double[0];
+                bndu = new double[0];
+                xstart = new double[0];
+                tmpprec = new double[0];
+                tmp0 = new double[0];
+                work = new double[0];
+                lstate = new linmin.linminstate();
+                bufyk = new double[0,0];
+                bufsk = new double[0,0];
+                bufrho = new double[0];
+                buftheta = new double[0];
+            }
+            public override alglib.apobject make_copy()
+            {
+                minbcstate _result = new minbcstate();
+                _result.nmain = nmain;
+                _result.epsg = epsg;
+                _result.epsf = epsf;
+                _result.epsx = epsx;
+                _result.maxits = maxits;
+                _result.xrep = xrep;
+                _result.stpmax = stpmax;
+                _result.diffstep = diffstep;
+                _result.s = (double[])s.Clone();
+                _result.prectype = prectype;
+                _result.diagh = (double[])diagh.Clone();
+                _result.x = (double[])x.Clone();
+                _result.f = f;
+                _result.g = (double[])g.Clone();
+                _result.needf = needf;
+                _result.needfg = needfg;
+                _result.xupdated = xupdated;
+                _result.userterminationneeded = userterminationneeded;
+                _result.teststep = teststep;
+                _result.rstate = (rcommstate)rstate.make_copy();
+                _result.xc = (double[])xc.Clone();
+                _result.ugc = (double[])ugc.Clone();
+                _result.cgc = (double[])cgc.Clone();
+                _result.xn = (double[])xn.Clone();
+                _result.ugn = (double[])ugn.Clone();
+                _result.cgn = (double[])cgn.Clone();
+                _result.xp = (double[])xp.Clone();
+                _result.fc = fc;
+                _result.fn = fn;
+                _result.fp = fp;
+                _result.d = (double[])d.Clone();
+                _result.lastscaledgoodstep = lastscaledgoodstep;
+                _result.hasbndl = (bool[])hasbndl.Clone();
+                _result.hasbndu = (bool[])hasbndu.Clone();
+                _result.bndl = (double[])bndl.Clone();
+                _result.bndu = (double[])bndu.Clone();
+                _result.repiterationscount = repiterationscount;
+                _result.repnfev = repnfev;
+                _result.repvaridx = repvaridx;
+                _result.repterminationtype = repterminationtype;
+                _result.xstart = (double[])xstart.Clone();
+                _result.fbase = fbase;
+                _result.fm2 = fm2;
+                _result.fm1 = fm1;
+                _result.fp1 = fp1;
+                _result.fp2 = fp2;
+                _result.xm1 = xm1;
+                _result.xp1 = xp1;
+                _result.gm1 = gm1;
+                _result.gp1 = gp1;
+                _result.tmpprec = (double[])tmpprec.Clone();
+                _result.tmp0 = (double[])tmp0.Clone();
+                _result.nfev = nfev;
+                _result.mcstage = mcstage;
+                _result.stp = stp;
+                _result.curstpmax = curstpmax;
+                _result.work = (double[])work.Clone();
+                _result.lstate = (linmin.linminstate)lstate.make_copy();
+                _result.trimthreshold = trimthreshold;
+                _result.nonmonotoniccnt = nonmonotoniccnt;
+                _result.bufyk = (double[,])bufyk.Clone();
+                _result.bufsk = (double[,])bufsk.Clone();
+                _result.bufrho = (double[])bufrho.Clone();
+                _result.buftheta = (double[])buftheta.Clone();
+                _result.bufsize = bufsize;
+                return _result;
+            }
+        };
+
+
+        /*************************************************************************
+        This structure stores optimization report:
+        * IterationsCount           number of iterations
+        * NFEV                      number of gradient evaluations
+        * TerminationType           termination type (see below)
+
+        TERMINATION CODES
+
+        TerminationType field contains completion code, which can be:
+          -8    internal integrity control detected  infinite  or  NAN  values  in
+                function/gradient. Abnormal termination signalled.
+          -7    gradient verification failed.
+                See MinBCSetGradientCheck() for more information.
+          -3    inconsistent constraints.
+           1    relative function improvement is no more than EpsF.
+           2    relative step is no more than EpsX.
+           4    gradient norm is no more than EpsG
+           5    MaxIts steps was taken
+           7    stopping conditions are too stringent,
+                further improvement is impossible,
+                X contains best point found so far.
+           8    terminated by user who called minbcrequesttermination(). X contains
+                point which was "current accepted" when  termination  request  was
+                submitted.
+
+        ADDITIONAL FIELDS
+
+        There are additional fields which can be used for debugging:
+        * DebugEqErr                error in the equality constraints (2-norm)
+        * DebugFS                   f, calculated at projection of initial point
+                                    to the feasible set
+        * DebugFF                   f, calculated at the final point
+        * DebugDX                   |X_start-X_final|
+        *************************************************************************/
+        public class minbcreport : apobject
+        {
+            public int iterationscount;
+            public int nfev;
+            public int varidx;
+            public int terminationtype;
+            public minbcreport()
+            {
+                init();
+            }
+            public override void init()
+            {
+            }
+            public override alglib.apobject make_copy()
+            {
+                minbcreport _result = new minbcreport();
+                _result.iterationscount = iterationscount;
+                _result.nfev = nfev;
+                _result.varidx = varidx;
+                _result.terminationtype = terminationtype;
+                return _result;
+            }
+        };
+
+
+
+
+        public const double gtol = 0.4;
+        public const double maxnonmonotoniclen = 1.0E-5;
+        public const double initialdecay = 0.5;
+        public const double mindecay = 0.1;
+        public const double decaycorrection = 0.8;
+
+
+        /*************************************************************************
+                             BOX CONSTRAINED OPTIMIZATION
+                  WITH FAST ACTIVATION OF MULTIPLE BOX CONSTRAINTS
+
+        DESCRIPTION:
+        The  subroutine  minimizes  function   F(x) of N arguments subject  to box
+        constraints (with some of box constraints actually being equality ones).
+
+        This optimizer uses algorithm similar to that of MinBLEIC (optimizer  with
+        general linear constraints), but presence of box-only  constraints  allows
+        us to use faster constraint activation strategies. On large-scale problems,
+        with multiple constraints active at the solution, this  optimizer  can  be
+        several times faster than BLEIC.
+
+        REQUIREMENTS:
+        * user must provide function value and gradient
+        * starting point X0 must be feasible or
+          not too far away from the feasible set
+        * grad(f) must be Lipschitz continuous on a level set:
+          L = { x : f(x)<=f(x0) }
+        * function must be defined everywhere on the feasible set F
+
+        USAGE:
+
+        Constrained optimization if far more complex than the unconstrained one.
+        Here we give very brief outline of the BC optimizer. We strongly recommend
+        you to read examples in the ALGLIB Reference Manual and to read ALGLIB User Guide
+        on optimization, which is available at http://www.alglib.net/optimization/
+
+        1. User initializes algorithm state with MinBCCreate() call
+
+        2. USer adds box constraints by calling MinBCSetBC() function.
+
+        3. User sets stopping conditions with MinBCSetCond().
+
+        4. User calls MinBCOptimize() function which takes algorithm  state and
+           pointer (delegate, etc.) to callback function which calculates F/G.
+
+        5. User calls MinBCResults() to get solution
+
+        6. Optionally user may call MinBCRestartFrom() to solve another problem
+           with same N but another starting point.
+           MinBCRestartFrom() allows to reuse already initialized structure.
+
+
+        INPUT PARAMETERS:
+            N       -   problem dimension, N>0:
+                        * if given, only leading N elements of X are used
+                        * if not given, automatically determined from size ofX
+            X       -   starting point, array[N]:
+                        * it is better to set X to a feasible point
+                        * but X can be infeasible, in which case algorithm will try
+                          to find feasible point first, using X as initial
+                          approximation.
+
+        OUTPUT PARAMETERS:
+            State   -   structure stores algorithm state
+
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbccreate(int n,
+            double[] x,
+            minbcstate state,
+            alglib.xparams _params)
+        {
+            double[,] c = new double[0,0];
+            int[] ct = new int[0];
+
+            alglib.ap.assert(n>=1, "MinBCCreate: N<1");
+            alglib.ap.assert(alglib.ap.len(x)>=n, "MinBCCreate: Length(X)<N");
+            alglib.ap.assert(apserv.isfinitevector(x, n, _params), "MinBCCreate: X contains infinite or NaN values!");
+            minbcinitinternal(n, x, 0.0, state, _params);
+        }
+
+
+        /*************************************************************************
+        The subroutine is finite difference variant of MinBCCreate().  It  uses
+        finite differences in order to differentiate target function.
+
+        Description below contains information which is specific to  this function
+        only. We recommend to read comments on MinBCCreate() in  order  to  get
+        more information about creation of BC optimizer.
+
+        INPUT PARAMETERS:
+            N       -   problem dimension, N>0:
+                        * if given, only leading N elements of X are used
+                        * if not given, automatically determined from size of X
+            X       -   starting point, array[0..N-1].
+            DiffStep-   differentiation step, >0
+
+        OUTPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+
+        NOTES:
+        1. algorithm uses 4-point central formula for differentiation.
+        2. differentiation step along I-th axis is equal to DiffStep*S[I] where
+           S[] is scaling vector which can be set by MinBCSetScale() call.
+        3. we recommend you to use moderate values of  differentiation  step.  Too
+           large step will result in too large truncation  errors, while too small
+           step will result in too large numerical  errors.  1.0E-6  can  be  good
+           value to start with.
+        4. Numerical  differentiation  is   very   inefficient  -   one   gradient
+           calculation needs 4*N function evaluations. This function will work for
+           any N - either small (1...10), moderate (10...100) or  large  (100...).
+           However, performance penalty will be too severe for any N's except  for
+           small ones.
+           We should also say that code which relies on numerical  differentiation
+           is  less  robust and precise. CG needs exact gradient values. Imprecise
+           gradient may slow  down  convergence, especially  on  highly  nonlinear
+           problems.
+           Thus  we  recommend to use this function for fast prototyping on small-
+           dimensional problems only, and to implement analytical gradient as soon
+           as possible.
+
+          -- ALGLIB --
+             Copyright 16.05.2011 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbccreatef(int n,
+            double[] x,
+            double diffstep,
+            minbcstate state,
+            alglib.xparams _params)
+        {
+            double[,] c = new double[0,0];
+            int[] ct = new int[0];
+
+            alglib.ap.assert(n>=1, "MinBCCreateF: N<1");
+            alglib.ap.assert(alglib.ap.len(x)>=n, "MinBCCreateF: Length(X)<N");
+            alglib.ap.assert(apserv.isfinitevector(x, n, _params), "MinBCCreateF: X contains infinite or NaN values!");
+            alglib.ap.assert(math.isfinite(diffstep), "MinBCCreateF: DiffStep is infinite or NaN!");
+            alglib.ap.assert((double)(diffstep)>(double)(0), "MinBCCreateF: DiffStep is non-positive!");
+            minbcinitinternal(n, x, diffstep, state, _params);
+        }
+
+
+        /*************************************************************************
+        This function sets boundary constraints for BC optimizer.
+
+        Boundary constraints are inactive by default (after initial creation).
+        They are preserved after algorithm restart with MinBCRestartFrom().
+
+        INPUT PARAMETERS:
+            State   -   structure stores algorithm state
+            BndL    -   lower bounds, array[N].
+                        If some (all) variables are unbounded, you may specify
+                        very small number or -INF.
+            BndU    -   upper bounds, array[N].
+                        If some (all) variables are unbounded, you may specify
+                        very large number or +INF.
+
+        NOTE 1: it is possible to specify BndL[i]=BndU[i]. In this case I-th
+        variable will be "frozen" at X[i]=BndL[i]=BndU[i].
+
+        NOTE 2: this solver has following useful properties:
+        * bound constraints are always satisfied exactly
+        * function is evaluated only INSIDE area specified by  bound  constraints,
+          even  when  numerical  differentiation is used (algorithm adjusts  nodes
+          according to boundary constraints)
+
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetbc(minbcstate state,
+            double[] bndl,
+            double[] bndu,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int n = 0;
+
+            n = state.nmain;
+            alglib.ap.assert(alglib.ap.len(bndl)>=n, "MinBCSetBC: Length(BndL)<N");
+            alglib.ap.assert(alglib.ap.len(bndu)>=n, "MinBCSetBC: Length(BndU)<N");
+            for(i=0; i<=n-1; i++)
+            {
+                alglib.ap.assert(math.isfinite(bndl[i]) || Double.IsNegativeInfinity(bndl[i]), "MinBCSetBC: BndL contains NAN or +INF");
+                alglib.ap.assert(math.isfinite(bndu[i]) || Double.IsPositiveInfinity(bndu[i]), "MinBCSetBC: BndL contains NAN or -INF");
+                state.bndl[i] = bndl[i];
+                state.hasbndl[i] = math.isfinite(bndl[i]);
+                state.bndu[i] = bndu[i];
+                state.hasbndu[i] = math.isfinite(bndu[i]);
+            }
+        }
+
+
+        /*************************************************************************
+        This function sets stopping conditions for the optimizer.
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+            EpsG    -   >=0
+                        The  subroutine  finishes  its  work   if   the  condition
+                        |v|<EpsG is satisfied, where:
+                        * |.| means Euclidian norm
+                        * v - scaled gradient vector, v[i]=g[i]*s[i]
+                        * g - gradient
+                        * s - scaling coefficients set by MinBCSetScale()
+            EpsF    -   >=0
+                        The  subroutine  finishes  its work if on k+1-th iteration
+                        the  condition  |F(k+1)-F(k)|<=EpsF*max{|F(k)|,|F(k+1)|,1}
+                        is satisfied.
+            EpsX    -   >=0
+                        The subroutine finishes its work if  on  k+1-th  iteration
+                        the condition |v|<=EpsX is fulfilled, where:
+                        * |.| means Euclidian norm
+                        * v - scaled step vector, v[i]=dx[i]/s[i]
+                        * dx - step vector, dx=X(k+1)-X(k)
+                        * s - scaling coefficients set by MinBCSetScale()
+            MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+                        iterations is unlimited.
+
+        Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
+        to automatic stopping criterion selection.
+
+        NOTE: when SetCond() called with non-zero MaxIts, BC solver may perform
+              slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
+              limit on iterations count.
+
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetcond(minbcstate state,
+            double epsg,
+            double epsf,
+            double epsx,
+            int maxits,
+            alglib.xparams _params)
+        {
+            alglib.ap.assert(math.isfinite(epsg), "MinBCSetCond: EpsG is not finite number");
+            alglib.ap.assert((double)(epsg)>=(double)(0), "MinBCSetCond: negative EpsG");
+            alglib.ap.assert(math.isfinite(epsf), "MinBCSetCond: EpsF is not finite number");
+            alglib.ap.assert((double)(epsf)>=(double)(0), "MinBCSetCond: negative EpsF");
+            alglib.ap.assert(math.isfinite(epsx), "MinBCSetCond: EpsX is not finite number");
+            alglib.ap.assert((double)(epsx)>=(double)(0), "MinBCSetCond: negative EpsX");
+            alglib.ap.assert(maxits>=0, "MinBCSetCond: negative MaxIts!");
+            if( (((double)(epsg)==(double)(0) && (double)(epsf)==(double)(0)) && (double)(epsx)==(double)(0)) && maxits==0 )
+            {
+                epsx = 1.0E-6;
+            }
+            state.epsg = epsg;
+            state.epsf = epsf;
+            state.epsx = epsx;
+            state.maxits = maxits;
+        }
+
+
+        /*************************************************************************
+        This function sets scaling coefficients for BC optimizer.
+
+        ALGLIB optimizers use scaling matrices to test stopping  conditions  (step
+        size and gradient are scaled before comparison with tolerances).  Scale of
+        the I-th variable is a translation invariant measure of:
+        a) "how large" the variable is
+        b) how large the step should be to make significant changes in the function
+
+        Scaling is also used by finite difference variant of the optimizer  - step
+        along I-th axis is equal to DiffStep*S[I].
+
+        In  most  optimizers  (and  in  the  BC  too)  scaling is NOT a form of
+        preconditioning. It just  affects  stopping  conditions.  You  should  set
+        preconditioner  by  separate  call  to  one  of  the  MinBCSetPrec...()
+        functions.
+
+        There is a special  preconditioning  mode, however,  which  uses   scaling
+        coefficients to form diagonal preconditioning matrix. You  can  turn  this
+        mode on, if you want.   But  you should understand that scaling is not the
+        same thing as preconditioning - these are two different, although  related
+        forms of tuning solver.
+
+        INPUT PARAMETERS:
+            State   -   structure stores algorithm state
+            S       -   array[N], non-zero scaling coefficients
+                        S[i] may be negative, sign doesn't matter.
+
+          -- ALGLIB --
+             Copyright 14.01.2011 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetscale(minbcstate state,
+            double[] s,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            alglib.ap.assert(alglib.ap.len(s)>=state.nmain, "MinBCSetScale: Length(S)<N");
+            for(i=0; i<=state.nmain-1; i++)
+            {
+                alglib.ap.assert(math.isfinite(s[i]), "MinBCSetScale: S contains infinite or NAN elements");
+                alglib.ap.assert((double)(s[i])!=(double)(0), "MinBCSetScale: S contains zero elements");
+                state.s[i] = Math.Abs(s[i]);
+            }
+        }
+
+
+        /*************************************************************************
+        Modification of the preconditioner: preconditioning is turned off.
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+
+          -- ALGLIB --
+             Copyright 13.10.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetprecdefault(minbcstate state,
+            alglib.xparams _params)
+        {
+            state.prectype = 0;
+        }
+
+
+        /*************************************************************************
+        Modification  of  the  preconditioner:  diagonal of approximate Hessian is
+        used.
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+            D       -   diagonal of the approximate Hessian, array[0..N-1],
+                        (if larger, only leading N elements are used).
+
+        NOTE 1: D[i] should be positive. Exception will be thrown otherwise.
+
+        NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
+
+          -- ALGLIB --
+             Copyright 13.10.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetprecdiag(minbcstate state,
+            double[] d,
+            alglib.xparams _params)
+        {
+            int i = 0;
+
+            alglib.ap.assert(alglib.ap.len(d)>=state.nmain, "MinBCSetPrecDiag: D is too short");
+            for(i=0; i<=state.nmain-1; i++)
+            {
+                alglib.ap.assert(math.isfinite(d[i]), "MinBCSetPrecDiag: D contains infinite or NAN elements");
+                alglib.ap.assert((double)(d[i])>(double)(0), "MinBCSetPrecDiag: D contains non-positive elements");
+            }
+            apserv.rvectorsetlengthatleast(ref state.diagh, state.nmain, _params);
+            state.prectype = 2;
+            for(i=0; i<=state.nmain-1; i++)
+            {
+                state.diagh[i] = d[i];
+            }
+        }
+
+
+        /*************************************************************************
+        Modification of the preconditioner: scale-based diagonal preconditioning.
+
+        This preconditioning mode can be useful when you  don't  have  approximate
+        diagonal of Hessian, but you know that your  variables  are  badly  scaled
+        (for  example,  one  variable is in [1,10], and another in [1000,100000]),
+        and most part of the ill-conditioning comes from different scales of vars.
+
+        In this case simple  scale-based  preconditioner,  with H[i] = 1/(s[i]^2),
+        can greatly improve convergence.
+
+        IMPRTANT: you should set scale of your variables  with  MinBCSetScale()
+        call  (before  or after MinBCSetPrecScale() call). Without knowledge of
+        the scale of your variables scale-based preconditioner will be  just  unit
+        matrix.
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+
+          -- ALGLIB --
+             Copyright 13.10.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetprecscale(minbcstate state,
+            alglib.xparams _params)
+        {
+            state.prectype = 3;
+        }
+
+
+        /*************************************************************************
+        This function turns on/off reporting.
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+            NeedXRep-   whether iteration reports are needed or not
+
+        If NeedXRep is True, algorithm will call rep() callback function if  it is
+        provided to MinBCOptimize().
+
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetxrep(minbcstate state,
+            bool needxrep,
+            alglib.xparams _params)
+        {
+            state.xrep = needxrep;
+        }
+
+
+        /*************************************************************************
+        This function sets maximum step length
+
+        INPUT PARAMETERS:
+            State   -   structure which stores algorithm state
+            StpMax  -   maximum step length, >=0. Set StpMax to 0.0,  if you don't
+                        want to limit step length.
+
+        Use this subroutine when you optimize target function which contains exp()
+        or  other  fast  growing  functions,  and optimization algorithm makes too
+        large  steps  which  lead   to overflow. This function allows us to reject
+        steps  that  are  too  large  (and  therefore  expose  us  to the possible
+        overflow) without actually calculating function value at the x+stp*d.
+
+          -- ALGLIB --
+             Copyright 02.04.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetstpmax(minbcstate state,
+            double stpmax,
+            alglib.xparams _params)
+        {
+            alglib.ap.assert(math.isfinite(stpmax), "MinBCSetStpMax: StpMax is not finite!");
+            alglib.ap.assert((double)(stpmax)>=(double)(0), "MinBCSetStpMax: StpMax<0!");
+            state.stpmax = stpmax;
+        }
+
+
+        /*************************************************************************
+        NOTES:
+
+        1. This function has two different implementations: one which  uses  exact
+           (analytical) user-supplied gradient,  and one which uses function value
+           only  and  numerically  differentiates  function  in  order  to  obtain
+           gradient.
+
+           Depending  on  the  specific  function  used to create optimizer object
+           (either  MinBCCreate() for analytical gradient or  MinBCCreateF()
+           for numerical differentiation) you should choose appropriate variant of
+           MinBCOptimize() - one  which  accepts  function  AND gradient or one
+           which accepts function ONLY.
+
+           Be careful to choose variant of MinBCOptimize() which corresponds to
+           your optimization scheme! Table below lists different  combinations  of
+           callback (function/gradient) passed to MinBCOptimize()  and specific
+           function used to create optimizer.
+
+
+                             |         USER PASSED TO MinBCOptimize()
+           CREATED WITH      |  function only   |  function and gradient
+           ------------------------------------------------------------
+           MinBCCreateF()    |     works               FAILS
+           MinBCCreate()     |     FAILS               works
+
+           Here "FAIL" denotes inappropriate combinations  of  optimizer  creation
+           function  and  MinBCOptimize()  version.   Attemps   to   use   such
+           combination (for  example,  to  create optimizer with MinBCCreateF()
+           and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
+           exception being thrown. Either  you  did  not pass gradient when it WAS
+           needed or you passed gradient when it was NOT needed.
+
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static bool minbciteration(minbcstate state,
+            alglib.xparams _params)
+        {
+            bool result = new bool();
+            int freezeidx = 0;
+            double freezeval = 0;
+            double scaleddnorm = 0;
+            int n = 0;
+            int m = 0;
+            int i = 0;
+            int j = 0;
+            double v = 0;
+            double vv = 0;
+            double v0 = 0;
+            bool b = new bool();
+            int mcinfo = 0;
+            int itidx = 0;
+            double ginit = 0;
+            double gdecay = 0;
+            bool activationstatus = new bool();
+            double activationstep = 0;
+            int i_ = 0;
+
+            
+            //
+            // Reverse communication preparations
+            // I know it looks ugly, but it works the same way
+            // anywhere from C++ to Python.
+            //
+            // This code initializes locals by:
+            // * random values determined during code
+            //   generation - on first subroutine call
+            // * values from previous call - on subsequent calls
+            //
+            if( state.rstate.stage>=0 )
+            {
+                freezeidx = state.rstate.ia[0];
+                n = state.rstate.ia[1];
+                m = state.rstate.ia[2];
+                i = state.rstate.ia[3];
+                j = state.rstate.ia[4];
+                mcinfo = state.rstate.ia[5];
+                itidx = state.rstate.ia[6];
+                b = state.rstate.ba[0];
+                activationstatus = state.rstate.ba[1];
+                freezeval = state.rstate.ra[0];
+                scaleddnorm = state.rstate.ra[1];
+                v = state.rstate.ra[2];
+                vv = state.rstate.ra[3];
+                v0 = state.rstate.ra[4];
+                ginit = state.rstate.ra[5];
+                gdecay = state.rstate.ra[6];
+                activationstep = state.rstate.ra[7];
+            }
+            else
+            {
+                freezeidx = 359;
+                n = -58;
+                m = -919;
+                i = -909;
+                j = 81;
+                mcinfo = 255;
+                itidx = 74;
+                b = false;
+                activationstatus = true;
+                freezeval = 205;
+                scaleddnorm = -838;
+                v = 939;
+                vv = -526;
+                v0 = 763;
+                ginit = -541;
+                gdecay = -698;
+                activationstep = -900;
+            }
+            if( state.rstate.stage==0 )
+            {
+                goto lbl_0;
+            }
+            if( state.rstate.stage==1 )
+            {
+                goto lbl_1;
+            }
+            if( state.rstate.stage==2 )
+            {
+                goto lbl_2;
+            }
+            if( state.rstate.stage==3 )
+            {
+                goto lbl_3;
+            }
+            if( state.rstate.stage==4 )
+            {
+                goto lbl_4;
+            }
+            if( state.rstate.stage==5 )
+            {
+                goto lbl_5;
+            }
+            if( state.rstate.stage==6 )
+            {
+                goto lbl_6;
+            }
+            if( state.rstate.stage==7 )
+            {
+                goto lbl_7;
+            }
+            if( state.rstate.stage==8 )
+            {
+                goto lbl_8;
+            }
+            if( state.rstate.stage==9 )
+            {
+                goto lbl_9;
+            }
+            if( state.rstate.stage==10 )
+            {
+                goto lbl_10;
+            }
+            if( state.rstate.stage==11 )
+            {
+                goto lbl_11;
+            }
+            if( state.rstate.stage==12 )
+            {
+                goto lbl_12;
+            }
+            if( state.rstate.stage==13 )
+            {
+                goto lbl_13;
+            }
+            if( state.rstate.stage==14 )
+            {
+                goto lbl_14;
+            }
+            if( state.rstate.stage==15 )
+            {
+                goto lbl_15;
+            }
+            if( state.rstate.stage==16 )
+            {
+                goto lbl_16;
+            }
+            if( state.rstate.stage==17 )
+            {
+                goto lbl_17;
+            }
+            if( state.rstate.stage==18 )
+            {
+                goto lbl_18;
+            }
+            if( state.rstate.stage==19 )
+            {
+                goto lbl_19;
+            }
+            if( state.rstate.stage==20 )
+            {
+                goto lbl_20;
+            }
+            if( state.rstate.stage==21 )
+            {
+                goto lbl_21;
+            }
+            if( state.rstate.stage==22 )
+            {
+                goto lbl_22;
+            }
+            if( state.rstate.stage==23 )
+            {
+                goto lbl_23;
+            }
+            if( state.rstate.stage==24 )
+            {
+                goto lbl_24;
+            }
+            if( state.rstate.stage==25 )
+            {
+                goto lbl_25;
+            }
+            if( state.rstate.stage==26 )
+            {
+                goto lbl_26;
+            }
+            if( state.rstate.stage==27 )
+            {
+                goto lbl_27;
+            }
+            if( state.rstate.stage==28 )
+            {
+                goto lbl_28;
+            }
+            if( state.rstate.stage==29 )
+            {
+                goto lbl_29;
+            }
+            if( state.rstate.stage==30 )
+            {
+                goto lbl_30;
+            }
+            if( state.rstate.stage==31 )
+            {
+                goto lbl_31;
+            }
+            
+            //
+            // Routine body
+            //
+            
+            //
+            // Algorithm parameters:
+            // * M          number of L-BFGS corrections.
+            //              This coefficient remains fixed during iterations.
+            // * GDecay     desired decrease of constrained gradient during L-BFGS iterations.
+            //              This coefficient is decreased after each L-BFGS round until
+            //              it reaches minimum decay.
+            //
+            m = Math.Min(5, state.nmain);
+            gdecay = initialdecay;
+            
+            //
+            // Init
+            //
+            n = state.nmain;
+            for(i=0; i<=n-1; i++)
+            {
+                state.xc[i] = state.xstart[i];
+            }
+            if( !optserv.enforceboundaryconstraints(state.xc, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, _params) )
+            {
+                
+                //
+                // Inconsistent constraints
+                //
+                state.repterminationtype = -3;
+                result = false;
+                return result;
+            }
+            state.userterminationneeded = false;
+            state.repterminationtype = 0;
+            state.repiterationscount = 0;
+            state.repnfev = 0;
+            state.repvaridx = -1;
+            apserv.rmatrixsetlengthatleast(ref state.bufyk, m+1, n, _params);
+            apserv.rmatrixsetlengthatleast(ref state.bufsk, m+1, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.bufrho, m, _params);
+            apserv.rvectorsetlengthatleast(ref state.buftheta, m, _params);
+            apserv.rvectorsetlengthatleast(ref state.tmp0, n, _params);
+            
+            //
+            // Fill TmpPrec with current preconditioner
+            //
+            apserv.rvectorsetlengthatleast(ref state.tmpprec, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                if( state.prectype==2 )
+                {
+                    state.tmpprec[i] = 1/state.diagh[i];
+                    continue;
+                }
+                if( state.prectype==3 )
+                {
+                    state.tmpprec[i] = math.sqr(state.s[i]);
+                    continue;
+                }
+                state.tmpprec[i] = 1;
+            }
+            
+            //
+            //  Check correctness of user-supplied gradient
+            //
+            if( !((double)(state.diffstep)==(double)(0) && (double)(state.teststep)>(double)(0)) )
+            {
+                goto lbl_32;
+            }
+            clearrequestfields(state, _params);
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.x[i_] = state.xc[i_];
+            }
+            state.needfg = true;
+            i = 0;
+        lbl_34:
+            if( i>n-1 )
+            {
+                goto lbl_36;
+            }
+            alglib.ap.assert(!state.hasbndl[i] || (double)(state.xc[i])>=(double)(state.bndl[i]), "MinBCIteration: internal error(State.X is out of bounds)");
+            alglib.ap.assert(!state.hasbndu[i] || (double)(state.xc[i])<=(double)(state.bndu[i]), "MinBCIteration: internal error(State.X is out of bounds)");
+            v = state.x[i];
+            state.x[i] = v-state.teststep*state.s[i];
+            if( state.hasbndl[i] )
+            {
+                state.x[i] = Math.Max(state.x[i], state.bndl[i]);
+            }
+            state.xm1 = state.x[i];
+            state.rstate.stage = 0;
+            goto lbl_rcomm;
+        lbl_0:
+            state.fm1 = state.f;
+            state.gm1 = state.g[i];
+            state.x[i] = v+state.teststep*state.s[i];
+            if( state.hasbndu[i] )
+            {
+                state.x[i] = Math.Min(state.x[i], state.bndu[i]);
+            }
+            state.xp1 = state.x[i];
+            state.rstate.stage = 1;
+            goto lbl_rcomm;
+        lbl_1:
+            state.fp1 = state.f;
+            state.gp1 = state.g[i];
+            state.x[i] = (state.xm1+state.xp1)/2;
+            if( state.hasbndl[i] )
+            {
+                state.x[i] = Math.Max(state.x[i], state.bndl[i]);
+            }
+            if( state.hasbndu[i] )
+            {
+                state.x[i] = Math.Min(state.x[i], state.bndu[i]);
+            }
+            state.rstate.stage = 2;
+            goto lbl_rcomm;
+        lbl_2:
+            state.x[i] = v;
+            if( !optserv.derivativecheck(state.fm1, state.gm1, state.fp1, state.gp1, state.f, state.g[i], state.xp1-state.xm1, _params) )
+            {
+                state.repvaridx = i;
+                state.repterminationtype = -7;
+                result = false;
+                return result;
+            }
+            i = i+1;
+            goto lbl_34;
+        lbl_36:
+            state.needfg = false;
+        lbl_32:
+            
+            //
+            // Main cycle of BC-PG algorithm
+            //
+            state.repterminationtype = 0;
+            state.lastscaledgoodstep = 0;
+            state.nonmonotoniccnt = (int)Math.Round(1.5*n)+5;
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.x[i_] = state.xc[i_];
+            }
+            clearrequestfields(state, _params);
+            if( (double)(state.diffstep)!=(double)(0) )
+            {
+                goto lbl_37;
+            }
+            state.needfg = true;
+            state.rstate.stage = 3;
+            goto lbl_rcomm;
+        lbl_3:
+            state.needfg = false;
+            goto lbl_38;
+        lbl_37:
+            state.needf = true;
+            state.rstate.stage = 4;
+            goto lbl_rcomm;
+        lbl_4:
+            state.needf = false;
+        lbl_38:
+            state.fc = state.f;
+            optserv.trimprepare(state.f, ref state.trimthreshold, _params);
+            state.repnfev = state.repnfev+1;
+            if( !state.xrep )
+            {
+                goto lbl_39;
+            }
+            
+            //
+            // Report current point
+            //
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.x[i_] = state.xc[i_];
+            }
+            state.f = state.fc;
+            state.xupdated = true;
+            state.rstate.stage = 5;
+            goto lbl_rcomm;
+        lbl_5:
+            state.xupdated = false;
+        lbl_39:
+            if( state.userterminationneeded )
+            {
+                
+                //
+                // User requested termination
+                //
+                state.repterminationtype = 8;
+                result = false;
+                return result;
+            }
+        lbl_41:
+            if( false )
+            {
+                goto lbl_42;
+            }
+            
+            //
+            // Steepest descent phase
+            //
+            // (a) calculate unconstrained gradient
+            // (b) check F/G for NAN/INF, abnormally terminate algorithm if needed
+            // (c) perform one steepest descent step, activating only those constraints
+            //     which prevent us from moving outside of box-constrained area
+            //
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.x[i_] = state.xc[i_];
+            }
+            clearrequestfields(state, _params);
+            if( (double)(state.diffstep)!=(double)(0) )
+            {
+                goto lbl_43;
+            }
+            
+            //
+            // Analytic gradient
+            //
+            state.needfg = true;
+            state.rstate.stage = 6;
+            goto lbl_rcomm;
+        lbl_6:
+            state.needfg = false;
+            goto lbl_44;
+        lbl_43:
+            
+            //
+            // Numerical differentiation
+            //
+            state.needf = true;
+            state.rstate.stage = 7;
+            goto lbl_rcomm;
+        lbl_7:
+            state.fbase = state.f;
+            i = 0;
+        lbl_45:
+            if( i>n-1 )
+            {
+                goto lbl_47;
+            }
+            v = state.x[i];
+            b = false;
+            if( state.hasbndl[i] )
+            {
+                b = b || (double)(v-state.diffstep*state.s[i])<(double)(state.bndl[i]);
+            }
+            if( state.hasbndu[i] )
+            {
+                b = b || (double)(v+state.diffstep*state.s[i])>(double)(state.bndu[i]);
+            }
+            if( b )
+            {
+                goto lbl_48;
+            }
+            state.x[i] = v-state.diffstep*state.s[i];
+            state.rstate.stage = 8;
+            goto lbl_rcomm;
+        lbl_8:
+            state.fm2 = state.f;
+            state.x[i] = v-0.5*state.diffstep*state.s[i];
+            state.rstate.stage = 9;
+            goto lbl_rcomm;
+        lbl_9:
+            state.fm1 = state.f;
+            state.x[i] = v+0.5*state.diffstep*state.s[i];
+            state.rstate.stage = 10;
+            goto lbl_rcomm;
+        lbl_10:
+            state.fp1 = state.f;
+            state.x[i] = v+state.diffstep*state.s[i];
+            state.rstate.stage = 11;
+            goto lbl_rcomm;
+        lbl_11:
+            state.fp2 = state.f;
+            state.g[i] = (8*(state.fp1-state.fm1)-(state.fp2-state.fm2))/(6*state.diffstep*state.s[i]);
+            goto lbl_49;
+        lbl_48:
+            state.xm1 = v-state.diffstep*state.s[i];
+            state.xp1 = v+state.diffstep*state.s[i];
+            if( state.hasbndl[i] && (double)(state.xm1)<(double)(state.bndl[i]) )
+            {
+                state.xm1 = state.bndl[i];
+            }
+            if( state.hasbndu[i] && (double)(state.xp1)>(double)(state.bndu[i]) )
+            {
+                state.xp1 = state.bndu[i];
+            }
+            state.x[i] = state.xm1;
+            state.rstate.stage = 12;
+            goto lbl_rcomm;
+        lbl_12:
+            state.fm1 = state.f;
+            state.x[i] = state.xp1;
+            state.rstate.stage = 13;
+            goto lbl_rcomm;
+        lbl_13:
+            state.fp1 = state.f;
+            if( (double)(state.xm1)!=(double)(state.xp1) )
+            {
+                state.g[i] = (state.fp1-state.fm1)/(state.xp1-state.xm1);
+            }
+            else
+            {
+                state.g[i] = 0;
+            }
+        lbl_49:
+            state.x[i] = v;
+            i = i+1;
+            goto lbl_45;
+        lbl_47:
+            state.f = state.fbase;
+            state.needf = false;
+        lbl_44:
+            state.fc = state.f;
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.ugc[i_] = state.g[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.cgc[i_] = state.g[i_];
+            }
+            optserv.projectgradientintobc(state.xc, ref state.cgc, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, _params);
+            ginit = 0.0;
+            for(i=0; i<=n-1; i++)
+            {
+                ginit = ginit+math.sqr(state.cgc[i]*state.s[i]);
+            }
+            ginit = Math.Sqrt(ginit);
+            if( !math.isfinite(ginit) || !math.isfinite(state.fc) )
+            {
+                
+                //
+                // Abnormal termination - infinities in function/gradient
+                //
+                state.repterminationtype = -8;
+                result = false;
+                return result;
+            }
+            if( state.userterminationneeded )
+            {
+                
+                //
+                // User requested termination
+                //
+                state.repterminationtype = 8;
+                result = false;
+                return result;
+            }
+            if( (double)(ginit)<=(double)(state.epsg) )
+            {
+                
+                //
+                // Gradient is small enough.
+                // Optimization is terminated
+                //
+                state.repterminationtype = 4;
+                result = false;
+                return result;
+            }
+            for(i=0; i<=n-1; i++)
+            {
+                state.d[i] = -(state.tmpprec[i]*state.cgc[i]);
+            }
+            scaleddnorm = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                scaleddnorm = scaleddnorm+math.sqr(state.d[i]/state.s[i]);
+            }
+            scaleddnorm = Math.Sqrt(scaleddnorm);
+            alglib.ap.assert((double)(scaleddnorm)>(double)(0), "MinBC: integrity check failed");
+            if( (double)(state.lastscaledgoodstep)>(double)(0) )
+            {
+                state.stp = state.lastscaledgoodstep/scaleddnorm;
+            }
+            else
+            {
+                state.stp = 1.0/scaleddnorm;
+            }
+            optserv.calculatestepbound(state.xc, state.d, 1.0, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, ref freezeidx, ref freezeval, ref state.curstpmax, _params);
+            activationstep = state.curstpmax;
+            if( freezeidx<0 || (double)(state.curstpmax)>(double)(1.0E50) )
+            {
+                state.curstpmax = 1.0E50;
+            }
+            if( (double)(state.stpmax)>(double)(0) )
+            {
+                state.curstpmax = Math.Min(state.curstpmax, state.stpmax/scaleddnorm);
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.xn[i_] = state.xc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.cgn[i_] = state.cgc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.ugn[i_] = state.ugc[i_];
+            }
+            state.fn = state.fc;
+            state.mcstage = 0;
+            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
+        lbl_50:
+            if( state.mcstage==0 )
+            {
+                goto lbl_51;
+            }
+            
+            //
+            // Copy XN to X, perform on-the-fly correction w.r.t box
+            // constraints (projection onto feasible set).
+            //
+            for(i=0; i<=n-1; i++)
+            {
+                state.x[i] = state.xn[i];
+                if( state.hasbndl[i] && (double)(state.xn[i])<(double)(state.bndl[i]) )
+                {
+                    state.x[i] = state.bndl[i];
+                }
+                if( state.hasbndu[i] && (double)(state.xn[i])>(double)(state.bndu[i]) )
+                {
+                    state.x[i] = state.bndu[i];
+                }
+            }
+            
+            //
+            // Gradient, either user-provided or numerical differentiation
+            //
+            clearrequestfields(state, _params);
+            if( (double)(state.diffstep)!=(double)(0) )
+            {
+                goto lbl_52;
+            }
+            
+            //
+            // Analytic gradient
+            //
+            state.needfg = true;
+            state.rstate.stage = 14;
+            goto lbl_rcomm;
+        lbl_14:
+            state.needfg = false;
+            state.repnfev = state.repnfev+1;
+            goto lbl_53;
+        lbl_52:
+            
+            //
+            // Numerical differentiation
+            //
+            state.needf = true;
+            state.rstate.stage = 15;
+            goto lbl_rcomm;
+        lbl_15:
+            state.fbase = state.f;
+            i = 0;
+        lbl_54:
+            if( i>n-1 )
+            {
+                goto lbl_56;
+            }
+            v = state.x[i];
+            b = false;
+            if( state.hasbndl[i] )
+            {
+                b = b || (double)(v-state.diffstep*state.s[i])<(double)(state.bndl[i]);
+            }
+            if( state.hasbndu[i] )
+            {
+                b = b || (double)(v+state.diffstep*state.s[i])>(double)(state.bndu[i]);
+            }
+            if( b )
+            {
+                goto lbl_57;
+            }
+            state.x[i] = v-state.diffstep*state.s[i];
+            state.rstate.stage = 16;
+            goto lbl_rcomm;
+        lbl_16:
+            state.fm2 = state.f;
+            state.x[i] = v-0.5*state.diffstep*state.s[i];
+            state.rstate.stage = 17;
+            goto lbl_rcomm;
+        lbl_17:
+            state.fm1 = state.f;
+            state.x[i] = v+0.5*state.diffstep*state.s[i];
+            state.rstate.stage = 18;
+            goto lbl_rcomm;
+        lbl_18:
+            state.fp1 = state.f;
+            state.x[i] = v+state.diffstep*state.s[i];
+            state.rstate.stage = 19;
+            goto lbl_rcomm;
+        lbl_19:
+            state.fp2 = state.f;
+            state.g[i] = (8*(state.fp1-state.fm1)-(state.fp2-state.fm2))/(6*state.diffstep*state.s[i]);
+            state.repnfev = state.repnfev+4;
+            goto lbl_58;
+        lbl_57:
+            state.xm1 = v-state.diffstep*state.s[i];
+            state.xp1 = v+state.diffstep*state.s[i];
+            if( state.hasbndl[i] && (double)(state.xm1)<(double)(state.bndl[i]) )
+            {
+                state.xm1 = state.bndl[i];
+            }
+            if( state.hasbndu[i] && (double)(state.xp1)>(double)(state.bndu[i]) )
+            {
+                state.xp1 = state.bndu[i];
+            }
+            state.x[i] = state.xm1;
+            state.rstate.stage = 20;
+            goto lbl_rcomm;
+        lbl_20:
+            state.fm1 = state.f;
+            state.x[i] = state.xp1;
+            state.rstate.stage = 21;
+            goto lbl_rcomm;
+        lbl_21:
+            state.fp1 = state.f;
+            if( (double)(state.xm1)!=(double)(state.xp1) )
+            {
+                state.g[i] = (state.fp1-state.fm1)/(state.xp1-state.xm1);
+            }
+            else
+            {
+                state.g[i] = 0;
+            }
+            state.repnfev = state.repnfev+2;
+        lbl_58:
+            state.x[i] = v;
+            i = i+1;
+            goto lbl_54;
+        lbl_56:
+            state.f = state.fbase;
+            state.needf = false;
+        lbl_53:
+            
+            //
+            // Back to MCSRCH
+            //
+            optserv.trimfunction(ref state.f, ref state.g, n, state.trimthreshold, _params);
+            state.fn = state.f;
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.cgn[i_] = state.g[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.ugn[i_] = state.g[i_];
+            }
+            for(i=0; i<=n-1; i++)
+            {
+                if( (double)(state.d[i])==(double)(0) )
+                {
+                    state.cgn[i] = 0;
+                }
+            }
+            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
+            goto lbl_50;
+        lbl_51:
+            v = state.fn;
+            for(i=0; i<=n-1; i++)
+            {
+                v = 0.1*v+state.ugn[i];
+            }
+            if( !math.isfinite(v) )
+            {
+                
+                //
+                // Abnormal termination - infinities in function/gradient
+                //
+                state.repterminationtype = -8;
+                result = false;
+                return result;
+            }
+            if( mcinfo!=1 && mcinfo!=5 )
+            {
+                
+                //
+                // We can not find step which decreases function value. We have
+                // two possibilities:
+                // (a) numerical properties of the function do not allow us to
+                //     find good step.
+                // (b) we are close to activation of some constraint, and it is
+                //     so close that step which activates it leads to change in
+                //     target function which is smaller than numerical noise.
+                //
+                // Optimization algorithm must be able to handle case (b), because
+                // inability to handle it will cause failure when algorithm
+                // started very close to boundary of the feasible area.
+                //
+                // In order to correctly handle such cases we allow limited amount
+                // of small steps which increase function value.
+                //
+                if( (freezeidx>=0 && (double)(scaleddnorm*state.curstpmax)<=(double)(maxnonmonotoniclen)) && state.nonmonotoniccnt>0 )
+                {
+                    
+                    //
+                    // We enforce non-monotonic step:
+                    // * Stp    := CurStpMax
+                    // * MCINFO := 5
+                    // * XN     := XC+CurStpMax*D
+                    // * non-monotonic counter is decreased
+                    //
+                    // NOTE: UGN/CGN are not updated because step is so short that we assume that
+                    //       GN is approximately equal to GC.
+                    //
+                    state.stp = state.curstpmax;
+                    mcinfo = 5;
+                    v = state.curstpmax;
+                    for(i_=0; i_<=n-1;i_++)
+                    {
+                        state.xn[i_] = state.xc[i_];
+                    }
+                    for(i_=0; i_<=n-1;i_++)
+                    {
+                        state.xn[i_] = state.xn[i_] + v*state.d[i_];
+                    }
+                    state.nonmonotoniccnt = state.nonmonotoniccnt-1;
+                }
+                else
+                {
+                    
+                    //
+                    // Numerical properties of the function does not allow
+                    // us to solve problem. Algorithm is terminated
+                    //
+                    state.repterminationtype = 7;
+                    result = false;
+                    return result;
+                }
+            }
+            if( state.userterminationneeded )
+            {
+                
+                //
+                // User requested termination
+                //
+                state.repterminationtype = 8;
+                result = false;
+                return result;
+            }
+            alglib.ap.assert(mcinfo!=5 || (double)(state.stp)==(double)(state.curstpmax), "MinBC: integrity check failed");
+            optserv.postprocessboundedstep(ref state.xn, state.xc, state.bndl, state.hasbndl, state.bndu, state.hasbndu, n, 0, freezeidx, freezeval, state.stp, activationstep, _params);
+            state.fp = state.fc;
+            state.fc = state.fn;
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.xp[i_] = state.xc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.xc[i_] = state.xn[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.cgc[i_] = state.cgn[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.ugc[i_] = state.ugn[i_];
+            }
+            if( !state.xrep )
+            {
+                goto lbl_59;
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.x[i_] = state.xc[i_];
+            }
+            clearrequestfields(state, _params);
+            state.xupdated = true;
+            state.rstate.stage = 22;
+            goto lbl_rcomm;
+        lbl_22:
+            state.xupdated = false;
+        lbl_59:
+            state.repiterationscount = state.repiterationscount+1;
+            if( mcinfo==1 )
+            {
+                v = 0;
+                for(i=0; i<=n-1; i++)
+                {
+                    v = v+math.sqr((state.xc[i]-state.xp[i])/state.s[i]);
+                }
+                v = Math.Sqrt(v);
+                if( (double)(v)<=(double)(state.epsx) )
+                {
+                    
+                    //
+                    // Step is small enough
+                    //
+                    state.repterminationtype = 2;
+                    result = false;
+                    return result;
+                }
+                if( (double)(Math.Abs(state.fp-state.fc))<=(double)(state.epsf*Math.Max(Math.Abs(state.fc), Math.Max(Math.Abs(state.fp), 1.0))) )
+                {
+                    
+                    //
+                    // Function change is small enough
+                    //
+                    state.repterminationtype = 1;
+                    result = false;
+                    return result;
+                }
+            }
+            if( state.maxits>0 && state.repiterationscount>=state.maxits )
+            {
+                
+                //
+                // Iteration counter exceeded limit
+                //
+                state.repterminationtype = 5;
+                result = false;
+                return result;
+            }
+            
+            //
+            // LBFGS stage:
+            // * during LBFGS iterations we activate new constraints, but never
+            //   deactivate already active ones.
+            // * we perform at most N iterations of LBFGS before re-evaluating
+            //   active set and restarting LBFGS.
+            //
+            // About termination:
+            // * LBFGS iterations can be terminated because of two reasons:
+            //   * "termination" - non-zero termination code in RepTerminationType,
+            //     which means that optimization is done
+            //   * "restart" - zero RepTerminationType, which means that we
+            //     have to re-evaluate active set and resume LBFGS stage.
+            // * one more option is "refresh" - to continue LBFGS iterations,
+            //   but with all BFGS updates (Sk/Yk pairs) being dropped;
+            //   it happens after changes in active set
+            //
+            ginit = 0.0;
+            for(i=0; i<=n-1; i++)
+            {
+                state.cgc[i] = state.ugc[i];
+                if( state.hasbndl[i] && (double)(state.xc[i])==(double)(state.bndl[i]) )
+                {
+                    state.cgc[i] = 0;
+                }
+                if( state.hasbndu[i] && (double)(state.xc[i])==(double)(state.bndu[i]) )
+                {
+                    state.cgc[i] = 0;
+                }
+                ginit = ginit+math.sqr(state.cgc[i]*state.s[i]);
+            }
+            ginit = Math.Sqrt(ginit);
+            state.bufsize = 0;
+            itidx = 0;
+        lbl_61:
+            if( itidx>n-1 )
+            {
+                goto lbl_63;
+            }
+            
+            //
+            // At the beginning of each iteration:
+            // * XC stores current point
+            // * FC stores current function value
+            // * UGC stores current unconstrained gradient
+            // * CGC stores current constrained gradient
+            // * D stores constrained step direction (calculated at this block)
+            //
+            // 1. Calculate search direction D according to L-BFGS algorithm
+            //    using constrained preconditioner to perform inner multiplication.
+            // 2. Evaluate scaled length of direction D; restart LBFGS if D is zero
+            //    (it may be possible that we found minimum, but it is also possible
+            //    that some constraints need deactivation)
+            // 3. If D is non-zero, try to use previous scaled step length as initial estimate for new step.
+            // 4. Calculate bound on step length.
+            //
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.work[i_] = state.cgc[i_];
+            }
+            for(i=state.bufsize-1; i>=0; i--)
+            {
+                v = 0.0;
+                for(i_=0; i_<=n-1;i_++)
+                {
+                    v += state.bufsk[i,i_]*state.work[i_];
+                }
+                state.buftheta[i] = v;
+                vv = v*state.bufrho[i];
+                for(i_=0; i_<=n-1;i_++)
+                {
+                    state.work[i_] = state.work[i_] - vv*state.bufyk[i,i_];
+                }
+            }
+            for(i=0; i<=n-1; i++)
+            {
+                state.work[i] = state.tmpprec[i]*state.work[i];
+            }
+            for(i=0; i<=state.bufsize-1; i++)
+            {
+                v = 0.0;
+                for(i_=0; i_<=n-1;i_++)
+                {
+                    v += state.bufyk[i,i_]*state.work[i_];
+                }
+                vv = state.bufrho[i]*(-v+state.buftheta[i]);
+                for(i_=0; i_<=n-1;i_++)
+                {
+                    state.work[i_] = state.work[i_] + vv*state.bufsk[i,i_];
+                }
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.d[i_] = -state.work[i_];
+            }
+            b = false;
+            for(i=0; i<=n-1; i++)
+            {
+                b = b || ((state.hasbndl[i] && (double)(state.xc[i])==(double)(state.bndl[i])) && (double)(state.d[i])!=(double)(0));
+                b = b || ((state.hasbndu[i] && (double)(state.xc[i])==(double)(state.bndu[i])) && (double)(state.d[i])!=(double)(0));
+            }
+            alglib.ap.assert(!b, "MinBC: integrity check failed (q)");
+            scaleddnorm = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                scaleddnorm = scaleddnorm+math.sqr(state.d[i]/state.s[i]);
+            }
+            scaleddnorm = Math.Sqrt(scaleddnorm);
+            if( (double)(scaleddnorm)==(double)(0) )
+            {
+                
+                //
+                // Search direction is zero.
+                // Skip back to steepest descent phase.
+                //
+                goto lbl_63;
+            }
+            if( (double)(state.lastscaledgoodstep)>(double)(0) )
+            {
+                state.stp = state.lastscaledgoodstep/scaleddnorm;
+            }
+            else
+            {
+                state.stp = 1.0/scaleddnorm;
+            }
+            state.curstpmax = 1.0E50;
+            if( (double)(state.stpmax)>(double)(0) )
+            {
+                state.curstpmax = Math.Min(state.curstpmax, state.stpmax/scaleddnorm);
+            }
+            
+            //
+            // Minimize G(t) = F(CONSTRAIN(XC + t*D)), with t being scalar, XC and D being vectors.
+            //
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.xn[i_] = state.xc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.cgn[i_] = state.cgc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.ugn[i_] = state.ugc[i_];
+            }
+            state.fn = state.fc;
+            state.mcstage = 0;
+            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
+        lbl_64:
+            if( state.mcstage==0 )
+            {
+                goto lbl_65;
+            }
+            
+            //
+            // Copy XN to X, perform on-the-fly correction w.r.t box
+            // constraints (projection onto feasible set).
+            //
+            for(i=0; i<=n-1; i++)
+            {
+                state.x[i] = state.xn[i];
+                if( state.hasbndl[i] && (double)(state.xn[i])<=(double)(state.bndl[i]) )
+                {
+                    state.x[i] = state.bndl[i];
+                }
+                if( state.hasbndu[i] && (double)(state.xn[i])>=(double)(state.bndu[i]) )
+                {
+                    state.x[i] = state.bndu[i];
+                }
+            }
+            
+            //
+            // Gradient, either user-provided or numerical differentiation
+            //
+            clearrequestfields(state, _params);
+            if( (double)(state.diffstep)!=(double)(0) )
+            {
+                goto lbl_66;
+            }
+            
+            //
+            // Analytic gradient
+            //
+            state.needfg = true;
+            state.rstate.stage = 23;
+            goto lbl_rcomm;
+        lbl_23:
+            state.needfg = false;
+            state.repnfev = state.repnfev+1;
+            goto lbl_67;
+        lbl_66:
+            
+            //
+            // Numerical differentiation
+            //
+            state.needf = true;
+            state.rstate.stage = 24;
+            goto lbl_rcomm;
+        lbl_24:
+            state.fbase = state.f;
+            i = 0;
+        lbl_68:
+            if( i>n-1 )
+            {
+                goto lbl_70;
+            }
+            v = state.x[i];
+            b = false;
+            if( state.hasbndl[i] )
+            {
+                b = b || (double)(v-state.diffstep*state.s[i])<(double)(state.bndl[i]);
+            }
+            if( state.hasbndu[i] )
+            {
+                b = b || (double)(v+state.diffstep*state.s[i])>(double)(state.bndu[i]);
+            }
+            if( b )
+            {
+                goto lbl_71;
+            }
+            state.x[i] = v-state.diffstep*state.s[i];
+            state.rstate.stage = 25;
+            goto lbl_rcomm;
+        lbl_25:
+            state.fm2 = state.f;
+            state.x[i] = v-0.5*state.diffstep*state.s[i];
+            state.rstate.stage = 26;
+            goto lbl_rcomm;
+        lbl_26:
+            state.fm1 = state.f;
+            state.x[i] = v+0.5*state.diffstep*state.s[i];
+            state.rstate.stage = 27;
+            goto lbl_rcomm;
+        lbl_27:
+            state.fp1 = state.f;
+            state.x[i] = v+state.diffstep*state.s[i];
+            state.rstate.stage = 28;
+            goto lbl_rcomm;
+        lbl_28:
+            state.fp2 = state.f;
+            state.g[i] = (8*(state.fp1-state.fm1)-(state.fp2-state.fm2))/(6*state.diffstep*state.s[i]);
+            state.repnfev = state.repnfev+4;
+            goto lbl_72;
+        lbl_71:
+            state.xm1 = v-state.diffstep*state.s[i];
+            state.xp1 = v+state.diffstep*state.s[i];
+            if( state.hasbndl[i] && (double)(state.xm1)<(double)(state.bndl[i]) )
+            {
+                state.xm1 = state.bndl[i];
+            }
+            if( state.hasbndu[i] && (double)(state.xp1)>(double)(state.bndu[i]) )
+            {
+                state.xp1 = state.bndu[i];
+            }
+            state.x[i] = state.xm1;
+            state.rstate.stage = 29;
+            goto lbl_rcomm;
+        lbl_29:
+            state.fm1 = state.f;
+            state.x[i] = state.xp1;
+            state.rstate.stage = 30;
+            goto lbl_rcomm;
+        lbl_30:
+            state.fp1 = state.f;
+            if( (double)(state.xm1)!=(double)(state.xp1) )
+            {
+                state.g[i] = (state.fp1-state.fm1)/(state.xp1-state.xm1);
+            }
+            else
+            {
+                state.g[i] = 0;
+            }
+            state.repnfev = state.repnfev+2;
+        lbl_72:
+            state.x[i] = v;
+            i = i+1;
+            goto lbl_68;
+        lbl_70:
+            state.f = state.fbase;
+            state.needf = false;
+        lbl_67:
+            
+            //
+            // Back to MCSRCH
+            //
+            optserv.trimfunction(ref state.f, ref state.g, n, state.trimthreshold, _params);
+            state.fn = state.f;
+            for(i=0; i<=n-1; i++)
+            {
+                state.ugn[i] = state.g[i];
+                state.cgn[i] = state.g[i];
+                if( state.hasbndl[i] && (double)(state.xn[i])<=(double)(state.bndl[i]) )
+                {
+                    state.cgn[i] = 0;
+                }
+                if( state.hasbndu[i] && (double)(state.xn[i])>=(double)(state.bndu[i]) )
+                {
+                    state.cgn[i] = 0;
+                }
+            }
+            linmin.mcsrch(n, ref state.xn, ref state.fn, ref state.cgn, state.d, ref state.stp, state.curstpmax, gtol, ref mcinfo, ref state.nfev, ref state.work, state.lstate, ref state.mcstage, _params);
+            goto lbl_64;
+        lbl_65:
+            for(i=0; i<=n-1; i++)
+            {
+                if( state.hasbndl[i] && (double)(state.xn[i])<=(double)(state.bndl[i]) )
+                {
+                    state.xn[i] = state.bndl[i];
+                }
+                if( state.hasbndu[i] && (double)(state.xn[i])>=(double)(state.bndu[i]) )
+                {
+                    state.xn[i] = state.bndu[i];
+                }
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.bufsk[state.bufsize,i_] = -state.xc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.bufyk[state.bufsize,i_] = -state.cgc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.bufsk[state.bufsize,i_] = state.bufsk[state.bufsize,i_] + state.xn[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.bufyk[state.bufsize,i_] = state.bufyk[state.bufsize,i_] + state.cgn[i_];
+            }
+            
+            //
+            // Handle special situations:
+            // * check for presence of NAN/INF in function/gradient
+            // * handle failure of line search
+            //
+            v = state.fn;
+            for(i=0; i<=n-1; i++)
+            {
+                v = 0.1*v+state.ugn[i];
+            }
+            if( !math.isfinite(v) )
+            {
+                
+                //
+                // Abnormal termination - infinities in function/gradient
+                //
+                state.repterminationtype = -8;
+                result = false;
+                return result;
+            }
+            if( state.userterminationneeded )
+            {
+                
+                //
+                // User requested termination
+                //
+                state.repterminationtype = 8;
+                result = false;
+                return result;
+            }
+            if( mcinfo!=1 )
+            {
+                
+                //
+                // Terminate LBFGS phase
+                //
+                goto lbl_63;
+            }
+            
+            //
+            // Current point is updated:
+            // * move XC/FC/GC to XP/FP/GP
+            // * move XN/FN/GN to XC/FC/GC
+            // * report current point and update iterations counter
+            // * push new pair SK/YK to LBFGS buffer
+            // * update length of the good step
+            //
+            activationstatus = false;
+            for(i=0; i<=n-1; i++)
+            {
+                if( (state.hasbndl[i] && (double)(state.xn[i])==(double)(state.bndl[i])) && (double)(state.xn[i])!=(double)(state.xc[i]) )
+                {
+                    activationstatus = true;
+                }
+                if( (state.hasbndu[i] && (double)(state.xn[i])==(double)(state.bndu[i])) && (double)(state.xn[i])!=(double)(state.xc[i]) )
+                {
+                    activationstatus = true;
+                }
+            }
+            state.fp = state.fc;
+            state.fc = state.fn;
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.xp[i_] = state.xc[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.xc[i_] = state.xn[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.cgc[i_] = state.cgn[i_];
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.ugc[i_] = state.ugn[i_];
+            }
+            if( !state.xrep )
+            {
+                goto lbl_73;
+            }
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.x[i_] = state.xc[i_];
+            }
+            clearrequestfields(state, _params);
+            state.xupdated = true;
+            state.rstate.stage = 31;
+            goto lbl_rcomm;
+        lbl_31:
+            state.xupdated = false;
+        lbl_73:
+            state.repiterationscount = state.repiterationscount+1;
+            if( state.bufsize==m )
+            {
+                
+                //
+                // Buffer is full, shift contents by one row
+                //
+                for(i=0; i<=state.bufsize-1; i++)
+                {
+                    for(i_=0; i_<=n-1;i_++)
+                    {
+                        state.bufsk[i,i_] = state.bufsk[i+1,i_];
+                    }
+                    for(i_=0; i_<=n-1;i_++)
+                    {
+                        state.bufyk[i,i_] = state.bufyk[i+1,i_];
+                    }
+                }
+                for(i=0; i<=state.bufsize-2; i++)
+                {
+                    state.bufrho[i] = state.bufrho[i+1];
+                    state.buftheta[i] = state.buftheta[i+1];
+                }
+            }
+            else
+            {
+                
+                //
+                // Buffer is not full, increase buffer size by 1
+                //
+                state.bufsize = state.bufsize+1;
+            }
+            v = 0.0;
+            for(i_=0; i_<=n-1;i_++)
+            {
+                v += state.bufyk[state.bufsize-1,i_]*state.bufsk[state.bufsize-1,i_];
+            }
+            vv = 0.0;
+            for(i_=0; i_<=n-1;i_++)
+            {
+                vv += state.bufyk[state.bufsize-1,i_]*state.bufyk[state.bufsize-1,i_];
+            }
+            if( (double)(v)==(double)(0) || (double)(vv)==(double)(0) )
+            {
+                
+                //
+                // Strange internal error in LBFGS - either YK=0
+                // (which should not have been) or (SK,YK)=0 (again,
+                // unexpected). It should not take place because
+                // MCINFO=1, which signals "good" step. But just
+                // to be sure we have special branch of code which
+                // restarts LBFGS
+                //
+                goto lbl_63;
+            }
+            state.bufrho[state.bufsize-1] = 1/v;
+            alglib.ap.assert(state.bufsize<=m, "MinBC: internal error");
+            v = 0;
+            vv = 0;
+            for(i=0; i<=n-1; i++)
+            {
+                v = v+math.sqr((state.xc[i]-state.xp[i])/state.s[i]);
+                vv = vv+math.sqr(state.xc[i]-state.xp[i]);
+            }
+            updateestimateofgoodstep(ref state.lastscaledgoodstep, Math.Sqrt(v), _params);
+            
+            //
+            // Check MaxIts-based stopping condition.
+            //
+            if( state.maxits>0 && state.repiterationscount>=state.maxits )
+            {
+                state.repterminationtype = 5;
+                result = false;
+                return result;
+            }
+            
+            //
+            // Smooth reset (LBFGS memory model is refreshed) or hard restart:
+            // * LBFGS model is refreshed, if line search was performed with activation of constraints
+            // * algorithm is restarted if scaled gradient decreased below GDecay
+            //
+            if( activationstatus )
+            {
+                state.bufsize = 0;
+                goto lbl_62;
+            }
+            v = 0.0;
+            for(i=0; i<=n-1; i++)
+            {
+                v = v+math.sqr(state.cgc[i]*state.s[i]);
+            }
+            if( (double)(Math.Sqrt(v))<(double)(gdecay*ginit) )
+            {
+                goto lbl_63;
+            }
+        lbl_62:
+            itidx = itidx+1;
+            goto lbl_61;
+        lbl_63:
+            
+            //
+            // Decrease decay coefficient. Subsequent L-BFGS stages will
+            // have more stringent stopping criteria.
+            //
+            gdecay = Math.Max(gdecay*decaycorrection, mindecay);
+            goto lbl_41;
+        lbl_42:
+            result = false;
+            return result;
+            
+            //
+            // Saving state
+            //
+        lbl_rcomm:
+            result = true;
+            state.rstate.ia[0] = freezeidx;
+            state.rstate.ia[1] = n;
+            state.rstate.ia[2] = m;
+            state.rstate.ia[3] = i;
+            state.rstate.ia[4] = j;
+            state.rstate.ia[5] = mcinfo;
+            state.rstate.ia[6] = itidx;
+            state.rstate.ba[0] = b;
+            state.rstate.ba[1] = activationstatus;
+            state.rstate.ra[0] = freezeval;
+            state.rstate.ra[1] = scaleddnorm;
+            state.rstate.ra[2] = v;
+            state.rstate.ra[3] = vv;
+            state.rstate.ra[4] = v0;
+            state.rstate.ra[5] = ginit;
+            state.rstate.ra[6] = gdecay;
+            state.rstate.ra[7] = activationstep;
+            return result;
+        }
+
+
+        /*************************************************************************
+        BC results
+
+        INPUT PARAMETERS:
+            State   -   algorithm state
+
+        OUTPUT PARAMETERS:
+            X       -   array[0..N-1], solution
+            Rep     -   optimization report. You should check Rep.TerminationType
+                        in  order  to  distinguish  successful  termination  from
+                        unsuccessful one:
+                        * -8    internal integrity control  detected  infinite or
+                                NAN   values   in   function/gradient.   Abnormal
+                                termination signalled.
+                        * -7   gradient verification failed.
+                               See MinBCSetGradientCheck() for more information.
+                        * -3   inconsistent constraints.
+                        *  1   relative function improvement is no more than EpsF.
+                        *  2   scaled step is no more than EpsX.
+                        *  4   scaled gradient norm is no more than EpsG.
+                        *  5   MaxIts steps was taken
+                        *  8   terminated by user who called minbcrequesttermination().
+                               X contains point which was "current accepted"  when
+                               termination request was submitted.
+                        More information about fields of this  structure  can  be
+                        found in the comments on MinBCReport datatype.
+           
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcresults(minbcstate state,
+            ref double[] x,
+            minbcreport rep,
+            alglib.xparams _params)
+        {
+            x = new double[0];
+
+            minbcresultsbuf(state, ref x, rep, _params);
+        }
+
+
+        /*************************************************************************
+        BC results
+
+        Buffered implementation of MinBCResults() which uses pre-allocated buffer
+        to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
+        intended to be used in the inner cycles of performance critical algorithms
+        where array reallocation penalty is too large to be ignored.
+
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcresultsbuf(minbcstate state,
+            ref double[] x,
+            minbcreport rep,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            int i_ = 0;
+
+            if( alglib.ap.len(x)<state.nmain )
+            {
+                x = new double[state.nmain];
+            }
+            rep.iterationscount = state.repiterationscount;
+            rep.nfev = state.repnfev;
+            rep.varidx = state.repvaridx;
+            rep.terminationtype = state.repterminationtype;
+            if( state.repterminationtype>0 )
+            {
+                for(i_=0; i_<=state.nmain-1;i_++)
+                {
+                    x[i_] = state.xc[i_];
+                }
+            }
+            else
+            {
+                for(i=0; i<=state.nmain-1; i++)
+                {
+                    x[i] = Double.NaN;
+                }
+            }
+        }
+
+
+        /*************************************************************************
+        This subroutine restarts algorithm from new point.
+        All optimization parameters (including constraints) are left unchanged.
+
+        This  function  allows  to  solve multiple  optimization  problems  (which
+        must have  same number of dimensions) without object reallocation penalty.
+
+        INPUT PARAMETERS:
+            State   -   structure previously allocated with MinBCCreate call.
+            X       -   new starting point.
+
+          -- ALGLIB --
+             Copyright 28.11.2010 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcrestartfrom(minbcstate state,
+            double[] x,
+            alglib.xparams _params)
+        {
+            int n = 0;
+            int i_ = 0;
+
+            n = state.nmain;
+            
+            //
+            // First, check for errors in the inputs
+            //
+            alglib.ap.assert(alglib.ap.len(x)>=n, "MinBCRestartFrom: Length(X)<N");
+            alglib.ap.assert(apserv.isfinitevector(x, n, _params), "MinBCRestartFrom: X contains infinite or NaN values!");
+            
+            //
+            // Set XC
+            //
+            for(i_=0; i_<=n-1;i_++)
+            {
+                state.xstart[i_] = x[i_];
+            }
+            
+            //
+            // prepare RComm facilities
+            //
+            state.rstate.ia = new int[6+1];
+            state.rstate.ba = new bool[1+1];
+            state.rstate.ra = new double[7+1];
+            state.rstate.stage = -1;
+            clearrequestfields(state, _params);
+        }
+
+
+        /*************************************************************************
+        This subroutine submits request for termination of running  optimizer.  It
+        should be called from user-supplied callback when user decides that it  is
+        time to "smoothly" terminate optimization process.  As  result,  optimizer
+        stops at point which was "current accepted" when termination  request  was
+        submitted and returns error code 8 (successful termination).
+
+        INPUT PARAMETERS:
+            State   -   optimizer structure
+
+        NOTE: after  request  for  termination  optimizer  may   perform   several
+              additional calls to user-supplied callbacks. It does  NOT  guarantee
+              to stop immediately - it just guarantees that these additional calls
+              will be discarded later.
+
+        NOTE: calling this function on optimizer which is NOT running will have no
+              effect.
+              
+        NOTE: multiple calls to this function are possible. First call is counted,
+              subsequent calls are silently ignored.
+
+          -- ALGLIB --
+             Copyright 08.10.2014 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcrequesttermination(minbcstate state,
+            alglib.xparams _params)
+        {
+            state.userterminationneeded = true;
+        }
+
+
+        /*************************************************************************
+        This  subroutine  turns  on  verification  of  the  user-supplied analytic
+        gradient:
+        * user calls this subroutine before optimization begins
+        * MinBCOptimize() is called
+        * prior to  actual  optimization, for each component  of  parameters being
+          optimized X[i] algorithm performs following steps:
+          * two trial steps are made to X[i]-TestStep*S[i] and X[i]+TestStep*S[i],
+            where X[i] is i-th component of the initial point and S[i] is a  scale
+            of i-th parameter
+          * if needed, steps are bounded with respect to constraints on X[]
+          * F(X) is evaluated at these trial points
+          * we perform one more evaluation in the middle point of the interval
+          * we  build  cubic  model using function values and derivatives at trial
+            points and we compare its prediction with actual value in  the  middle
+            point
+          * in case difference between prediction and actual value is higher  than
+            some predetermined threshold, algorithm stops with completion code -7;
+            Rep.VarIdx is set to index of the parameter with incorrect derivative.
+        * after verification is over, algorithm proceeds to the actual optimization.
+
+        NOTE 1: verification  needs  N (parameters count) gradient evaluations. It
+                is very costly and you should use  it  only  for  low  dimensional
+                problems,  when  you  want  to  be  sure  that  you've   correctly
+                calculated  analytic  derivatives.  You  should  not use it in the
+                production code (unless you want to check derivatives provided  by
+                some third party).
+
+        NOTE 2: you  should  carefully  choose  TestStep. Value which is too large
+                (so large that function behaviour is significantly non-cubic) will
+                lead to false alarms. You may use  different  step  for  different
+                parameters by means of setting scale with MinBCSetScale().
+
+        NOTE 3: this function may lead to false positives. In case it reports that
+                I-th  derivative was calculated incorrectly, you may decrease test
+                step  and  try  one  more  time  - maybe your function changes too
+                sharply  and  your  step  is  too  large for such rapidly chanding
+                function.
+
+        INPUT PARAMETERS:
+            State       -   structure used to store algorithm state
+            TestStep    -   verification step:
+                            * TestStep=0 turns verification off
+                            * TestStep>0 activates verification
+
+          -- ALGLIB --
+             Copyright 15.06.2012 by Bochkanov Sergey
+        *************************************************************************/
+        public static void minbcsetgradientcheck(minbcstate state,
+            double teststep,
+            alglib.xparams _params)
+        {
+            alglib.ap.assert(math.isfinite(teststep), "MinBCSetGradientCheck: TestStep contains NaN or Infinite");
+            alglib.ap.assert((double)(teststep)>=(double)(0), "MinBCSetGradientCheck: invalid argument TestStep(TestStep<0)");
+            state.teststep = teststep;
+        }
+
+
+        /*************************************************************************
+        Clears request fileds (to be sure that we don't forget to clear something)
+        *************************************************************************/
+        private static void clearrequestfields(minbcstate state,
+            alglib.xparams _params)
+        {
+            state.needf = false;
+            state.needfg = false;
+            state.xupdated = false;
+        }
+
+
+        /*************************************************************************
+        Internal initialization subroutine.
+        *************************************************************************/
+        private static void minbcinitinternal(int n,
+            double[] x,
+            double diffstep,
+            minbcstate state,
+            alglib.xparams _params)
+        {
+            int i = 0;
+            double[,] c = new double[0,0];
+            int[] ct = new int[0];
+
+            
+            //
+            // Initialize
+            //
+            state.teststep = 0;
+            state.nmain = n;
+            state.diffstep = diffstep;
+            apserv.rvectorsetlengthatleast(ref state.bndl, n, _params);
+            apserv.bvectorsetlengthatleast(ref state.hasbndl, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.bndu, n, _params);
+            apserv.bvectorsetlengthatleast(ref state.hasbndu, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.xstart, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.xc, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.cgc, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.ugc, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.xn, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.cgn, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.ugn, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.xp, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.d, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.s, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.x, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.g, n, _params);
+            apserv.rvectorsetlengthatleast(ref state.work, n, _params);
+            for(i=0; i<=n-1; i++)
+            {
+                state.bndl[i] = Double.NegativeInfinity;
+                state.hasbndl[i] = false;
+                state.bndu[i] = Double.PositiveInfinity;
+                state.hasbndu[i] = false;
+                state.s[i] = 1.0;
+            }
+            minbcsetcond(state, 0.0, 0.0, 0.0, 0, _params);
+            minbcsetxrep(state, false, _params);
+            minbcsetstpmax(state, 0.0, _params);
+            minbcsetprecdefault(state, _params);
+            minbcrestartfrom(state, x, _params);
+        }
+
+
+        /*************************************************************************
+        This subroutine updates estimate of the good step length given:
+        1) previous estimate
+        2) new length of the good step
+
+        It makes sure that estimate does not change too rapidly - ratio of new and
+        old estimates will be at least 0.01, at most 100.0
+
+        In case previous estimate of good step is zero (no estimate), new estimate
+        is used unconditionally.
+
+          -- ALGLIB --
+             Copyright 16.01.2013 by Bochkanov Sergey
+        *************************************************************************/
+        private static void updateestimateofgoodstep(ref double estimate,
+            double newstep,
+            alglib.xparams _params)
+        {
+            if( (double)(estimate)==(double)(0) )
+            {
+                estimate = newstep;
+                return;
+            }
+            if( (double)(newstep)<(double)(estimate*0.01) )
+            {
+                estimate = estimate*0.01;
+                return;
+            }
+            if( (double)(newstep)>(double)(estimate*100) )
+            {
+                estimate = estimate*100;
+                return;
+            }
+            estimate = newstep;
         }
 
 

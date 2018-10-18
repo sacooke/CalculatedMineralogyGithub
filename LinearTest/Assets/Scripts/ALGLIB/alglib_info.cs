@@ -1,5 +1,5 @@
 /*************************************************************************
-ALGLIB 3.14.0 (source code generated 2018-06-16)
+ALGLIB dev (source code generated 2018-10-11)
 Copyright (c) Sergey Bochkanov (ALGLIB project).
 
 >>> SOURCE LICENSE >>>
@@ -19,4 +19,4 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 [assembly:System.Reflection.AssemblyCompanyAttribute("ALGLIB Project")]
 [assembly:System.Reflection.AssemblyProductAttribute("ALGLIB for C# (managed)")]
-[assembly:System.Reflection.AssemblyInformationalVersionAttribute("3.14.0.0")]
+[assembly:System.Reflection.AssemblyInformationalVersionAttribute("dev built 2018-10-11")]

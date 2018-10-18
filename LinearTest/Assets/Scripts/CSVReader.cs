@@ -355,7 +355,7 @@ public class CSVReader : MonoBehaviour
         chemTest.Add(10000.0 - totalChem);
         foreach (double d in chemTest)
         {
-            //Debug.Log(d);
+            //Debug.Log("d - " + d);
         }
         return chemTest;
 
