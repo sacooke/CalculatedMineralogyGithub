@@ -26,6 +26,7 @@ public class Export : MonoBehaviour
 
     public CombiController combiController;
     public AssayController assayController;
+    public BothController bothController;
 
     // Use this for initialization
     void Start()
@@ -127,7 +128,7 @@ public class Export : MonoBehaviour
     public void CombiOverwrite(bool overwrite)
     {
         CombiOverwritePanel.SetActive(false);
-        combiController.combiMenu.SetActive(true);
+        bothController.sharedMenu.SetActive(true);
         if (overwrite)
         {
             StartNewStringbuilder();
@@ -144,7 +145,7 @@ public class Export : MonoBehaviour
     public void AssayOverwrite(bool overwrite)
     {
         AssayOverwritePanel.SetActive(false);
-        assayController.assayMenu.SetActive(true);
+        bothController.sharedMenu.SetActive(true);
         if (overwrite)
         {
             StartNewStringbuilder();
@@ -176,7 +177,7 @@ public class Export : MonoBehaviour
         {
             tempFilename = filename;
             CombiOverwritePanel.SetActive(true);
-            combiController.combiMenu.SetActive(false);
+            bothController.sharedMenu.SetActive(false);
             Debug.Log("overwrite?");
         }
     }
@@ -198,7 +199,7 @@ public class Export : MonoBehaviour
         {
             tempFilename = filename;
             AssayOverwritePanel.SetActive(true);
-            assayController.assayMenu.SetActive(false);
+            bothController.sharedMenu.SetActive(false);
             Debug.Log("overwrite?");
         }
     }

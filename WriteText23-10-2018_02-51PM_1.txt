@@ -1,0 +1,140 @@
+
+ID: Quartz (Qz)
+
+cn: 0, 0, 0, 0, 10000, 
+c: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+ct: -1, -1, -1, -1, -1, 
+scale: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+
+
+successful completion 1
+
+target function value: 499.933473599623
+Values: {100.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00}
+dual variables: 0, 0, 0, 0, 0.05, 
+primal feasibility error: 0
+iteration count: 1
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, 
+
+---------------------------------
+
+
+ID: K-feldspar (Kf)
+
+cn: 969, 0, 1405, 0, 7626, 
+c: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+ct: -1, -1, -1, -1, -1, 
+scale: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+
+
+successful completion 1
+
+target function value: 499.93296641271
+Values: {0.00,0.00,100.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00}
+dual variables: 0, 0, 0.0844839857651245, 0, 0.05, 
+primal feasibility error: 0
+iteration count: 2
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, -1, 0, -1, 
+
+---------------------------------
+
+
+ID: Anorthite (Pl)
+
+cn: 1695, 2518, 0, 0, 5787, 
+c: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+ct: -1, -1, -1, -1, -1, 
+scale: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+
+
+successful completion 1
+
+target function value: 499.939899001479
+Values: {0.00,0.00,0.00,100.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00}
+dual variables: 0, 0.0836576648133439, 0, 0, 0.05, 
+primal feasibility error: 0
+iteration count: 2
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, 0, -1, 0, 0, -1, 
+
+---------------------------------
+
+
+ID: Muscovite (Ms)
+
+cn: 2032, 0, 982, 0, 6986, 
+c: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+ct: -1, -1, -1, -1, -1, 
+scale: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+
+
+LP problem is primal infeasible(dual unbounded)
+
+target function value: 0
+Values: {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00}
+dual variables: 0, 0, 0, 0, 0, 
+primal feasibility error: 0
+iteration count: 4
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+
+---------------------------------
+
+
+ID: Clinozoisite (Cz)
+
+cn: 1782, 1764, 0, 0, 6454, 
+c: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+ct: -1, -1, -1, -1, -1, 
+scale: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+
+
+successful completion 1
+
+target function value: 499.93594397206
+Values: {1.50,0.00,0.00,70.06,0.00,0.00,28.45,0.00,0.00,0.00,0.00}
+dual variables: 0.05, 0.05, 0, 0, 0.05, 
+primal feasibility error: 0
+iteration count: 3
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, -1, -1, 0, -1, -1, 0, -1, -1, -1, -1, -1, -1, 0, 0, -1, 
+
+---------------------------------
+
+
+ID: Albite
+
+cn: 1029, 0, 0, 877, 8094, 
+c: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+ct: -1, -1, -1, -1, -1, 
+scale: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+
+
+LP problem is primal infeasible(dual unbounded)
+
+target function value: 0
+Values: {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00}
+dual variables: 0, 0, 0, 0, 0, 
+primal feasibility error: 0
+iteration count: 3
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+
+---------------------------------
+
+
+ID: gran33
+
+cn: 676.29, 25.18, 463.65, 289.41, 8545.47, 
+c: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+ct: -1, -1, -1, -1, -1, 
+scale: 5, 5, 5, 5, 5, 5, 5, -100, -100, -100, -100, 
+
+
+LP problem is primal infeasible(dual unbounded)
+
+target function value: 0
+Values: {0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00}
+dual variables: 0, 0, 0, 0, 0, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+
+---------------------------------
+

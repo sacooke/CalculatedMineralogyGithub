@@ -1,0 +1,133 @@
+
+ID: Quartz (Qz)
+
+cn: 0, 0, 0, 0, 10000, 
+c: -5, -5, -5, -5, -5, -5, -5, 100, 100, 100, 100, 
+ct: 0, 0, 0, 0, 0, 
+
+
+successful completion 1
+
+target function value: 500.066526400377
+Values: {-100.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00}
+dual variables: 1, 1, 1, 1, -0.05, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1, -1, -1, -1, -1, 
+
+---------------------------------
+
+
+ID: K-feldspar (Kf)
+
+cn: 969, 0, 1405, 0, 7626, 
+c: -5, -5, -5, -5, -5, -5, -5, 100, 100, 100, 100, 
+ct: 0, 0, 0, 0, 0, 
+
+
+successful completion 1
+
+target function value: -1992.63419420552
+Values: {-76.26,0.00,0.00,0.00,0.00,0.00,0.00,-9.69,0.00,-14.05,0.00}
+dual variables: 1, 1, 1, 1, -0.05, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1, -1, -1, -1, -1, 
+
+---------------------------------
+
+
+ID: Anorthite (Pl)
+
+cn: 1695, 2518, 0, 0, 5787, 
+c: -5, -5, -5, -5, -5, -5, -5, 100, 100, 100, 100, 
+ct: 0, 0, 0, 0, 0, 
+
+
+successful completion 1
+
+target function value: -3923.58286640499
+Values: {-57.87,0.00,0.00,0.00,0.00,0.00,0.00,-16.95,-25.18,0.00,0.00}
+dual variables: 1, 1, 1, 1, -0.05, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1, -1, -1, -1, -1, 
+
+---------------------------------
+
+
+ID: Muscovite (Ms)
+
+cn: 2032, 0, 982, 0, 6986, 
+c: -5, -5, -5, -5, -5, -5, -5, 100, 100, 100, 100, 
+ct: 0, 0, 0, 0, 0, 
+
+
+successful completion 1
+
+target function value: -2664.63396993199
+Values: {-69.86,0.00,0.00,0.00,0.00,0.00,0.00,-20.32,0.00,-9.82,0.00}
+dual variables: 1, 1, 1, 1, -0.05, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1, -1, -1, -1, -1, 
+
+---------------------------------
+
+
+ID: Clinozoisite (Cz)
+
+cn: 1782, 1764, 0, 0, 6454, 
+c: -5, -5, -5, -5, -5, -5, -5, 100, 100, 100, 100, 
+ct: 0, 0, 0, 0, 0, 
+
+
+successful completion 1
+
+target function value: -3223.23304501215
+Values: {-64.54,0.00,0.00,0.00,0.00,0.00,0.00,-17.82,-17.64,0.00,0.00}
+dual variables: 1, 1, 1, 1, -0.05, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1, -1, -1, -1, -1, 
+
+---------------------------------
+
+
+ID: Albite
+
+cn: 1029, 0, 0, 877, 8094, 
+c: -5, -5, -5, -5, -5, -5, -5, 100, 100, 100, 100, 
+ct: 0, 0, 0, 0, 0, 
+
+
+successful completion 1
+
+target function value: -1501.23329723345
+Values: {-80.94,0.00,0.00,0.00,0.00,0.00,0.00,-10.29,0.00,0.00,-8.77}
+dual variables: 1, 1, 1, 1, -0.05, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1, -1, -1, -1, -1, 
+
+---------------------------------
+
+
+ID: gran33
+
+cn: 676.29, 25.18, 463.65, 289.41, 8545.47, 
+c: -5, -5, -5, -5, -5, -5, -5, 100, 100, 100, 100, 
+ct: 0, 0, 0, 0, 0, 
+
+
+successful completion 1
+
+target function value: -1027.19014712679
+Values: {-85.45,0.00,0.00,0.00,0.00,0.00,0.00,-6.76,-0.25,-4.64,-2.89}
+dual variables: 1, 1, 1, 1, -0.05, 
+primal feasibility error: 0
+iteration count: 5
+array[N+M], statuses of box (N) and linear (M) constraints: stats: 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, -1, -1, -1, -1, -1, 
+
+---------------------------------
+

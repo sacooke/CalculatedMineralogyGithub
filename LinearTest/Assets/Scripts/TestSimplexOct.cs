@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TestSimplexOct : MonoBehaviour
 {
-    void Start()
+    void DontStart()
     {
         Debug.Log("is this happening more than once?");
         //Linear programming, Simplex algorithm

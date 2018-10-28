@@ -36,7 +36,7 @@ public class CombiController : MonoBehaviour {
 	void Update () {
 	
 	}
-
+    /*
     public void InitialiseCombi()
     {
         mainMenu.SetActive(false);
@@ -55,7 +55,7 @@ public class CombiController : MonoBehaviour {
 
             sampleToggles.Add(g.GetComponent<Toggle>());
         }
-    }
+    }*/
 
     public void CalculateCombi()
     {

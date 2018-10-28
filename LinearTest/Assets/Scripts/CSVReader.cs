@@ -77,6 +77,7 @@ public class CSVReader : MonoBehaviour
 
     public CombiController combi;
     public AssayController assay;
+    public BothController both;
 
     public void Start()
     {
@@ -101,10 +102,7 @@ public class CSVReader : MonoBehaviour
 
         assayMode = isAssay;
 
-        if (!assayMode)
-            combi.InitialiseCombi();
-        else
-            assay.InitialiseAssay();
+        both.Initialise(isAssay);
 
         //Debug.Log("size = " + (1 + grid.GetUpperBound(0)) + "," + (gridHeight));
 
@@ -342,6 +340,7 @@ public class CSVReader : MonoBehaviour
             //Debug.Log("[" + x + "," + (row ) + "] = " + grid[x, row]);
             if (ContainsNoCase(grid[x, 0], "wt%") || ContainsNoCase(grid[x, 0], "_pc"))
             {
+                Debug.Log("<color=blue>CHEMTEST: </color>" + grid[x, row]);
                 chemTest.Add((Double.Parse(grid[x, row]))*100);
                 //Debug.Log((Double.Parse(grid[x, row ])) * 100);
             }
