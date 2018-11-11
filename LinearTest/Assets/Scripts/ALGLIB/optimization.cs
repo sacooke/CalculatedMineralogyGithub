@@ -4259,8 +4259,10 @@ public partial class alglib
     public static void minlpsetlc2(minlpstate state, double[,] a, double[] al, double[] au)
     {
         int k;
-        if( (ap.rows(a)!=ap.len(al)) || (ap.rows(a)!=ap.len(au)))
+        if ((ap.rows(a) != ap.len(al)) || (ap.rows(a) != ap.len(au)))
+        {
             throw new alglibexception("Error while calling 'minlpsetlc2': looks like one of arguments has wrong size");
+        }
     
         k = ap.rows(a);
         minlp.minlpsetlc2(state.innerobj, a, al, au, k, null);

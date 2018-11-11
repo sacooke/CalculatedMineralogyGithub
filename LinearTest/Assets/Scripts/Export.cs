@@ -184,6 +184,7 @@ public class Export : MonoBehaviour
 
     public void ExportDataToCSVAssay(string filename)
     {
+        Debug.Log("got here");
         if (!File.Exists(filename))
         {
             StartNewStringbuilder();

@@ -179,6 +179,23 @@ public class CSVReader : MonoBehaviour
         }
         Debug.Log(textOutput);
     }
+    static public void DebugOutputGrid(double[,] grid)
+    {
+        string textOutput = "";
+        for (int y = 0; y <= grid.GetUpperBound(1); y++)
+        {
+            textOutput += y;
+            textOutput += ": ";
+            for (int x = 0; x <= grid.GetUpperBound(0); x++)
+            {
+
+                textOutput += grid[x, y].ToString("F2");
+                textOutput += "|";
+            }
+            textOutput += "\n";
+        }
+        Debug.Log(textOutput);
+    }
 
     //outputs the first column of a 2d array. Just used for a quick debugging
     static public void DebugFirstValues(string[,] grid)
@@ -340,7 +357,6 @@ public class CSVReader : MonoBehaviour
             //Debug.Log("[" + x + "," + (row ) + "] = " + grid[x, row]);
             if (ContainsNoCase(grid[x, 0], "wt%") || ContainsNoCase(grid[x, 0], "_pc"))
             {
-                Debug.Log("<color=blue>CHEMTEST: </color>" + grid[x, row]);
                 chemTest.Add((Double.Parse(grid[x, row]))*100);
                 //Debug.Log((Double.Parse(grid[x, row ])) * 100);
             }
@@ -352,10 +368,15 @@ public class CSVReader : MonoBehaviour
             totalChem += d;
         }
         chemTest.Add(10000.0 - totalChem);
+        string dString = "";
         foreach (double d in chemTest)
         {
-            //Debug.Log("d - " + d);
+            dString += d;
+            dString += ", ";
         }
+
+        Debug.Log("d - " + dString);
+
         return chemTest;
 
     }
