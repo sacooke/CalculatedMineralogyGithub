@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
+using System.Collections.Generic;
 using System.IO;
 
 
@@ -27,6 +28,9 @@ public class Export : MonoBehaviour
     public CombiController combiController;
     public AssayController assayController;
     public BothController bothController;
+    
+
+    bool tempToCsv;
 
     // Use this for initialization
     void Start()
@@ -53,9 +57,9 @@ public class Export : MonoBehaviour
         fileChooser.callbackYes = delegate (string filename) {
             fileChooser.gameObject.SetActive(false);
             if (format == "txt")
-                ExportDataToTXT(filename);
+                ExportDataToTXTCombi(filename);
             else if (format == "csv")
-                ExportDataToCSV(filename);
+                ExportDataToCSVCombi(filename);
         };
         fileChooser.callbackNo = delegate () {
             fileChooser.gameObject.SetActive(false);
@@ -77,24 +81,26 @@ public class Export : MonoBehaviour
         };
     }
 
-    public void ExportDataToTXT(string filename)
+    public void ExportDataToTXTCombi(string filename)
     {
         if (!File.Exists(filename))
         {
+            tempFilename = filename;
             StartNewStringbuilder();
             sb.AppendLine("Export from \"" + csvName + "\" created on " + System.DateTime.Now.ToString("dd/MM/yyyy") + " at " + System.DateTime.Now.ToString("hh:mmtt"));
             sb.AppendLine("");
-            combiController.CalculateCombi();
-
+            combiController.CalculateCombi(false);
+            /*
             // Create a file to write to.
             using (StreamWriter sw = File.CreateText(filename))
             {
                 sw.Write(sb.ToString());
-            }
+            }*/
         }
         else
         {
             tempFilename = filename;
+            tempToCsv = false;
             CombiOverwritePanel.SetActive(true);
             combiController.combiMenu.SetActive(false);
             Debug.Log("overwrite?");
@@ -105,20 +111,22 @@ public class Export : MonoBehaviour
     {
         if (!File.Exists(filename))
         {
+            tempFilename = filename;
             StartNewStringbuilder();
             sb.AppendLine("Export from \"" + csvName + "\" created on " + System.DateTime.Now.ToString("dd/MM/yyyy") + " at " + System.DateTime.Now.ToString("hh:mmtt"));
             sb.AppendLine("");
-            assayController.CalculateAssay();
-
+            assayController.CalculateAssay(false);
+            /*
             // Create a file to write to.
             using (StreamWriter sw = File.CreateText(filename))
             {
                 sw.Write(sb.ToString());
-            }
+            }*/
         }
         else
         {
             tempFilename = filename;
+            tempToCsv = false;
             AssayOverwritePanel.SetActive(true);
             assayController.assayMenu.SetActive(false);
             Debug.Log("overwrite?");
@@ -132,13 +140,13 @@ public class Export : MonoBehaviour
         if (overwrite)
         {
             StartNewStringbuilder();
-            combiController.CalculateCombi();
-
+            combiController.CalculateCombi(tempToCsv);
+            /*
             // Create a file to write to.
             using (StreamWriter sw = File.CreateText(tempFilename))
             {
                 sw.Write(sb.ToString());
-            }
+            }*/
         }
 
     }
@@ -149,33 +157,35 @@ public class Export : MonoBehaviour
         if (overwrite)
         {
             StartNewStringbuilder();
-            assayController.CalculateAssay();
-
+            assayController.CalculateAssay(tempToCsv);
+            /*
             // Create a file to write to.
             using (StreamWriter sw = File.CreateText(tempFilename))
             {
                 sw.Write(sb.ToString());
-            }
+            }*/
         }
 
     }
 
-    public void ExportDataToCSV(string filename)
+    public void ExportDataToCSVCombi(string filename)
     {
         if (!File.Exists(filename))
         {
+            tempFilename = filename;
             StartNewStringbuilder();
-            combiController.CalculateCombi();
-
+            combiController.CalculateCombi(true);
+            /*
             // Create a file to write to.
             using (StreamWriter sw = File.CreateText(filename))
             {
                 sw.Write(sb.ToString());
-            }
+            }*/
         }
         else
         {
             tempFilename = filename;
+            tempToCsv = true;
             CombiOverwritePanel.SetActive(true);
             bothController.sharedMenu.SetActive(false);
             Debug.Log("overwrite?");
@@ -184,21 +194,22 @@ public class Export : MonoBehaviour
 
     public void ExportDataToCSVAssay(string filename)
     {
-        Debug.Log("got here");
         if (!File.Exists(filename))
         {
+            tempFilename = filename;
             StartNewStringbuilder();
-            assayController.CalculateAssay();
+            assayController.CalculateAssay(true);
 
             // Create a file to write to.
-            using (StreamWriter sw = File.CreateText(filename))
+            /*using (StreamWriter sw = File.CreateText(filename))
             {
                 sw.Write(sb.ToString());
-            }
+            }*/
         }
         else
         {
             tempFilename = filename;
+            tempToCsv = true;
             AssayOverwritePanel.SetActive(true);
             bothController.sharedMenu.SetActive(false);
             Debug.Log("overwrite?");
@@ -213,9 +224,6 @@ public class Export : MonoBehaviour
     public void StartNewStringbuilder()
     {
         sb = new StringBuilder();
-        //sb.AppendLine("Export from \"" + csvName + "\" created on " + System.DateTime.Now.ToString("dd/MM/yyyy")
-        //    + " at " + System.DateTime.Now.ToString("hh:mmtt"));
-        //sb.AppendLine("");
     }
 
     public void WriteStringToStringBuilder(string line)

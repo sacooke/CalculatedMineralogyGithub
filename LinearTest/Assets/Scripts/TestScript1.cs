@@ -49,6 +49,7 @@ public class TestScript1 : MonoBehaviour {
     void ExtractAndLoadCSV(string filename, bool isAssay)
     {
         //turn off UI
+        export.SetFilenameString(filename);
         StartCoroutine(ImportSamples(filename, isAssay));
     }
 

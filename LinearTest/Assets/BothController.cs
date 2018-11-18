@@ -37,6 +37,8 @@ public class BothController : MonoBehaviour {
     public InputField setAllMineralWeightsInputField;
     public InputField setAllElementWeightsInputField;
 
+    public Slider progressBar;
+
     // Use this for initialization
     void Start()
     {

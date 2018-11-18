@@ -17,6 +17,7 @@ public class CombiController : MonoBehaviour {
     public GameObject mainMenu;
     public GameObject combiMenu;
     public CSVReader csvController;
+    public BothController bothController;
     public GameObject samplePrefab;
     public GameObject sampleScrollView; //content
 
@@ -57,11 +58,56 @@ public class CombiController : MonoBehaviour {
         }
     }*/
 
-    public void CalculateCombi()
+    public void CalculateCombi(bool toCSV)
     {
-        string columnNames = "Sample no,Other(Quartz),Feld_Alb_Na,FeldsKBa,Feld_Plag,Carb_Calc,Carb_Ank,Anhydrite,ChloriteFe,Muscovite,BiotFe,DOLOMITE,Amph_act,Amph_horFe,Epid_LC,Magnetite,Apatite,Chalcopyrite,Pyrite,Uraninite,Arsenopyrite,JAROSITE,Molybdenite,Chalcocite,Sphene,TALC,Barite,Kaolinite,Smectite/Montmorillonite,Musc_Phengite,Tour_Fe,NonSulfideCu_Chrysocolla,Vermiculite,Andalusite,Pyrophyllite,Pyroxene,Anthrhophyllite,Residual SSQ,degreesFreedom,probability";
+        string fullExportString = "";
+        string columnNames = "Sample No.,Score";
 
-        export.WriteStringToStringBuilder(columnNames);
+
+        List<string> minList = new List<string>();
+        List<double> weightList = new List<double>();
+
+        List<string> elementList = new List<string>();
+        List<int> columnIndexList = new List<int>();
+        double result;
+
+        foreach (Toggle tog in bothController.mineralCompScrollView.transform.GetComponentsInChildren<Toggle>())
+        {
+            if (tog.isOn)
+            {
+                string minString = tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp;
+                minList.Add(minString);
+                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : 1);
+                columnNames += "," + minString;
+            }
+        }
+        foreach (Toggle tog in bothController.elementCompScrollView.transform.GetComponentsInChildren<Toggle>())
+        {
+            if (tog.isOn)
+            {
+                string elemString = tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp;
+                minList.Add(elemString);
+                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : -100);
+                columnNames += "," + elemString;
+            }
+        }
+        foreach (Toggle tog in bothController.columnScrollView.transform.GetComponentsInChildren<Toggle>())
+        {
+            if (tog.isOn)
+            {
+                string elem = tog.gameObject.GetComponent<SampleListEntry>().SampleID;
+                elementList.Add(elem.Substring(0, elem.IndexOf('_')));//, elem.Length-elem.IndexOf('_')));
+                columnIndexList.Add(tog.gameObject.GetComponent<SampleListEntry>().index);
+                Debug.Log("it = " + elem.Substring(0, elem.IndexOf('_')));//, elem.Length - elem.IndexOf('_')));
+            }
+        }
+        if (toCSV)
+            export.WriteStringToStringBuilder(columnNames);
+        else
+        {
+            export.WriteStringToStringBuilder(System.DateTime.Now.ToString("dd-MM-yyyy") + "_" + System.DateTime.Now.ToString("hh-mmtt"));
+            export.WriteStringToStringBuilder("==========");
+        }
 
         foreach (Toggle tog in sampleToggles)
         {
@@ -206,6 +252,12 @@ public class CombiController : MonoBehaviour {
 
         }
     }   //CalculateCombi()
+
+
+    public IEnumerator EnumerateCombi(bool toCSV)
+    {
+        yield return null;
+    }
 
     public void SetSampleValuesList(double[] sampleArray)
     {
@@ -460,4 +512,152 @@ public class CombiController : MonoBehaviour {
         else
             return (1.0 - p) / 2;
     } // Gauss()
+
+
+
+    public void oldCalcCombi()
+    {
+        foreach (Toggle tog in sampleToggles)
+        {
+            if (tog.isOn)
+            {
+                //calculate for sampleID
+                //this involves combiSampleValues 
+                int s = tog.gameObject.GetComponent<SampleListEntry>().index;
+                elementDoubleList = new double[csvController.elementPositions.Count + 1];
+                int i = 0;
+                foreach (int ep in csvController.elementPositions)
+                {
+                    //Debug.Log("element: " + ep + "," + s + " = " + csvController.grid[ep, s]);
+                    if (!double.TryParse(csvController.grid[ep, s], out elementDoubleList[i]))
+                        Debug.Log("<color=red>error: could not parse double</color>");
+                    i++;
+                }
+                double otherDouble = 100;
+                for (int j = 0; j < csvController.elementPositions.Count; j++)
+                {
+                    otherDouble -= elementDoubleList[j];
+                }
+                elementDoubleList[csvController.elementPositions.Count] = otherDouble;
+
+                chemicalDoubleList = new double[csvController.chemicalPositions.Count];
+                i = 0;
+                foreach (int cp in csvController.chemicalPositions)
+                {
+                    //Debug.Log("chemical: " + cp + "," + s + " = " + csvController.grid[cp, s]);
+                    if (!double.TryParse(csvController.grid[cp, s], out chemicalDoubleList[i]))
+                        Debug.Log("<color=red>error: could not parse double</color>");
+                    i++;
+                }
+                combinedDoubleList = new double[elementDoubleList.Length + chemicalDoubleList.Length + 1];
+                Array.Copy(elementDoubleList, combinedDoubleList, elementDoubleList.Length);
+                Array.Copy(chemicalDoubleList, 0, combinedDoubleList, elementDoubleList.Length, chemicalDoubleList.Length);
+                combinedDoubleList[combinedDoubleList.Length - 1] = 100;
+
+
+                //double[] x = new double[chemicalDoubleList.Length]; //{ 15, 52, 23, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0.1, 1, 5, 0.5, 0, 0, 4, 0, 0, 0, 0 };//{ 1, 1, 1 };//
+                //Array.Copy(chemicalDoubleList, x, chemicalDoubleList.Length);
+                double[] x = new double[] { 15, 52, 23, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 1.2, 0, 0.1, 1, 5, 0.5, 0, 0, 4, 0, 0, 0, 0 };
+                double[] bndl = new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };//{ -1, +1, -1 }; //lower = 0
+                double[] bndu = new double[] { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 };//{ +1, +3, +1 }; //upper = 100
+                double epsx = 0.0000000001;
+                int maxits = 0;
+                alglib.minlmstate state;
+                alglib.minlmreport rep;
+
+
+                /*string firstArray = "";
+                foreach (double d in chemicalDoubleList)
+                {
+                    firstArray += d.ToString() + ", ";
+                }
+                Debug.Log("chemicalDoubleList: " + firstArray);
+
+                string fourthArray = "";
+                foreach (double d in elementDoubleList)
+                {
+                    fourthArray += d.ToString() + ", ";
+                }
+                Debug.Log("elementDoubleList: " + fourthArray);
+
+
+                string thirdArray = "";
+                foreach (double d in combinedDoubleList)
+                {
+                    thirdArray += d.ToString() + ", ";
+                }
+                Debug.Log("combinedDoubleList: " + thirdArray);
+
+                Debug.Log("LENGTH OF SAMPLES: " + combinedDoubleList.Length);
+                Debug.Log("LENGTH OF X: " + x.Length);*/
+
+
+                x[0] = chemicalDoubleList[0];
+                x[1] = chemicalDoubleList[1];
+                x[2] = chemicalDoubleList[2];
+                x[3] = chemicalDoubleList[3];
+                x[4] = chemicalDoubleList[4];
+                x[5] = chemicalDoubleList[5];
+                x[6] = chemicalDoubleList[6];
+                x[7] = chemicalDoubleList[7];
+                x[8] = chemicalDoubleList[8] * 0.5;
+                x[9] = chemicalDoubleList[9];
+                x[10] = chemicalDoubleList[10];
+                x[11] = chemicalDoubleList[11] * 0.5;
+                x[12] = chemicalDoubleList[11] * 0.5;
+                x[13] = chemicalDoubleList[13];
+                x[14] = chemicalDoubleList[14];
+                x[15] = chemicalDoubleList[15];
+                x[16] = chemicalDoubleList[16];
+                x[17] = chemicalDoubleList[17];
+                x[18] = elementDoubleList[14] / 0.8;
+                x[19] = elementDoubleList[1] / 0.5;
+                x[20] = chemicalDoubleList[18];
+                x[21] = chemicalDoubleList[19];
+                x[22] = 0.01;
+                x[23] = elementDoubleList[13] / 0.25;
+                x[24] = chemicalDoubleList[20];
+                x[25] = elementDoubleList[2] / 0.6;
+                x[26] = chemicalDoubleList[21];
+                x[27] = chemicalDoubleList[22];
+                x[28] = chemicalDoubleList[8] * 0.5;
+                x[29] = chemicalDoubleList[23];
+                x[30] = chemicalDoubleList[24];
+                x[31] = chemicalDoubleList[25];
+                x[32] = chemicalDoubleList[26];
+                x[33] = chemicalDoubleList[27];
+                x[34] = chemicalDoubleList[28];
+                x[35] = chemicalDoubleList[12];
+
+                string secondArray = "";
+                /*foreach (double d in x)
+                {
+                    secondArray += d.ToString() + ", ";
+                }
+                Debug.Log("x: " + secondArray);*/
+
+                alglib.minlmcreatev(combinedDoubleList.Length, x, 0.0001, out state);
+                alglib.minlmsetbc(state, bndl, bndu);
+                alglib.minlmsetcond(state, epsx, maxits);
+                alglib.minlmsetxrep(state, true);
+                alglib.minlmoptimize(state, function1_fvec, function1_rep, null);
+                alglib.minlmresults(state, out x, out rep);
+
+                //Debug.Log("thething: " + alglib.ap.format(x, 2));// EXPECTED: [-3,+3]
+                exportResult = alglib.ap.format(x, 2);
+
+                string id = csvController.grid[0, s];
+
+                int degreesOfFreedom = combinedDoubleList.Length - x.Length;
+
+                double chiSquare = ChiSquarePval(Math.Sqrt(exportFunc), degreesOfFreedom);
+
+                string truncatedExportResult = exportResult.Substring(1, exportResult.Length - 2);
+
+                export.WriteStringToStringBuilder(id + "," + truncatedExportResult + "," + exportFunc + "," + degreesOfFreedom + "," + chiSquare);
+            }
+
+
+        }
+    }   //CalculateCombi()
 }
