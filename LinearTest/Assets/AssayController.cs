@@ -26,7 +26,6 @@ public class AssayController : MonoBehaviour
     public GameObject sampleScrollView;
     public GameObject columnScrollView;
 
-    public Text progressText;
 
     public double[] elementDoubleList;
     public double[] chemicalDoubleList;
@@ -93,376 +92,9 @@ CT      -   constraint types, array[K]:
         double result = SumProduct(c, resultArray);
         Debug.Log("Result: " + result);*/
 
-        assayMineralDict = new Dictionary<string, AssayMineralComposition>();
-        assayElementDict = new Dictionary<string, AssayMineralComposition>();
+        AddAllAMCs();
 
-        string mineralComp;
-        AssayMineralComposition AMC;
 
-        mineralComp = "Other(Quartz)";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 7;
-
-
-
-
-
-        mineralComp = "OLD Feld_Alb";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 10.5685, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8.5028, 0, 0, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "OLD FeldsparK";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 9.69, 0, 0, 0, 0, 0, 14.05, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "OLD Anorthite (Pl)";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 16.95, 0, 0, 25.18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "OLD Muscovi_pure";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 20.32, 0, 0, 0, 0, 0, 9.81, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "OLD Epid_Clzt";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 17.82, 0, 0, 17.64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 5.1;
-
-        mineralComp = "OLD Kaolinite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 20.9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 5;
-
-
-
-
-        mineralComp = "Feld_Alb_Ca-Na";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 10.41, 0, 0, 0.38, 0, 0.05, 0.11, 0.01, 0, 0, 7.8, 0, 0, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "Feld_Alb_Na";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 10.4, 0, 0, 0, 0, 0.04, 0.24, 0.02, 0, 0, 8.21, 0, 0, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "FeldsparK";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 9.817163594, 0, 0, 0.12149786, 0, 0.0979097, 13.33707643, 0, 0, 0, 0.126114876, 0, 0, 0, 0 });
-        AMC.weight = 7;
-
-        mineralComp = "FeldsKBa";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 9.85, 0, 0.25, 0, 0, 0.08, 13.5, 0, 0.03, 0, 0.31, 0, 0, 0.03, 0 });
-        AMC.weight = 7;
-
-        mineralComp = "Feld_Plag";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 15.3732, 0, 0, 7.8908, 0, 0.199, 0.1423, -0.0012, -0.0065, 0, 3.8507, 0, 0, 0.002, 0 });
-        AMC.weight = 3;
-
-        mineralComp = "Carb_Calc";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 40.04426534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 0.3;
-
-        mineralComp = "Carb_Ank";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 20.0185592, 0, 12.55342226, 0, 6.071985112, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 5.7;
-
-        mineralComp = "Carb_Dol";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 21.73, 0, 0, 0, 13.18, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 3;
-
-        mineralComp = "Anhydrite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 29.44, 0, 0, 0, 0, 0, 0, 0, 0, 23.55, 0, 0 });
-        AMC.weight = 1.3;
-
-        mineralComp = "ChloriteFe";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 9.6754, 0, 0, 0.1066, 0, 20.3305, 0.0161, 9.3554, 0.0787, 0, 0.0455, 0, 0, 0.0163, 0 });
-        AMC.weight = 10;
-
-        mineralComp = "ChloriteMg";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 10.0939, 0, 0, 0.0377, 0, 10.5241, 0.0335, 14.3654, 0.0387, 0, 0.0293, 0, 0, 0.0267, 0 });
-        AMC.weight = 10;
-
-        mineralComp = "Muscovite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 19.5, 0, 0, 0, 0, 0.08, 8.37, 0.05, 0.093, 0, 0.47, 0, 0, 0, 0 });
-        AMC.weight = 7;
-
-        mineralComp = "Musc_Phengite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 16.46, 0, 0, 0, 0, 3.19, 9.14, 0.81, 0, 0, 0.08, 0, 0, 0.1, 0 });
-        AMC.weight = 4;
-
-        mineralComp = "BiotMg";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 7.5391, 0, 0, 0.0156, 0, 7.9141, 7.8631, 11.8337, 0.052, 0, 0.0718, 0, 0, 1.0092, 0 });
-        AMC.weight = 9;
-
-        mineralComp = "BiotFe";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 7.3702, 0, 0, 0.1426, 0, 13.0428, 7.3473, 8.2094, 0.0686, 0, 0.0769, 0, 0, 0.9201, 0 });
-        AMC.weight = 9;
-
-        mineralComp = "Amph_Act";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 1.5633, 0, 0, 8.7168, 0, 12.7119, 0.1038, 8.065, 0.0905, 0, 0.204, 0, 0, 0.0574, 0 });
-        AMC.weight = 8;
-
-        mineralComp = "Amph_HorMg";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 3.42, 0, 0, 8.63, 0, 11.26, 0.43, 8.03, 0.48, 0, 0.78, 0, 0, 0.53, 0 });
-        AMC.weight = 7.5;
-
-        mineralComp = "Amph_Trem";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0.9295, 0, 0, 9.3243, 0, 6.3783, 0.0668, 11.4574, 0.1231, 0, 0.2079, 0, 0, 0.0767, 0 });
-        AMC.weight = 6;
-
-        mineralComp = "Epid_LC";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 12.5294, 0, 0, 16.5257, 0, 9.494, 0, 0.0194, 0.1798, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 4;
-
-        mineralComp = "Epid_Clzt";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 17.8137858, 0, 0, 17.63863053, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 3;
-
-        mineralComp = "Magnetite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 72.34827478, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 7;
-
-        mineralComp = "Apatite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 39.05798859, 0, 0, 0, 0, 0, 0, 0, 18.17529238, 0, 0, 0 });
-        AMC.weight = 10;
-    
-        mineralComp = "Chalcopyrite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 34.5, 30.49887156, 0, 0, 0, 0, 0, 0, 35, 0, 0 });
-        AMC.weight = 8;
-
-        mineralComp = "Pyrite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 46.59103012, 0, 0, 0, 0, 0, 0, 53.4, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "Uraninite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88.15 });
-        AMC.weight = 10;
-
-        mineralComp = "Arsenopyrite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 46, 0, 0, 0, 34.3, 0, 0, 0, 0, 0, 0, 19.7, 0, 0 });
-        AMC.weight = 10;
-
-        mineralComp = "Molybdenite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.9, 0, 0, 40.1, 0, 0 });
-        AMC.weight = 10;
-
-        mineralComp = "Chalcocite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 79.85, 0, 0, 0, 0, 0, 0, 0, 20.15, 0, 0 });
-        AMC.weight = 6;
-
-        mineralComp = "Sphene";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 20.44022825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24.46569855, 0 });
-        AMC.weight = 2;
-
-        mineralComp = "Rutile";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.96494742, 0 });
-        AMC.weight = -1;
-
-        mineralComp = "Barite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 58.84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13.74, 0, 0 });
-        AMC.weight = -1;
-
-        mineralComp = "Kaolinite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 20.75, 0, 0, 0.04, 0, 0.16, 0.17, 0.04, 0, 0, 0.07, 0, 0, 0.05, 0 });
-        AMC.weight = 7.1;
-
-        mineralComp = "Smectite/Montmorillonite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 9.44, 0, 0, 0.49, 0, 2.23, 0.37, 1.87, 0.023, 0, 1.61, 0, 0, 0.04, 0 });
-        AMC.weight = 7.2;
-
-        mineralComp = "Jarosite";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 33.45, 7.81, 0, 0, 0, 0, 0, 12.81, 0, 0 });
-        AMC.weight = 5;
-
-        mineralComp = "Tour_Fe";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 13.07, 0, 0, 1.43, 0, 9.21, 0.04, 5.23, 0, 0, 1.26, 0, 0, 1.51, 0 });
-        AMC.weight = 7.5;
-
-        mineralComp = "Tour_Mg";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 18.03, 0, 0, 0.45, 0, 2.38, 0.01, 5.69, 0, 0, 1.46, 0, 0, 0.24, 0 });
-        AMC.weight = 6;
-
-        mineralComp = "Chrysocolla";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayMineralDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 2.05, 0, 0, 0, 33.86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = 0;
-
-
-
-        mineralComp = "Al";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "As";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Ba";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Ca";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Cu";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Fe";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "K";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Mg";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Mn";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Mo";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Na";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "P";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "S";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "Ti";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 });
-        AMC.weight = -100;
-
-        mineralComp = "U";
-        AMC = new AssayMineralComposition(mineralComp);
-        assayElementDict.Add(mineralComp, AMC);
-        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100 });
-        AMC.weight = -100;
-
-        
 
 
     }
@@ -473,23 +105,427 @@ CT      -   constraint types, array[K]:
 
     }
 
+    public void AddAllAMCs()
+    {
+
+
+        assayMineralDict = new Dictionary<string, AssayMineralComposition>();
+        assayElementDict = new Dictionary<string, AssayMineralComposition>();
+
+        string mineralComp;
+        AssayMineralComposition AMC;
+
+        mineralComp = "Other(Quartz)";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 7;
+
+        mineralComp = "Feld_Alb_Ca-Na";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 10.41, 0, 0, 0, 0.38, 0, 0.05, 0.11, 0.01, 0, 0, 7.8, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 5;
+
+        mineralComp = "Feld_Alb_Na";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 10.4, 0, 0, 0, 0, 0, 0.04, 0.24, 0.02, 0, 0, 8.21, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 5;
+
+        mineralComp = "FeldsparK";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 9.817163594, 0, 0, 0, 0.12149786, 0, 0.0979097, 13.33707643, 0, 0, 0, 0.126114876, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 7;
+
+        mineralComp = "FeldsKBa";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 9.85, 0, 0, 0.25, 0, 0, 0.08, 13.5, 0, 0.03, 0, 0.31, 0, 0, 0, 0, 0.03, 0, 0, 0 });
+        AMC.weight = 7;
+
+        mineralComp = "Feld_Plag";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 15.3732, 0, 0, 0, 7.8908, 0, 0.199, 0.1423, -0.0012, -0.0065, 0, 3.8507, 0, 0, 0, 0, 0.002, 0, 0, 0 });
+        AMC.weight = 3;
+
+        mineralComp = "Carb_Calc";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 40.04426534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 0.3;
+
+        mineralComp = "Carb_Ank";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 20.0185592, 0, 12.55342226, 0, 6.071985112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 5.7;
+
+        mineralComp = "Carb_Dol";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 21.73, 0, 0, 0, 13.18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 3;
+
+        mineralComp = "Rhodonite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 3;
+
+        mineralComp = "Siderite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 3;
+
+        mineralComp = "Anhydrite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 29.44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23.55, 0, 0, 0, 0, 0 });
+        AMC.weight = 1.3;
+
+        mineralComp = "ChloriteFe";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 9.6754, 0, 0, 0, 0.1066, 0, 20.3305, 0.0161, 9.3554, 0.0787, 0, 0.0455, 0, 0, 0, 0, 0.0163, 0, 0, 0 });
+        AMC.weight = 10;
+
+        mineralComp = "ChloriteMg";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 10.0939, 0, 0, 0, 0.0377, 0, 10.5241, 0.0335, 14.3654, 0.0387, 0, 0.0293, 0, 0, 0, 0, 0.0267, 0, 0, 0 });
+        AMC.weight = 10;
+
+        mineralComp = "Muscovite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 19.5, 0, 0, 0, 0, 0, 0.08, 8.37, 0.05, 0.093, 0, 0.47, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 7;
+
+        mineralComp = "Musc_Phengite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 16.46, 0, 0, 0, 0, 0, 3.19, 9.14, 0.81, 0, 0, 0.08, 0, 0, 0, 0, 0.1, 0, 0, 0 });
+        AMC.weight = 4;
+
+        mineralComp = "BiotMg";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 7.5391, 0, 0, 0, 0.0156, 0, 7.9141, 7.8631, 11.8337, 0.052, 0, 0.0718, 0, 0, 0, 0, 1.0092, 0, 0, 0 });
+        AMC.weight = 9;
+
+        mineralComp = "BiotFe";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 7.3702, 0, 0, 0, 0.1426, 0, 13.0428, 7.3473, 8.2094, 0.0686, 0, 0.0769, 0, 0, 0, 0, 0.9201, 0, 0, 0 });
+        AMC.weight = 9;
+
+        mineralComp = "Amph_tscher";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 7.33, 0, 0, 0, 7.7, 0, 13.72, 0.62, 5.76, 0.33, 0, 1.43, 0, 0, 0, 0, 0.74, 0, 0, 0 });
+        AMC.weight = 5;
+
+        mineralComp = "Amph_Act";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 1.5633, 0, 0, 0, 8.7168, 0, 12.7119, 0.1038, 8.065, 0.0905, 0, 0.204, 0, 0, 0, 0, 0.0574, 0, 0, 0 });
+        AMC.weight = 8;
+
+        mineralComp = "Amph_HorMg";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 3.42, 0, 0, 0, 8.63, 0, 11.26, 0.43, 8.03, 0.48, 0, 0.78, 0, 0, 0, 0, 0.53, 0, 0, 0 });
+        AMC.weight = 7.5;
+
+        mineralComp = "Amph_Trem";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0.9295, 0, 0, 0, 9.3243, 0, 6.3783, 0.0668, 11.4574, 0.1231, 0, 0.2079, 0, 0, 0, 0, 0.0767, 0, 0, 0 });
+        AMC.weight = 6;
+
+        mineralComp = "Epid_LC";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 12.5294, 0, 0, 0, 16.5257, 0, 9.494, 0, 0.0194, 0.1798, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 4;
+
+        mineralComp = "Epid_Clzt";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 17.8137858, 0, 0, 0, 17.63863053, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 3;
+
+        mineralComp = "Magnetite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 72.34827478, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 7;
+
+        mineralComp = "Apatite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 39.05798859, 0, 0, 0, 0, 0, 0, 0, 18.17529238, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 10;
+
+        mineralComp = "Chalcopyrite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 34.5, 30.49887156, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0 });
+        AMC.weight = 8;
+
+        mineralComp = "Pyrite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 46.59103012, 0, 0, 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0 });
+        AMC.weight = 5;
+
+        mineralComp = "Spalerite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 2.86, 0, 0, 0, 0, 0, 0, 0, 33.06, 0, 0, 0, 64.07, 0 });
+        AMC.weight = 5;
+
+        mineralComp = "galena";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86.6, 13.4, 0, 0, 0, 0, 0 });
+        AMC.weight = 5;
+
+        mineralComp = "Uraninite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88.15, 0, 0 });
+        AMC.weight = 10;
+
+        mineralComp = "Arsenopyrite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 46, 0, 0, 0, 0, 34.3, 0, 0, 0, 0, 0, 0, 0, 19.7, 0, 0, 0, 0, 0 });
+        AMC.weight = 10;
+
+        mineralComp = "Molybdenite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.9, 0, 0, 0, 40.1, 0, 0, 0, 0, 0 });
+        AMC.weight = 10;
+
+        mineralComp = "Chalcocite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 79.85, 0, 0, 0, 0, 0, 0, 0, 0, 20.15, 0, 0, 0, 0, 0 });
+        AMC.weight = 6;
+
+        mineralComp = "Sphene/titanite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 20.44022825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24.46569855, 0, 0, 0 });
+        AMC.weight = 2;
+
+        mineralComp = "Rutile";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.96494742, 0, 0, 0 });
+        AMC.weight = -1;
+
+        mineralComp = "Barite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 58.84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13.74, 0, 0, 0, 0, 0 });
+        AMC.weight = -1;
+
+        mineralComp = "Kaolinite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 20.75, 0, 0, 0, 0.04, 0, 0.16, 0.17, 0.04, 0, 0, 0.07, 0, 0, 0, 0, 0.05, 0, 0, 0 });
+        AMC.weight = 7.1;
+
+        mineralComp = "Smectite/Montmorillonite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 9.44, 0, 0, 0, 0.49, 0, 2.23, 0.37, 1.87, 0.023, 0, 1.61, 0, 0, 0, 0, 0.04, 0, 0, 0 });
+        AMC.weight = 7.2;
+
+        mineralComp = "Jarosite";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 33.45, 7.81, 0, 0, 0, 0, 0, 0, 12.81, 0, 0, 0, 0, 0 });
+        AMC.weight = 5.0;
+
+        mineralComp = "Tour_Fe";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 13.07, 0, 0, 0, 1.43, 0, 9.21, 0.04, 5.23, 0, 0, 1.26, 0, 0, 0, 0, 1.51, 0, 0, 0 });
+        AMC.weight = 7.5;
+
+        mineralComp = "Tour_Mg";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 18.03, 0, 0, 0, 0.45, 0, 2.38, 0.01, 5.69, 0, 0, 1.46, 0, 0, 0, 0, 0.24, 0, 0, 0 });
+        AMC.weight = 6;
+
+        mineralComp = "Chrysocolla";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayMineralDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 2.05, 0, 0, 0, 0, 33.86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = 0;
+
+        mineralComp = "Ag";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Al";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "As";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Au";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Ba";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Ca";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Cu";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Fe";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "K";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Mg";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Mn";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Mo";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Na";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "P";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Pb";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "S";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Te";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Ti";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "U";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Zn";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 });
+        AMC.weight = -100;
+
+        mineralComp = "Zr";
+        AMC = new AssayMineralComposition(mineralComp);
+        assayElementDict.Add(mineralComp, AMC);
+        FillAMCDatabase(AMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100 });
+        AMC.weight = -100;
+    }
+
     public void FillAMCDatabase(AssayMineralComposition AMC, double[] val)
     {
-        AMC.elementDictionary.Add("Al", val[0]);
-        AMC.elementDictionary.Add("As", val[1]);
-        AMC.elementDictionary.Add("Ba", val[2]);
-        AMC.elementDictionary.Add("Ca", val[3]);
-        AMC.elementDictionary.Add("Cu", val[4]);
-        AMC.elementDictionary.Add("Fe", val[5]);
-        AMC.elementDictionary.Add("K", val[6]);
-        AMC.elementDictionary.Add("Mg", val[7]);
-        AMC.elementDictionary.Add("Mn", val[8]);
-        AMC.elementDictionary.Add("Mo", val[9]);
-        AMC.elementDictionary.Add("Na", val[10]);
-        AMC.elementDictionary.Add("P", val[11]);
-        AMC.elementDictionary.Add("S", val[12]);
-        AMC.elementDictionary.Add("Ti", val[13]);
-        AMC.elementDictionary.Add("U", val[14]);
+        AMC.elementDictionary.Add("Ag", val[0]);
+        AMC.elementDictionary.Add("Al", val[1]);
+        AMC.elementDictionary.Add("As", val[2]);
+        AMC.elementDictionary.Add("Au", val[3]);
+        AMC.elementDictionary.Add("Ba", val[4]);
+        AMC.elementDictionary.Add("Ca", val[5]);
+        AMC.elementDictionary.Add("Cu", val[6]);
+        AMC.elementDictionary.Add("Fe", val[7]);
+        AMC.elementDictionary.Add("K", val[8]);
+        AMC.elementDictionary.Add("Mg", val[9]);
+        AMC.elementDictionary.Add("Mn", val[10]);
+        AMC.elementDictionary.Add("Mo", val[11]);
+        AMC.elementDictionary.Add("Na", val[12]);
+        AMC.elementDictionary.Add("P", val[13]);
+        AMC.elementDictionary.Add("Pb", val[14]);
+        AMC.elementDictionary.Add("S", val[15]);
+        AMC.elementDictionary.Add("Te", val[16]);
+        AMC.elementDictionary.Add("Ti", val[17]);
+        AMC.elementDictionary.Add("U", val[18]);
+        AMC.elementDictionary.Add("Zn", val[19]);
+        AMC.elementDictionary.Add("Zr", val[20]);
+
+
+        //Ag	Al	As	Au	Ba	Ca	Cu	Fe	K	Mg	Mn	Mo	Na	P	Pb	S	Te	Ti	U	Zn	Zr
 
 
         //string[] ArrayOfElements = new string[] { "Al", "As", "Ba", "Ca", "Cu", "Fe", "K", "Mg", "Mn", "Mo", "Na", "P", "S", "Ti", "W" };
@@ -675,17 +711,20 @@ CT      -   constraint types, array[K]:
                 double[] x = new double[] { };
                 
                 
-
+                //Initialise the Simplex Array with elementList (the columns from the CSV) and the minList (the list of minerals from the AMC)
                 double[,] simplexArray = new double[elementList.Count+1, minList.Count];
 
+                //The cost array is represented by the minList's weight values
                 double[] c = new double[simplexArray.GetUpperBound(1)+1];
 
+                //for each of the selected mineral compositions i...
                 //Debug.Log("For i <= " + (simplexArray2.GetUpperBound(1) - 1));
                 for (int i = 0; i <= simplexArray.GetUpperBound(1); i++)
                 {
-                    
+
                     double other = 100;
 
+                    //and for each of the CSV columns j...
                     //Debug.Log("For j <= " + simplexArray2.GetUpperBound(0));
                     for (int j = 0; j <= simplexArray.GetUpperBound(0) - 1; j++)//i <= simplexArray.GetUpperBound(0); i++)
                     {
@@ -693,28 +732,31 @@ CT      -   constraint types, array[K]:
                         double val = 0;
                         //Debug.Log("minlist[" + i + "] = " + minList[i]);
                         //Debug.Log("elementList[" + j + "] = " + elementList[j]);
+
+                        //Get the AMC for the Mineral Composition or singular Element
                         if (assayMineralDict.TryGetValue(minList[i], out AMC))
                         {
+                            //Find the element value for the particular element within the AMC
                             AMC.elementDictionary.TryGetValue(elementList[j], out val);
-                            simplexArray[j,i] = val;
+                            simplexArray[j, i] = val;
                             //Debug.Log("m[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
                         }
                         else if (assayElementDict.TryGetValue(minList[i], out AMC))
                         {
                             AMC.elementDictionary.TryGetValue(elementList[j], out val);
-                            simplexArray[j,i] = val;
+                            simplexArray[j, i] = val;
                             //Debug.Log("e[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
                         }
                         else
                             Debug.Log("failed");
                         other -= val;
                     }
-                    
-                        simplexArray[simplexArray.GetUpperBound(0), i] = other;
-                        //Debug.Log("o[" + simplexArray2.GetUpperBound(0) + ", " + i + "] = " + other);
 
-                        c[i] = -weightList[i];
-                        //Debug.Log("c[" + i + "] = " + c[i]);
+                    simplexArray[simplexArray.GetUpperBound(0), i] = other;
+                    //Debug.Log("o[" + simplexArray2.GetUpperBound(0) + ", " + i + "] = " + other);
+
+                    c[i] = -weightList[i];
+                    //Debug.Log("c[" + i + "] = " + c[i]);
                 }
 
                 //CSVReader.DebugOutputGrid(simplexArray);
@@ -992,6 +1034,9 @@ CT      -   constraint types, array[K]:
 
     public IEnumerator EnumerateAssay(bool toCSV)
     {
+
+        bothController.loadingMenu.SetActive(true);
+        bothController.sharedMenu.SetActive(false);
 
         string fullExportString = "";
         string columnNames = "Sample No.,Score";
@@ -1305,7 +1350,7 @@ CT      -   constraint types, array[K]:
 
                 //Debug.Log("<color=green>--------------------------</color>");
                 bothController.progressBar.value++;
-                progressText.text = bothController.progressBar.value + "/" + maxSamples;
+                bothController.progressText.text = bothController.progressBar.value + "/" + maxSamples;
                 yield return null;
 
                 //Debug.Log("'Result': " + result);
@@ -1319,6 +1364,8 @@ CT      -   constraint types, array[K]:
         {
             sw.Write(export.sb.ToString());
         }
+        bothController.loadingMenu.SetActive(false);
+        bothController.sharedMenu.SetActive(true);
         yield return null;
     }
 

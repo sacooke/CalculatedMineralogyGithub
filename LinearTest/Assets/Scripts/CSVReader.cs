@@ -19,6 +19,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.IO;
 
 public class CSVReader : MonoBehaviour
 {
@@ -93,6 +95,49 @@ public class CSVReader : MonoBehaviour
         grid = SplitCsvGrid(csvFile);
 
         int gridHeight = 1 + grid.GetUpperBound(1);
+
+
+
+        bool CompilingDatabase = false;
+        if (CompilingDatabase)
+        {
+            StringBuilder sb = new StringBuilder(); 
+            Debug.Log("<color/red>making the database</color>");
+            bool itIsAssay = false;
+            for (int y = 1; y <= grid.GetUpperBound(1); y++)
+            {
+                string sample = grid[0, y];
+                string assayWeight = grid[1, y];
+                string combiWeight = grid[24, y];
+
+                if (itIsAssay)
+                {
+                    sb.AppendLine("");
+                    sb.AppendLine("mineralComp = \"" + sample + "\";");
+                    sb.AppendLine("AMC = new AssayMineralComposition(mineralComp);");
+                    sb.AppendLine("assayMineralDict.Add(mineralComp, AMC);");
+                    sb.AppendLine("FillAMCDatabase(AMC, new double[] { " + grid[2, y] + ", " + grid[3, y] + ", " + grid[4, y] + ", " + grid[5, y] + ", " + grid[6, y] + ", " + grid[7, y] + ", " + grid[8, y] + ", " + grid[9, y] + ", " + grid[10, y] + ", " + grid[11, y] + ", " + grid[12, y] + ", " + grid[13, y] + ", " + grid[14, y] + ", " + grid[15, y] + ", " + grid[16, y] + ", " + grid[17, y] + ", " + grid[18, y] + ", " + grid[19, y] + ", " + grid[20, y] + ", " + grid[21, y] + ", " + grid[22, y] + " });");
+                    sb.AppendLine("AMC.weight = " + assayWeight + ";");
+                }
+                else
+                {
+                    sb.AppendLine("");
+                    sb.AppendLine("mineralComp = \"" + sample + "\";");
+                    sb.AppendLine("CMC = new CombiMineralComposition(mineralComp);");
+                    sb.AppendLine("combiMineralDict.Add(mineralComp, CMC);");
+                    sb.AppendLine("FillCMCDatabase(CMC, new double[] { " + grid[2, y] + ", " + grid[3, y] + ", " + grid[4, y] + ", " + grid[5, y] + ", " + grid[6, y] + ", " + grid[7, y] + ", " + grid[8, y] + ", " + grid[9, y] + ", " + grid[10, y] + ", " + grid[11, y] + ", " + grid[12, y] + ", " + grid[13, y] + ", " + grid[14, y] + ", " + grid[15, y] + ", " + grid[16, y] + ", " + grid[17, y] + ", " + grid[18, y] + ", " + grid[19, y] + ", " + grid[20, y] + ", " + grid[21, y] + ", " + grid[22, y] + " });");
+                    sb.AppendLine("CMC.weight = " + combiWeight + ";");
+                }
+            }
+            string filename = System.Environment.CurrentDirectory + "/thing.txt";
+            Debug.Log(filename);
+            using (StreamWriter sw = File.CreateText(filename))
+            {
+                sw.Write(sb.ToString());
+            }
+
+            return;
+        }
 
         GetElements(grid); //ppm
         GetChemicals(grid); //pc or wt%

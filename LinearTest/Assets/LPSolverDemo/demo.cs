@@ -12,7 +12,6 @@ namespace demo
         [STAThread]
         public void Start()
         {
-            UnityEngine.Debug.Log("itbegins");
             System.Diagnostics.Debug.WriteLine(System.Environment.CurrentDirectory);
             lpsolve.Init(".");
 

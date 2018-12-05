@@ -10,9 +10,12 @@ public class BothController : MonoBehaviour {
     public GameObject sharedMenu;
     public GameObject assayMenu;
     public GameObject combiMenu;
+    public GameObject loadingMenu;
+    public GameObject errorMenu;
     public CSVReader csvController;
-    
+
     public AssayController assayController;
+    public CombiController combiController;
 
     public FileChooser fileChooser;
     private string fileContentString;
@@ -20,10 +23,12 @@ public class BothController : MonoBehaviour {
     public Export export;
 
     public GameObject samplePrefab;
+    public GameObject combiElemMinPrefab;
     public GameObject sampleScrollView;
     public GameObject columnScrollView;
     public GameObject mineralCompScrollView;
     public GameObject elementCompScrollView;
+    public GameObject combiColumnScrollView;
 
     public GameObject mineralCompListPrefab;
 
@@ -38,6 +43,7 @@ public class BothController : MonoBehaviour {
     public InputField setAllElementWeightsInputField;
 
     public Slider progressBar;
+    public Text progressText;
 
     // Use this for initialization
     void Start()
@@ -52,7 +58,6 @@ public class BothController : MonoBehaviour {
 
     public void Initialise(bool isAssay)
     {
-
         mainMenu.SetActive(false);
         sharedMenu.SetActive(true);
         assayMenu.SetActive(isAssay);
@@ -71,28 +76,65 @@ public class BothController : MonoBehaviour {
 
             sampleToggles.Add(g.GetComponent<Toggle>());
         }
-
-        for (int i = 1; i < csvController.grid.GetUpperBound(0); i++)
+        if (isAssay)
         {
-            string columnHeader = csvController.grid[i, 0];
-
-            if (columnHeader != "" && columnHeader != null)
+            for (int i = 1; i < csvController.grid.GetUpperBound(0); i++)
             {
-                columns.Add(columnHeader);
+                string columnHeader = csvController.grid[i, 0];
 
-                GameObject g = GameObject.Instantiate(samplePrefab) as GameObject;
-                g.transform.SetParent(columnScrollView.transform, false);
-                g.GetComponentInChildren<Text>().text = columnHeader;
-                g.GetComponent<SampleListEntry>().SampleID = columnHeader;
-                g.GetComponent<SampleListEntry>().index = i;
-                if (!ContainsNoCase(columnHeader, "_pc"))
-                    g.GetComponent<Toggle>().isOn = false;
-                columnToggles.Add(g.GetComponent<Toggle>());
+                if (columnHeader != "" && columnHeader != null)
+                {
+                    columns.Add(columnHeader);
 
+                    GameObject g = GameObject.Instantiate(samplePrefab) as GameObject;
+                    g.transform.SetParent(columnScrollView.transform, false);
+                    g.GetComponentInChildren<Text>().text = columnHeader;
+                    g.GetComponent<SampleListEntry>().SampleID = columnHeader;
+                    g.GetComponent<SampleListEntry>().index = i;
+                    if (!ContainsNoCase(columnHeader, "_pc"))
+                        g.GetComponent<Toggle>().isOn = false;
+                    columnToggles.Add(g.GetComponent<Toggle>());
+
+                }
+                //int samplePos = csvController.samplePositions[i];
+
+                //sampleToggles.Add(g.GetComponent<Toggle>());
             }
-            //int samplePos = csvController.samplePositions[i];
+        }
+        else
+        {
+            Debug.Log("TIME FOR COMBI");
+            for (int i = 1; i < csvController.grid.GetUpperBound(0); i++)
+            {
+                string columnHeader = csvController.grid[i, 0];
 
-            //sampleToggles.Add(g.GetComponent<Toggle>());
+                if (columnHeader != "" && columnHeader != null)
+                {
+                    columns.Add(columnHeader);
+
+                    GameObject g = GameObject.Instantiate(combiElemMinPrefab) as GameObject;
+                    g.transform.SetParent(combiColumnScrollView.transform, false);
+                    g.GetComponentInChildren<Text>().text = columnHeader;
+                    g.GetComponent<CombiMineralElementListEntry>().SampleID = columnHeader;
+                    g.GetComponent<CombiMineralElementListEntry>().label.text = columnHeader;
+                    g.GetComponent<CombiMineralElementListEntry>().index = i;
+                    if (ContainsNoCase(columnHeader, "_ppm"))
+                        g.GetComponent<CombiMineralElementListEntry>().ElementToggle.isOn = true;
+                    else if (ContainsNoCase(columnHeader, "_wt%"))
+                        g.GetComponent<CombiMineralElementListEntry>().MineralToggle.isOn = true;
+                    //g.GetComponent<CombiMineralElementListEntry>().ElementToggle.
+                    //columnToggles.Add(g.GetComponent<Toggle>());
+
+                }
+                //int samplePos = csvController.samplePositions[i];
+
+                //sampleToggles.Add(g.GetComponent<Toggle>());
+
+
+            //NEXT TIME:
+            //Add the mineral comps to the- oh shit i need to make the CMC a real thing huh, okay brb gotta do that
+            //then add them to the CombiMineralCompScrollview which definitely already exists in code
+            }
         }
 
 
@@ -123,6 +165,37 @@ public class BothController : MonoBehaviour {
                 mcle.index = i;
                 g.GetComponent<Toggle>().isOn = false;
                 g.GetComponentInChildren<InputField>().text = amc.weight.ToString();
+                elementToggles.Add(g.GetComponent<Toggle>());
+                i++;
+            }
+        }
+        else
+        {
+            int i = 0;
+            foreach (CombiController.CombiMineralComposition cmc in combiController.combiMineralDict.Values)
+            {
+
+                GameObject g = GameObject.Instantiate(mineralCompListPrefab) as GameObject;
+                g.transform.SetParent(mineralCompScrollView.transform, false);
+                MineralCompositionListEntry mcle = g.GetComponent<MineralCompositionListEntry>();
+                mcle.label.text = cmc.mineral;
+                mcle.MineralComp = cmc.mineral;
+                mcle.index = i;
+                g.GetComponentInChildren<InputField>().text = cmc.weight.ToString();
+                mineralToggles.Add(g.GetComponent<Toggle>());
+                i++;
+            }
+            foreach (CombiController.CombiMineralComposition cmc in combiController.combiElementDict.Values)
+            {
+
+                GameObject g = GameObject.Instantiate(mineralCompListPrefab) as GameObject;
+                g.transform.SetParent(elementCompScrollView.transform, false);
+                MineralCompositionListEntry mcle = g.GetComponent<MineralCompositionListEntry>();
+                mcle.label.text = cmc.mineral;
+                mcle.MineralComp = cmc.mineral;
+                mcle.index = i;
+                g.GetComponent<Toggle>().isOn = false;
+                g.GetComponentInChildren<InputField>().text = cmc.weight.ToString();
                 elementToggles.Add(g.GetComponent<Toggle>());
                 i++;
             }
