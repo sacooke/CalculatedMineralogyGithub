@@ -1,17 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-public class ErrorListEntry : MonoBehaviour
+public class QXRDListEntry : MonoBehaviour
 {
-    
+
     public string MineralComp;
     public Text label;
     public InputField inputField;
     public int index;
     public CombiMineralElementListEntry CMELE;
-    public int errorType = -1; //0 = elementRelativeError, 1 = elementAbsoluteError, 2 = mineralRelativeError, 3 = mineralAbsoluteError
+    public Dropdown dropdown;
 
 
     // Use this for initialization
@@ -33,13 +34,15 @@ public class ErrorListEntry : MonoBehaviour
         //inputField.text = Regex.Replace(inputField.text, @"[^0-9.]", "");
     }
 
-    public void SetInputFieldValue(string newText)
+    public void SetLabel(string text)
     {
-        inputField.text = newText;
+        label.text = text;
+        MineralComp = text;
     }
-    public string GetInputFieldValue()
+
+    public void AddToDropdown(List<string> m_DropOptions)
     {
-        return inputField.text;
+        dropdown.AddOptions(m_DropOptions);
     }
 
     public void DestroySelf()

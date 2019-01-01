@@ -12,6 +12,7 @@ public class BothController : MonoBehaviour {
     public GameObject combiMenu;
     public GameObject loadingMenu;
     public GameObject errorMenu;
+    public GameObject QXRDMenu;
     public CSVReader csvController;
 
     public AssayController assayController;
@@ -103,7 +104,6 @@ public class BothController : MonoBehaviour {
         }
         else
         {
-            Debug.Log("TIME FOR COMBI");
             for (int i = 1; i < csvController.grid.GetUpperBound(0); i++)
             {
                 string columnHeader = csvController.grid[i, 0];

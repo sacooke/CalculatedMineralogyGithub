@@ -21,7 +21,9 @@ public class CombiController : MonoBehaviour {
     public BothController bothController;
     public GameObject samplePrefab;
     public GameObject errorPrefab;
+    public GameObject QXRDPrefab;
     public GameObject sampleScrollView; //content
+    public GameObject QXRDScrollview;
     public GameObject absErrElementScrollView;
     public GameObject absErrMineralScrollView;
     public GameObject relErrElementScrollView;
@@ -46,6 +48,8 @@ public class CombiController : MonoBehaviour {
     public InputField setAllRelativeQXRDErrorInputField;
     public InputField setAllAbsoluteQXRDErrorInputField;
 
+    public bool QXRDListIsFull = false;
+    public List<int> compQXRDIndexList = new List<int>();
 
     // Use this for initialization
     void Start () {
@@ -673,6 +677,99 @@ public class CombiController : MonoBehaviour {
         }
     }
 
+    public void PopulateQXRDScrollview()
+    {
+        if (!QXRDListIsFull)
+        {
+            QXRDListEntry QLE;
+            List<string> mineralList = new List<string>();
+            foreach (Transform column in bothController.combiColumnScrollView.transform)
+            {
+                CombiMineralElementListEntry CMELE = column.gameObject.GetComponent<CombiMineralElementListEntry>();
+                if (CMELE.MineralToggle.isOn)
+                {
+                    mineralList.Add(CMELE.SampleID);
+                    /*
+                    if (double.IsNegativeInfinity(CMELE.MineralRelativeError))
+                        CMELE.MineralRelativeError = 6;
+
+                    //start new prefab of ErrorListEntry absolute
+                    GameObject gER = GameObject.Instantiate(errorPrefab) as GameObject;
+                    //add the relative value and submit to the relative list
+                    gER.transform.SetParent(relErrMineralScrollView.transform, false);
+                    ELE = gER.GetComponent<ErrorListEntry>();
+                    ELE.SetInputFieldValue(CMELE.MineralRelativeError.ToString());
+                    ELE.errorType = 0; //0 = elementRelativeError, 1 = elementAbsoluteError, 2 = mineralRelativeError, 3 = mineralAbsoluteError
+                    ELE.label.text = CMELE.SampleID;
+                    ELE.CMELE = CMELE;
+
+
+
+                    if (double.IsNegativeInfinity(CMELE.MineralAbsoluteError))
+                        CMELE.MineralAbsoluteError = 0.50;
+
+                    //start new prefab of ErrorListEntry absolute
+                    GameObject gEA = GameObject.Instantiate(errorPrefab) as GameObject;
+                    //add the absolute value and submit to the absolute list
+                    gEA.transform.SetParent(absErrMineralScrollView.transform, false);
+                    ELE = gEA.GetComponent<ErrorListEntry>();
+                    ELE.SetInputFieldValue(CMELE.MineralAbsoluteError.ToString());
+                    ELE.errorType = 1; //0 = elementRelativeError, 1 = elementAbsoluteError, 2 = mineralRelativeError, 3 = mineralAbsoluteError
+                    ELE.label.text = CMELE.SampleID;
+                    ELE.CMELE = CMELE;*/
+
+                }
+            }
+
+            int i = 0;
+            foreach (Toggle tog in bothController.mineralCompScrollView.transform.GetComponentsInChildren<Toggle>())
+            {
+                if (tog.isOn)
+                {
+                    GameObject g = GameObject.Instantiate(QXRDPrefab) as GameObject;
+                    g.transform.SetParent(QXRDScrollview.transform, false);
+                    QLE = g.GetComponent<QXRDListEntry>();
+                    QLE.index = i;
+                    QLE.SetLabel(tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp);
+                    QLE.AddToDropdown(mineralList);
+                    int optionVal = 0;
+                    foreach(Dropdown.OptionData option in QLE.dropdown.options)
+                    {
+                        if (ContainsNoCase(option.text, QLE.MineralComp.Substring(0, 3)))
+                        {
+                            //Debug.Log(option.text + " has first three letters of " + QLE.MineralComp.Substring(0, 3));
+                            QLE.dropdown.value = optionVal;
+                        }
+                        optionVal++;
+                    }
+                }
+            }
+            QXRDListIsFull = true;
+        }
+
+        bothController.QXRDMenu.SetActive(true);
+        bothController.sharedMenu.SetActive(false);
+
+    }
+
+    public void ExitQXRDMenu()
+    {
+        bothController.QXRDMenu.SetActive(false);
+        bothController.sharedMenu.SetActive(true);
+
+    }
+
+    public void DepopulateQXRDScrollview()
+    {
+        foreach (Transform QXRD in QXRDScrollview.transform)
+        {
+            QXRDListEntry QLE = QXRD.GetComponent<QXRDListEntry>();
+            QLE.DestroySelf();
+        }
+        QXRDListIsFull = false;
+        ExitQXRDMenu();
+    }
+
 
     public void CalculateCombi2(bool toCSV)
     {
@@ -724,7 +821,6 @@ public class CombiController : MonoBehaviour {
             export.WriteStringToStringBuilder(System.DateTime.Now.ToString("dd-MM-yyyy") + "_" + System.DateTime.Now.ToString("hh-mmtt"));
             export.WriteStringToStringBuilder("==========");
         }
-
         foreach (Toggle tog in sampleToggles)
         {
             if(tog.isOn)
@@ -882,6 +978,7 @@ public class CombiController : MonoBehaviour {
         Debug.Log("EnumerateCombi");
         bothController.loadingMenu.SetActive(true);
         bothController.sharedMenu.SetActive(false);
+        bothController.QXRDMenu.SetActive(false);
 
         string fullExportString = "";
         string columnNames = "Sample No.,Score";
@@ -949,7 +1046,7 @@ public class CombiController : MonoBehaviour {
                 QXRDIndexList.Add(CMELE.index);
                 QXRDRelativeErrorList.Add(CMELE.ElementRelativeError);
                 QXRDAbsoluteErrorList.Add(CMELE.ElementAbsoluteError);
-                Debug.Log("it = " + elem.Substring(0, elem.IndexOf('_')));//, elem.Length - elem.IndexOf('_')));
+                //Debug.Log("it = " + elem.Substring(0, elem.IndexOf('_')));//, elem.Length - elem.IndexOf('_')));
             }
         }
         if (toCSV)
@@ -971,6 +1068,107 @@ public class CombiController : MonoBehaviour {
         }
         bothController.progressBar.value = 0;
         bothController.progressBar.maxValue = maxSamples;
+
+        //populate compQXRDIndexList with all of the dropdown values
+        foreach (QXRDListEntry QLE in QXRDScrollview.transform.GetComponentsInChildren<QXRDListEntry>())
+        {
+            Debug.Log("adding " + (QLE.dropdown.value-1));
+            compQXRDIndexList.Add(QLE.dropdown.value-1);
+        }
+
+
+
+        //Initialise the Simplex Array with elementList (the columns from the CSV) and the minList (the list of minerals from the AMC)
+        //double[,] simplexArray = new double[elementList.Count + 1, minList.Count];
+
+        mineral2DArray = new double[assayHeaderList.Count + 1 + QXRDHeaderList.Count + 1][];
+
+
+        //for each of the CSV columns j...
+        //Debug.Log("For i <= " + (simplexArray2.GetUpperBound(1) - 1));
+        for (int j = 0; j < mineral2DArray.Length; j++)
+        {
+            //Debug.Log("gt here " + j);
+            mineral2DArray[j] = new double[minList.Count];
+            //Debug.Log("mineral2DArray[j].Length = " + mineral2DArray[j].Length);
+        }
+
+
+        //and for each of the selected mineral compositions l...
+        //Debug.Log("For j <= " + simplexArray2.GetUpperBound(0));
+        for (int l = 0; l < minList.Count; l++)//i <= simplexArray.GetUpperBound(0); i++)
+        {
+
+            double other = 100;
+
+            int row = 0;
+            for (int j = 0; j < assayHeaderList.Count; j++)
+            {
+
+                //EVERYTYHING BELOW HERE IS OLD===============================================
+                CombiMineralComposition CMC;
+                double val = 0;
+                //Debug.Log("minlist[" + i + "] = " + minList[i]);
+                //Debug.Log("elementList[" + j + "] = " + elementList[j]);
+
+                //Get the AMC for the Mineral Composition or singular Element
+                if (combiMineralDict.TryGetValue(minList[l], out CMC))
+                {
+                    //Find the element value for the particular element within the AMC
+                    CMC.elementDictionary.TryGetValue(assayHeaderList[j], out val); //=================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    mineral2DArray[j][l] = val;
+                    //Debug.Log("m[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
+                }
+                else if (combiElementDict.TryGetValue(minList[l], out CMC))
+                {
+                    CMC.elementDictionary.TryGetValue(assayHeaderList[l], out val);
+                    mineral2DArray[j][l] = val;
+                    //Debug.Log("e[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
+                }
+                else
+                    Debug.Log("failed");
+                other -= val;
+                row++;
+            }
+
+            mineral2DArray[row][l] = other;
+            row++;
+            int QXRDstartingPosition = row;
+            for (int j = QXRDstartingPosition; j < QXRDHeaderList.Count + QXRDstartingPosition; j++)
+            {
+                //Debug.Log("if(" + QXRDHeaderList[j - QXRDstartingPosition] + " == " + minList[l]);
+                Debug.Log("if(" + compQXRDIndexList[row - QXRDstartingPosition] + " == " + (j - QXRDstartingPosition));
+                if (compQXRDIndexList[row - QXRDstartingPosition] == j - QXRDstartingPosition)
+                {
+                    Debug.Log("min2DArray[" + row + "][" + l + "] = 100 because " + (row - QXRDstartingPosition) + " = " + (j - QXRDstartingPosition));
+                    mineral2DArray[row][l] = 69;
+                }/*
+                        if(QXRDHeaderList[j-QXRDstartingPosition] == minList[l])
+                        {
+                            mineral2DArray[row][l] = 100;
+
+                        }*/
+                row++;
+            }
+
+        }
+
+        //========================DEBUG ENTIRE GRID===================================
+
+        //Debug.Log("o[" + simplexArray2.GetUpperBound(0) + ", " + i + "] = " + other);
+        int h = 0;
+        for (int l = 0; l < minList.Count; l++)//i <= simplexArray.GetUpperBound(0); i++)
+        {
+            string outputLine = "";
+            for (int u = 0; u < mineral2DArray[0].Length; u++)
+            {
+                outputLine += mineral2DArray[l][u].ToString() + ", ";
+            }
+            Debug.Log("<color=green>" + h + ": </color>" + outputLine);
+            h++;
+        }
+
+
 
         foreach (Toggle tog in bothController.sampleToggles)
         {
@@ -1157,78 +1355,6 @@ public class CombiController : MonoBehaviour {
                 absoluteError[k] = -1;
 
 
-                //Initialise the Simplex Array with elementList (the columns from the CSV) and the minList (the list of minerals from the AMC)
-                //double[,] simplexArray = new double[elementList.Count + 1, minList.Count];
-
-                mineral2DArray = new double[assayHeaderList.Count + 1 + QXRDHeaderList.Count + 1][];
-
-
-                //for each of the CSV columns j...
-                //Debug.Log("For i <= " + (simplexArray2.GetUpperBound(1) - 1));
-                for (int j = 0; j < mineral2DArray.Length; j++)
-                {
-                    //Debug.Log("gt here " + j);
-                    mineral2DArray[j] = new double[minList.Count];
-                    //Debug.Log("mineral2DArray[j].Length = " + mineral2DArray[j].Length);
-                }
-
-
-                //and for each of the selected mineral compositions l...
-                //Debug.Log("For j <= " + simplexArray2.GetUpperBound(0));
-                for (int l = 0; l < minList.Count; l++)//i <= simplexArray.GetUpperBound(0); i++)
-                {
-
-                    double other = 100;
-
-                    int row = 0;
-                    for (int j = 0; j < assayHeaderList.Count; j++)
-                    {
-
-                        //EVERYTYHING BELOW HERE IS OLD===============================================
-                        CombiMineralComposition CMC;
-                        double val = 0;
-                        //Debug.Log("minlist[" + i + "] = " + minList[i]);
-                        //Debug.Log("elementList[" + j + "] = " + elementList[j]);
-
-                        //Get the AMC for the Mineral Composition or singular Element
-                        if (combiMineralDict.TryGetValue(minList[l], out CMC))
-                        {
-                            //Find the element value for the particular element within the AMC
-                            CMC.elementDictionary.TryGetValue(assayHeaderList[j], out val); //=================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                            mineral2DArray[j][l] = val;
-                            //Debug.Log("m[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
-                        }
-                        else if (combiElementDict.TryGetValue(minList[l], out CMC))
-                        {
-                            CMC.elementDictionary.TryGetValue(assayHeaderList[l], out val);
-                            mineral2DArray[j][l] = val;
-                            //Debug.Log("e[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
-                        }
-                        else 
-                            Debug.Log("failed");
-                        other -= val;
-                        row++;
-                    }
-
-                    mineral2DArray[row][l] = other;
-                    row++;
-                    int QXRDstartingPosition = row;
-                    for(int j = QXRDstartingPosition; j < QXRDHeaderList.Count+QXRDstartingPosition; j++)
-                    {
-                        //Debug.Log("if(" + QXRDHeaderList[j - QXRDstartingPosition] + " == " + minList[l]);
-                        if(QXRDHeaderList[j-QXRDstartingPosition] == minList[l])
-                        {
-                            mineral2DArray[row][l] = 100;
-
-                        }
-                        row++;
-                    }
-
-                }
-                
-                //Debug.Log("o[" + simplexArray2.GetUpperBound(0) + ", " + i + "] = " + other);
-
-                
 
 
                 //assaydataother and such
@@ -1750,4 +1876,19 @@ public class CombiController : MonoBehaviour {
 
         }
     }   //CalculateCombi()
+
+    bool ContainsNoCase(string source, string toCheck)
+    {
+        bool returnable = false;
+        if (source.IndexOf(toCheck, StringComparison.OrdinalIgnoreCase) >= 0)
+            returnable = true;
+        return returnable;
+    }
+    bool MatchesNoCase(string source, string toCheck)
+    {
+        bool returnable = false;
+        if (System.String.Equals(source, toCheck, System.StringComparison.OrdinalIgnoreCase))
+            returnable = true;
+        return returnable;
+    }
 }

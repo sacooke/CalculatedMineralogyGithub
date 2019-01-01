@@ -1105,7 +1105,6 @@ CT      -   constraint types, array[K]:
         {
             if (tog.isOn)
             {
-                Debug.Log("we start: " + toCSV);
                 int s = tog.gameObject.GetComponent<SampleListEntry>().index;
 
                 csvController.GetChemTestList(csvController.grid, s);
