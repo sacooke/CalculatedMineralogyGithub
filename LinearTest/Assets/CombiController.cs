@@ -57,6 +57,8 @@ public class CombiController : MonoBehaviour {
 
         AddAllCMCs();
 
+        //TestScript1.Doit();
+
     }
 	
 	// Update is called once per frame
@@ -92,389 +94,626 @@ public class CombiController : MonoBehaviour {
         string mineralComp;
         CombiMineralComposition CMC;
 
-        mineralComp = "Other(Quartz)";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 10.00;
+        bool isTesting = false;
 
-        mineralComp = "Feld_Alb_Ca-Na";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 10.41, 0, 0, 0, 0.38, 0, 0.05, 0.11, 0.01, 0, 0, 7.8, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 10.00;
+        if (!isTesting)
+        {
 
-        mineralComp = "Feld_Alb_Na";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 10.4, 0, 0, 0, 0, 0, 0.04, 0.24, 0.02, 0, 0, 8.21, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 10.00;
+            mineralComp = "Other(Quartz)";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 10.00;
 
-        mineralComp = "FeldsparK";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 9.817163594, 0, 0, 0, 0.12149786, 0, 0.0979097, 13.33707643, 0, 0, 0, 0.126114876, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 10.00;
+            mineralComp = "Feld_Alb_Ca-Na";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 10.41, 0, 0, 0, 0.38, 0, 0.05, 0.11, 0.01, 0, 0, 7.8, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 10.00;
 
-        mineralComp = "FeldsKBa";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 9.85, 0, 0, 0.25, 0, 0, 0.08, 13.5, 0, 0.03, 0, 0.31, 0, 0, 0, 0, 0.03, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Feld_Alb_Na";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 10.4, 0, 0, 0, 0, 0, 0.04, 0.24, 0.02, 0, 0, 8.21, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 10.00;
 
-        mineralComp = "Feld_Plag";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 15.3732, 0, 0, 0, 7.8908, 0, 0.199, 0.1423, -0.0012, -0.0065, 0, 3.8507, 0, 0, 0, 0, 0.002, 0, 0, 0 });
-        CMC.weight = 10.00;
+            mineralComp = "FeldsparK";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 9.817163594, 0, 0, 0, 0.12149786, 0, 0.0979097, 13.33707643, 0, 0, 0, 0.126114876, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 10.00;
 
-        mineralComp = "Carb_Calc";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 40.04426534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "FeldsKBa";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 9.85, 0, 0, 0.25, 0, 0, 0.08, 13.5, 0, 0.03, 0, 0.31, 0, 0, 0, 0, 0.03, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Carb_Ank";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 20.0185592, 0, 12.55342226, 0, 6.071985112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Feld_Plag";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 15.3732, 0, 0, 0, 7.8908, 0, 0.199, 0.1423, -0.0012, -0.0065, 0, 3.8507, 0, 0, 0, 0, 0.002, 0, 0, 0 });
+            CMC.weight = 10.00;
 
-        mineralComp = "Carb_Dol";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 21.73, 0, 0, 0, 13.18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Carb_Calc";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 40.04426534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Rhodonite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Carb_Ank";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 20.0185592, 0, 12.55342226, 0, 6.071985112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Siderite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Carb_Dol";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 21.73, 0, 0, 0, 13.18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Anhydrite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 29.44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23.55, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Rhodonite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "ChloriteFe";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 9.6754, 0, 0, 0, 0.1066, 0, 20.3305, 0.0161, 9.3554, 0.0787, 0, 0.0455, 0, 0, 0, 0, 0.0163, 0, 0, 0 });
-        CMC.weight = 5.00;
+            mineralComp = "Siderite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "ChloriteMg";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 10.0939, 0, 0, 0, 0.0377, 0, 10.5241, 0.0335, 14.3654, 0.0387, 0, 0.0293, 0, 0, 0, 0, 0.0267, 0, 0, 0 });
-        CMC.weight = 5.00;
+            mineralComp = "Anhydrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 29.44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23.55, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Muscovite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 19.5, 0, 0, 0, 0, 0, 0.08, 8.37, 0.05, 0.093, 0, 0.47, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "ChloriteFe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 9.6754, 0, 0, 0, 0.1066, 0, 20.3305, 0.0161, 9.3554, 0.0787, 0, 0.0455, 0, 0, 0, 0, 0.0163, 0, 0, 0 });
+            CMC.weight = 5.00;
 
-        mineralComp = "Musc_Phengite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 16.46, 0, 0, 0, 0, 0, 3.19, 9.14, 0.81, 0, 0, 0.08, 0, 0, 0, 0, 0.1, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "ChloriteMg";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 10.0939, 0, 0, 0, 0.0377, 0, 10.5241, 0.0335, 14.3654, 0.0387, 0, 0.0293, 0, 0, 0, 0, 0.0267, 0, 0, 0 });
+            CMC.weight = 5.00;
 
-        mineralComp = "BiotMg";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 7.5391, 0, 0, 0, 0.0156, 0, 7.9141, 7.8631, 11.8337, 0.052, 0, 0.0718, 0, 0, 0, 0, 1.0092, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Muscovite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 19.5, 0, 0, 0, 0, 0, 0.08, 8.37, 0.05, 0.093, 0, 0.47, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "BiotFe";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 7.3702, 0, 0, 0, 0.1426, 0, 13.0428, 7.3473, 8.2094, 0.0686, 0, 0.0769, 0, 0, 0, 0, 0.9201, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Musc_Phengite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 16.46, 0, 0, 0, 0, 0, 3.19, 9.14, 0.81, 0, 0, 0.08, 0, 0, 0, 0, 0.1, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Amph_tscher";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 7.33, 0, 0, 0, 7.7, 0, 13.72, 0.62, 5.76, 0.33, 0, 1.43, 0, 0, 0, 0, 0.74, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "BiotMg";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 7.5391, 0, 0, 0, 0.0156, 0, 7.9141, 7.8631, 11.8337, 0.052, 0, 0.0718, 0, 0, 0, 0, 1.0092, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Amph_Act";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 1.5633, 0, 0, 0, 8.7168, 0, 12.7119, 0.1038, 8.065, 0.0905, 0, 0.204, 0, 0, 0, 0, 0.0574, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "BiotFe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 7.3702, 0, 0, 0, 0.1426, 0, 13.0428, 7.3473, 8.2094, 0.0686, 0, 0.0769, 0, 0, 0, 0, 0.9201, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Amph_HorMg";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 3.42, 0, 0, 0, 8.63, 0, 11.26, 0.43, 8.03, 0.48, 0, 0.78, 0, 0, 0, 0, 0.53, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Amph_tscher";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 7.33, 0, 0, 0, 7.7, 0, 13.72, 0.62, 5.76, 0.33, 0, 1.43, 0, 0, 0, 0, 0.74, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Amph_Trem";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0.9295, 0, 0, 0, 9.3243, 0, 6.3783, 0.0668, 11.4574, 0.1231, 0, 0.2079, 0, 0, 0, 0, 0.0767, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Amph_Act";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 1.5633, 0, 0, 0, 8.7168, 0, 12.7119, 0.1038, 8.065, 0.0905, 0, 0.204, 0, 0, 0, 0, 0.0574, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Epid_LC";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 12.5294, 0, 0, 0, 16.5257, 0, 9.494, 0, 0.0194, 0.1798, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Amph_HorMg";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 3.42, 0, 0, 0, 8.63, 0, 11.26, 0.43, 8.03, 0.48, 0, 0.78, 0, 0, 0, 0, 0.53, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Epid_Clzt";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 17.8137858, 0, 0, 0, 17.63863053, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Amph_Trem";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0.9295, 0, 0, 0, 9.3243, 0, 6.3783, 0.0668, 11.4574, 0.1231, 0, 0.2079, 0, 0, 0, 0, 0.0767, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Magnetite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 72.34827478, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 2.00;
+            mineralComp = "Epid_LC";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 12.5294, 0, 0, 0, 16.5257, 0, 9.494, 0, 0.0194, 0.1798, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Apatite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 39.05798859, 0, 0, 0, 0, 0, 0, 0, 18.17529238, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Epid_Clzt";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 17.8137858, 0, 0, 0, 17.63863053, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Chalcopyrite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 34.5, 30.49887156, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Magnetite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 72.34827478, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 2.00;
 
-        mineralComp = "Pyrite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 46.59103012, 0, 0, 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Apatite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 39.05798859, 0, 0, 0, 0, 0, 0, 0, 18.17529238, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Spalerite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 2.86, 0, 0, 0, 0, 0, 0, 0, 33.06, 0, 0, 0, 64.07, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Chalcopyrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 34.5, 30.49887156, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "galena";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86.6, 13.4, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Pyrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 46.59103012, 0, 0, 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Uraninite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88.15, 0, 0 });
-        CMC.weight = 0.10;
+            mineralComp = "Spalerite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 2.86, 0, 0, 0, 0, 0, 0, 0, 33.06, 0, 0, 0, 64.07, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Arsenopyrite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 46, 0, 0, 0, 0, 34.3, 0, 0, 0, 0, 0, 0, 0, 19.7, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "galena";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86.6, 13.4, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Molybdenite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.9, 0, 0, 0, 40.1, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Uraninite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88.15, 0, 0 });
+            CMC.weight = 0.10;
 
-        mineralComp = "Chalcocite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 79.85, 0, 0, 0, 0, 0, 0, 0, 0, 20.15, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Arsenopyrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 46, 0, 0, 0, 0, 34.3, 0, 0, 0, 0, 0, 0, 0, 19.7, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Sphene/titanite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 20.44022825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24.46569855, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Molybdenite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.9, 0, 0, 0, 40.1, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Rutile";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.96494742, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Chalcocite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 79.85, 0, 0, 0, 0, 0, 0, 0, 0, 20.15, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Barite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 58.84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13.74, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Sphene/titanite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 20.44022825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24.46569855, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Kaolinite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 20.75, 0, 0, 0, 0.04, 0, 0.16, 0.17, 0.04, 0, 0, 0.07, 0, 0, 0, 0, 0.05, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Rutile";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.96494742, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Smectite/Montmorillonite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 9.44, 0, 0, 0, 0.49, 0, 2.23, 0.37, 1.87, 0.023, 0, 1.61, 0, 0, 0, 0, 0.04, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Barite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 58.84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13.74, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Jarosite";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 33.45, 7.81, 0, 0, 0, 0, 0, 0, 12.81, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Kaolinite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 20.75, 0, 0, 0, 0.04, 0, 0.16, 0.17, 0.04, 0, 0, 0.07, 0, 0, 0, 0, 0.05, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Tour_Fe";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 13.07, 0, 0, 0, 1.43, 0, 9.21, 0.04, 5.23, 0, 0, 1.26, 0, 0, 0, 0, 1.51, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Smectite/Montmorillonite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 9.44, 0, 0, 0, 0.49, 0, 2.23, 0.37, 1.87, 0.023, 0, 1.61, 0, 0, 0, 0, 0.04, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Tour_Mg";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 18.03, 0, 0, 0, 0.45, 0, 2.38, 0.01, 5.69, 0, 0, 1.46, 0, 0, 0, 0, 0.24, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Jarosite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 33.45, 7.81, 0, 0, 0, 0, 0, 0, 12.81, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Chrysocolla";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiMineralDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 2.05, 0, 0, 0, 0, 33.86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 1.00;
+            mineralComp = "Tour_Fe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 13.07, 0, 0, 0, 1.43, 0, 9.21, 0.04, 5.23, 0, 0, 1.26, 0, 0, 0, 0, 1.51, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Ag";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Tour_Mg";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 18.03, 0, 0, 0, 0.45, 0, 2.38, 0.01, 5.69, 0, 0, 1.46, 0, 0, 0, 0, 0.24, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "Al";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Chrysocolla";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 2.05, 0, 0, 0, 0, 33.86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
 
-        mineralComp = "As";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Ag";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Au";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Al";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Ba";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "As";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Ca";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Au";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Cu";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Ba";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Fe";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Ca";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "K";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Cu";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Mg";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Fe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Mn";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "K";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Mo";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Mg";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Na";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Mn";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "P";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Mo";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Pb";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Na";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "S";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "P";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Te";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Pb";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Ti";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "S";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "U";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Te";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Zn";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 });
-        CMC.weight = 0.01;
+            mineralComp = "Ti";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0 });
+            CMC.weight = 0.01;
 
-        mineralComp = "Zr";
-        CMC = new CombiMineralComposition(mineralComp);
-        combiElementDict.Add(mineralComp, CMC);
-        FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100 });
-        CMC.weight = 0.01;
+            mineralComp = "U";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0 });
+            CMC.weight = 0.01;
+
+            mineralComp = "Zn";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 });
+            CMC.weight = 0.01;
+
+            mineralComp = "Zr";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiElementDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100 });
+            CMC.weight = 0.01;
+        }
+        else
+        {
+
+            mineralComp = "Other/Quartz)";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 15.00;
+
+            mineralComp = "Feld_Alb_Na";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 10.4, 0, 0, 0, 0, 0, 0.04, 0.24, 0.02, 0, 0, 8.21, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 52.00;
+
+            mineralComp = "FeldsKBa";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 9.85, 0, 0, 0.25, 0, 0, 0.08, 13.5, 0, 0.03, 0, 0.31, 0, 0, 0, 0, 0.03, 0, 0, 0 });
+            CMC.weight = 23.00;
+
+            mineralComp = "Feld_Plag";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 15.3732, 0, 0, 0, 7.8908, 0, 0.199, 0.1423, -0.0012, -0.0065, 0, 3.8507, 0, 0, 0, 0, 0.002, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Carb_Calc";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 40.04426534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Carb_Ank";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 20.0185592, 0, 12.55342226, 0, 6.071985112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Anhydrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 29.44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23.55, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "ChloriteFe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 9.6754, 0, 0, 0, 0.1066, 0, 20.3305, 0.0161, 9.3554, 0.0787, 0, 0.0455, 0, 0, 0, 0, 0.0163, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Muscovite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 19.5, 0, 0, 0, 0, 0, 0.08, 8.37, 0.05, 0.093, 0, 0.47, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.50;
+
+            mineralComp = "BiotFe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 7.3702, 0, 0, 0, 0.1426, 0, 13.0428, 7.3473, 8.2094, 0.0686, 0, 0.0769, 0, 0, 0, 0, 0.9201, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "DOLOMITE";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 21.73, 0, 0, 0, 13.18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Amph_Act";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 1.5633, 0, 0, 0, 8.7168, 0, 12.7119, 0.1038, 8.065, 0.0905, 0, 0.204, 0, 0, 0, 0, 0.0574, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Amph_aHorFe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 5.0515, 0, 0, 0, 8.269, 0, 10.3061, 0.5901, 8.2338, 0.2274, 0, 0.8272, 0, 0, 0, 0, 0.4134, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Epid_LC";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 12.5294, 0, 0, 0, 16.5257, 0, 9.494, 0, 0.0194, 0.1798, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Magnetite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 72.34827478, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 1.00;
+
+            mineralComp = "Apatite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 39.05798859, 0, 0, 0, 0, 0, 0, 0, 18.17529238, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Chalcopyrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 34.5, 30.49887156, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Pyrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 46.59103012, 0, 0, 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "(NONE) Uraninite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88.15, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "(NONE) Arsenopyrite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 46, 0, 0, 0, 0, 34.3, 0, 0, 0, 0, 0, 0, 0, 19.7, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Jarosite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 33.45, 7.81, 0, 0, 0, 0, 0, 0, 12.81, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Molybdenite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.9, 0, 0, 0, 40.1, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "(NONE) Chalcocite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 79.85, 0, 0, 0, 0, 0, 0, 0, 0, 20.15, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "(NONE) Sphene/titanite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 20.44022825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24.46569855, 0, 0, 0 });
+            CMC.weight = 1.20;
+
+            mineralComp = "TALC_w";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 19.23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "(NONE) Barite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 58.84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13.74, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.10;
+
+            mineralComp = "Kaolinite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 20.75, 0, 0, 0, 0.04, 0, 0.16, 0.17, 0.04, 0, 0, 0.07, 0, 0, 0, 0, 0.05, 0, 0, 0 });
+            CMC.weight = 1.00;
+
+            mineralComp = "Smectite/Montmorillonite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 9.44, 0, 0, 0, 0.49, 0, 2.23, 0.37, 1.87, 0.023, 0, 1.61, 0, 0, 0, 0, 0.04, 0, 0, 0 });
+            CMC.weight = 5.00;
+
+
+            mineralComp = "Muscov_Phengite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 16.46, 0, 0, 0, 0, 0, 3.19, 9.14, 0.81, 0, 0, 0.08, 0, 0, 0, 0, 0.1, 0, 0, 0 });
+            CMC.weight = 0.50;
+            
+            mineralComp = "Tour_Fe";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 13.07, 0, 0, 0, 1.43, 0, 9.21, 0.04, 5.23, 0, 0, 1.26, 0, 0, 0, 0, 1.51, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+
+
+            mineralComp = "NonSulfideCu_Chrysocolla";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 2.05, 0, 0, 0, 0, 33.86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+
+
+
+
+
+            mineralComp = "Vermiculite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 8.13, 0, 0, 0, 0, 0, 5.6, 0, 13.62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 4.00;
+
+
+            mineralComp = "Andalusite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 33.3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+            mineralComp = "Pyrophyllite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 14.98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+
+
+            mineralComp = "Pyroxene";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 0, 0, 0, 0, 17.25, 0, 12.02, 0, 5.23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+            CMC.weight = 0.00;
+
+
+            mineralComp = "Anthophyllite";
+            CMC = new CombiMineralComposition(mineralComp);
+            combiMineralDict.Add(mineralComp, CMC);
+            FillCMCDatabase(CMC, new double[] { 0, 1.12, 0, 0, 0, 0.69, 0, 11.57, 0.04, 23.97, 0.25, 0, 0.24, 0, 0, 0, 0, 0.21, 0, 0, 0 });
+            CMC.weight = 0.00;
+        }
     }
 
     public void FillCMCDatabase(CombiMineralComposition CMC, double[] val)
@@ -735,7 +974,7 @@ public class CombiController : MonoBehaviour {
                     int optionVal = 0;
                     foreach(Dropdown.OptionData option in QLE.dropdown.options)
                     {
-                        if (ContainsNoCase(option.text, QLE.MineralComp.Substring(0, 3)))
+                        if (ContainsNoCase(option.text, QLE.MineralComp.Substring(0, 6)))
                         {
                             //Debug.Log(option.text + " has first three letters of " + QLE.MineralComp.Substring(0, 3));
                             QLE.dropdown.value = optionVal;
@@ -981,7 +1220,7 @@ public class CombiController : MonoBehaviour {
         bothController.QXRDMenu.SetActive(false);
 
         string fullExportString = "";
-        string columnNames = "Sample No.,Score";
+        string columnNames = "Sample No.";
 
 
         List<string> minList = new List<string>();
@@ -996,6 +1235,7 @@ public class CombiController : MonoBehaviour {
         List<double> assayAbsoluteErrorList = new List<double>();
         List<double> QXRDAbsoluteErrorList = new List<double>();
         double result;
+        int numberOfMineralComps = 0;
 
         foreach (Toggle tog in bothController.mineralCompScrollView.transform.GetComponentsInChildren<Toggle>())
         {
@@ -1003,17 +1243,19 @@ public class CombiController : MonoBehaviour {
             {
                 string minString = tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp;
                 minList.Add(minString);
-                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : 1);
+                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : 1); //If a weight for the mineral doesnt exist, default to 1
                 columnNames += "," + minString;
+                numberOfMineralComps++;
             }
         }
+        columnNames += ",Residual SSQ,degreesFreedom,probability";
         foreach (Toggle tog in bothController.elementCompScrollView.transform.GetComponentsInChildren<Toggle>())
         {
             if (tog.isOn)
             {
                 string elemString = tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp;
                 minList.Add(elemString);
-                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : -100);
+                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : -100); //If a weight for the mineral doesnt exist, default to -100
                 columnNames += "," + elemString;
             }
         }
@@ -1072,7 +1314,7 @@ public class CombiController : MonoBehaviour {
         //populate compQXRDIndexList with all of the dropdown values
         foreach (QXRDListEntry QLE in QXRDScrollview.transform.GetComponentsInChildren<QXRDListEntry>())
         {
-            Debug.Log("adding " + (QLE.dropdown.value-1));
+            //Debug.Log("adding " + (QLE.dropdown.value-1));
             compQXRDIndexList.Add(QLE.dropdown.value-1);
         }
 
@@ -1096,6 +1338,16 @@ public class CombiController : MonoBehaviour {
 
         //and for each of the selected mineral compositions l...
         //Debug.Log("For j <= " + simplexArray2.GetUpperBound(0));
+
+        for (int q = 0; q < minList.Count; q++)
+        {
+            //Debug.Log("minList[" + q + "] = " + minList[q]);
+        }
+        for (int q = 0; q < assayHeaderList.Count; q++)
+        {
+            //Debug.Log("assayHeaderList[" + q + "] = " + assayHeaderList[q]);
+        }
+
         for (int l = 0; l < minList.Count; l++)//i <= simplexArray.GetUpperBound(0); i++)
         {
 
@@ -1121,7 +1373,10 @@ public class CombiController : MonoBehaviour {
                 }
                 else if (combiElementDict.TryGetValue(minList[l], out CMC))
                 {
-                    CMC.elementDictionary.TryGetValue(assayHeaderList[l], out val);
+                    //Debug.Log("l = " + l);
+                    //Debug.Log("trying to get value: " + assayHeaderList[j]);
+                    CMC.elementDictionary.TryGetValue(assayHeaderList[j], out val);
+                    //Debug.Log("got: " + val);
                     mineral2DArray[j][l] = val;
                     //Debug.Log("e[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
                 }
@@ -1134,22 +1389,27 @@ public class CombiController : MonoBehaviour {
             mineral2DArray[row][l] = other;
             row++;
             int QXRDstartingPosition = row;
-            for (int j = QXRDstartingPosition; j < QXRDHeaderList.Count + QXRDstartingPosition; j++)
+            if (l < numberOfMineralComps)
             {
-                //Debug.Log("if(" + QXRDHeaderList[j - QXRDstartingPosition] + " == " + minList[l]);
-                Debug.Log("if(" + compQXRDIndexList[row - QXRDstartingPosition] + " == " + (j - QXRDstartingPosition));
-                if (compQXRDIndexList[row - QXRDstartingPosition] == j - QXRDstartingPosition)
+                for (int j = QXRDstartingPosition; j < QXRDHeaderList.Count + QXRDstartingPosition; j++)
                 {
-                    Debug.Log("min2DArray[" + row + "][" + l + "] = 100 because " + (row - QXRDstartingPosition) + " = " + (j - QXRDstartingPosition));
-                    mineral2DArray[row][l] = 69;
-                }/*
+                    //Debug.Log("if(" + QXRDHeaderList[j - QXRDstartingPosition] + " == " + minList[l]);
+                    //Debug.Log("if " + l + " == " + j + " - " + QXRDstartingPosition + "(" + (j - QXRDstartingPosition) + ")");
+                    //Debug.Log("if compQXRDIndexList[" + l + "] (" + compQXRDIndexList[l] + ") == " + (j - QXRDstartingPosition));
+                    if (compQXRDIndexList[l] == j - QXRDstartingPosition)//j - QXRDstartingPosition && l == compQXRDIndexList[l])//.index)//if (compQXRDIndexList[row - QXRDstartingPosition] == j - QXRDstartingPosition)//////////SOMETHING OUT OF RANGE
+                    {
+                        //Debug.Log("min2DArray[" + row + "][" + l + "] = 69");// because " + (row - QXRDstartingPosition) + " = " + (j - QXRDstartingPosition));
+                        mineral2DArray[row][l] = 100;
+                    }/*
                         if(QXRDHeaderList[j-QXRDstartingPosition] == minList[l])
                         {
                             mineral2DArray[row][l] = 100;
 
                         }*/
-                row++;
+                    row++;
+                }
             }
+            mineral2DArray[row][l] = 100;
 
         }
 
@@ -1157,19 +1417,23 @@ public class CombiController : MonoBehaviour {
 
         //Debug.Log("o[" + simplexArray2.GetUpperBound(0) + ", " + i + "] = " + other);
         int h = 0;
-        for (int l = 0; l < minList.Count; l++)//i <= simplexArray.GetUpperBound(0); i++)
+        Debug.Log("mineral2DArray length 1 = " + mineral2DArray.Length);
+        Debug.Log("mineral2DArray length 2 = " + mineral2DArray[0].Length);
+        //i <= simplexArray.GetUpperBound(0); i++)
+        for (int u = 0; u < mineral2DArray.Length; u++)
         {
             string outputLine = "";
-            for (int u = 0; u < mineral2DArray[0].Length; u++)
+            for (int l = 0; l < minList.Count; l++)
             {
-                outputLine += mineral2DArray[l][u].ToString() + ", ";
+                //Debug.Log("1 = " + u + ", 2 = " + l);
+                outputLine += mineral2DArray[u][l].ToString() + ", ";
             }
             Debug.Log("<color=green>" + h + ": </color>" + outputLine);
             h++;
         }
 
 
-
+        //Now that we've set up all the universal parameters, we can start calculating
         foreach (Toggle tog in bothController.sampleToggles)
         {
             if (tog.isOn)
@@ -1333,6 +1597,7 @@ public class CombiController : MonoBehaviour {
                     k++;
                 }
                 relativeError[k] = -1;
+                k++;
                 foreach (double error in QXRDRelativeErrorList)
                 {
                     relativeError[k] = error;
@@ -1347,6 +1612,7 @@ public class CombiController : MonoBehaviour {
                     k++;
                 }
                 absoluteError[k] = -1;
+                k++;
                 foreach (double error in QXRDAbsoluteErrorList)
                 {
                     absoluteError[k] = error;
@@ -1354,6 +1620,11 @@ public class CombiController : MonoBehaviour {
                 }
                 absoluteError[k] = -1;
 
+                Debug.Log("relativeError: " + DebugWholeArray(relativeError) + " (" + relativeError.Length + ")");
+                Debug.Log("absoluteError: " + DebugWholeArray(absoluteError) + " (" + absoluteError.Length + ")");
+                Debug.Log("X: " + DebugWholeArray(x) + " (" + x.Length + ")");
+                Debug.Log("bndl: " + DebugWholeArray(bndl) + " (" + bndl.Length + ")");
+                Debug.Log("bndu: " + DebugWholeArray(bndu) + " (" + bndu.Length + ")");
 
 
 
@@ -1460,6 +1731,30 @@ public class CombiController : MonoBehaviour {
         bothController.loadingMenu.SetActive(false);
         bothController.sharedMenu.SetActive(true);
         yield return null;
+    }
+
+    public string DebugWholeArray(string[] array)
+    {
+
+        string outputLine = "";
+        for (int l = 0; l < array.Length; l++)
+        {
+            //Debug.Log("1 = " + u + ", 2 = " + l);
+            outputLine += array[l].ToString() + ", ";
+        }
+        return outputLine;
+    }
+
+    public string DebugWholeArray(double[] array)
+    {
+
+        string outputLine = "";
+        for (int l = 0; l < array.Length; l++)
+        {
+            //Debug.Log("1 = " + u + ", 2 = " + l);
+            outputLine += array[l].ToString() + ", ";
+        }
+        return outputLine;
     }
 
     public void SetSampleValuesList(double[] sampleArray)
@@ -1601,12 +1896,14 @@ public class CombiController : MonoBehaviour {
             if (relativeError[acrossCounter] != -1)
             {   //combinedDoubleList = the list of values provided by each line of the CSV
                 fi[acrossCounter] = (combinedDoubleList[acrossCounter] - (0.01 * product)) / ((combinedDoubleList[acrossCounter] * (relativeError[acrossCounter] / 100) + absoluteError[acrossCounter]));
-                //Debug.Log("<color=green>fi[" + acrossCounter + "] = (" + combiSampleValues[acrossCounter] + " - (0.01 * " + product + ")) / ((" + combiSampleValues[acrossCounter] + " * " + relativeError[acrossCounter] + " / 100) + " + absoluteError[acrossCounter] + ")) = " + fi[acrossCounter] + "</color>");
+                //if(acrossCounter<1)
+                //    Debug.Log("<color=green>fi[" + acrossCounter + "] = (" + combiSampleValues[acrossCounter] + " - (0.01 * " + product + ")) / ((" + combiSampleValues[acrossCounter] + " * " + relativeError[acrossCounter] + " / 100) + " + absoluteError[acrossCounter] + ")) = " + fi[acrossCounter] + "</color>");
             }   //ONLY GOES UP TO fi[35] THATS WRONG
             else
             {
                 fi[acrossCounter] = (combinedDoubleList[acrossCounter] - (0.01 * product));
-                //Debug.Log("<color=yellow>fi[" + acrossCounter + "] = (" + combiSampleValues[acrossCounter] + " - (0.01 * " + product + ")) = " + fi[acrossCounter] + "</color>");
+                //if(acrossCounter<1)
+                //    Debug.Log("<color=yellow>fi[" + acrossCounter + "] = (" + combiSampleValues[acrossCounter] + " - (0.01 * " + product + ")) = " + fi[acrossCounter] + "</color>");
             }
 
         } //cahnge dimensionality of fi to the length of fi and not x, then try that out i guess
@@ -1626,7 +1923,7 @@ public class CombiController : MonoBehaviour {
         // output = prob. x value occurred by chance.
         // ACM 299.
         if (x <= 0.0 || df < 1)
-            throw new Exception("Bad arg in ChiSquarePval()");
+            throw new Exception("Bad arg in ChiSquarePval() x = " + x + ", df = " + df);
         double a = 0.0; // 299 variable names
         double y = 0.0;
         double s = 0.0;

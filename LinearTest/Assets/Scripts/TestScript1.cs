@@ -131,14 +131,14 @@ public class TestScript1 : MonoBehaviour {
         {
             firstArray += d.ToString() + ", ";
         }
-        Debug.Log("arrayA: " + firstArray);
+        //Debug.Log("arrayA: " + firstArray);
 
         string secondArray = "";
         foreach (double d in arrayB)
         {
             secondArray += d.ToString() + ", ";
         }
-        Debug.Log("arrayB: " + secondArray);
+        //Debug.Log("arrayB: " + secondArray);
 
         double result = 0;
         for (int i = 0; i < arrayA.Length; i++)
@@ -227,16 +227,18 @@ public class TestScript1 : MonoBehaviour {
 
         for (int acrossCounter = 0; acrossCounter < fi.Length; acrossCounter++)
         {
-            double product = SumProduct(x, minerals[acrossCounter]);
+                double product = SumProduct(x, minerals[acrossCounter]);
             if (relativeError[acrossCounter] != -1)
             {
                 fi[acrossCounter] = (samples[acrossCounter] - (0.01 * product)) / ((samples[acrossCounter] * (relativeError[acrossCounter] / 100) + absoluteError[acrossCounter]));
-                Debug.Log("<color=green>fi[" + acrossCounter + "] = (" + samples[acrossCounter] + " - (0.01 * " + product + ")) / ((" + samples[acrossCounter] + " * " + relativeError[acrossCounter] + " / 100) + " + absoluteError[acrossCounter] + ")) = " + fi[acrossCounter] + "</color>");
+                if (acrossCounter < 1)
+                    Debug.Log("<color=green>fi[" + acrossCounter + "] = (" + samples[acrossCounter] + " - (0.01 * " + product + ")) / ((" + samples[acrossCounter] + " * " + relativeError[acrossCounter] + " / 100) + " + absoluteError[acrossCounter] + ")) = " + fi[acrossCounter] + "</color>");
             }   //ONLY GOES UP TO fi[35] THATS WRONG
             else
             {
                 fi[acrossCounter] = (samples[acrossCounter] - (0.01 * product));
-                Debug.Log("<color=yellow>fi[" + acrossCounter + "] = (" + samples[acrossCounter] + " - (0.01 * " + product + ")) = " + fi[acrossCounter] + "</color>");
+                if(acrossCounter<1)
+                    Debug.Log("<color=yellow>fi[" + acrossCounter + "] = (" + samples[acrossCounter] + " - (0.01 * " + product + ")) = " + fi[acrossCounter] + "</color>");
             }
 
         } //cahnge dimensionality of fi to the length of fi and not x, then try that out i guess
@@ -289,6 +291,16 @@ public class TestScript1 : MonoBehaviour {
         Debug.Log("LENGTH OF SAMPLES: " + samples.Length);
         Debug.Log("LENGTH OF X: " + x.Length);
 
+        double[] relativeError = { 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, 3.00, -1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, -1 };
+        double[] absoluteError = { 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, -1, 0.50, 0.50, 0.50, 0.50, 0.10, 0.10, 0.10, 0.50, 0.50, 0.50, 0.10, 0.50, 0.10, 0.10, 0.50, 0.50, 0.50, 0.50, 0.10, 0.50, 0.10, 0.50, 0.50, 0.50, 0.10, 0.10, 0.10, 0.10, 0.10, -1 };
+
+
+        Debug.Log("relativeError: " + DebugWholeArray(relativeError) + " (" + relativeError.Length + ")");
+        Debug.Log("absoluteError: " + DebugWholeArray(absoluteError) + " (" + absoluteError.Length + ")");
+        Debug.Log("X: " + DebugWholeArray(x) + " (" + x.Length + ")");
+        Debug.Log("bndl: " + DebugWholeArray(bndl) + " (" + bndl.Length + ")");
+        Debug.Log("bndu: " + DebugWholeArray(bndu) + " (" + bndu.Length + ")");
+
         alglib.minlmcreatev(samples.Length, x, 0.0001, out state);
         alglib.minlmsetbc(state, bndl, bndu);
         alglib.minlmsetcond(state, epsx, maxits);
@@ -299,6 +311,29 @@ public class TestScript1 : MonoBehaviour {
         Debug.Log("thething: " + alglib.ap.format(x, 2)); // EXPECTED: [-3,+3]
         //System.Console.ReadLine();
         return 0;
+    }
+    public static string DebugWholeArray(string[] array)
+    {
+
+        string outputLine = "";
+        for (int l = 0; l < array.Length; l++)
+        {
+            //Debug.Log("1 = " + u + ", 2 = " + l);
+            outputLine += array[l].ToString() + ", ";
+        }
+        return outputLine;
+    }
+
+    public static string DebugWholeArray(double[] array)
+    {
+
+        string outputLine = "";
+        for (int l = 0; l < array.Length; l++)
+        {
+            //Debug.Log("1 = " + u + ", 2 = " + l);
+            outputLine += array[l].ToString() + ", ";
+        }
+        return outputLine;
     }
     public static void function1_fvec2(double[] x, double[] fi, object obj)
     {
