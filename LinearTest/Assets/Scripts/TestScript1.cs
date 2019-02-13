@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,8 @@ public class TestScript1 : MonoBehaviour {
     public LPPNamespace.LPP lpp;
 
     public CSVReader csvController = null;
+
+    public Dropdown datasetDropdown;
 
     // Use this for initialization
     void Start () {
@@ -48,6 +51,25 @@ public class TestScript1 : MonoBehaviour {
 
     void ExtractAndLoadCSV(string filename, bool isAssay)
     {
+
+        string path = Application.dataPath;
+        if (Application.platform == RuntimePlatform.OSXPlayer)
+        {
+            path += "/../../";
+        }
+        else if (Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+            path += "/../";
+        }
+        path += "/Mineral Tables/";
+        DirectoryInfo dir = new DirectoryInfo(path);
+        FileInfo[] info = dir.GetFiles("*.csv");
+        List<string> datasetStrings = new List<string>();
+        foreach (FileInfo f in info)
+        {
+            datasetStrings.Add(f.Name);
+        }
+        datasetDropdown.AddOptions(datasetStrings);
         //turn off UI
         export.SetFilenameString(filename);
         StartCoroutine(ImportSamples(filename, isAssay));
@@ -61,10 +83,11 @@ public class TestScript1 : MonoBehaviour {
         csvController.csvFile = fileContentString;
         if (fileContentString != null && fileContentString.Length > 0 && fileContentString != "null")
         {
-            csvController.InitialiseGrid(isAssay);
+            csvController.InitialiseGrid(isAssay); 
         }
         else
         {
+            Debug.Log("Error: File Content is null");
             //DisplayErrorMessage(errorMessage);
         }
 

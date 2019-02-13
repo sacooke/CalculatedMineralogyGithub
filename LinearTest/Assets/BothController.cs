@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
@@ -30,6 +31,7 @@ public class BothController : MonoBehaviour {
     public GameObject mineralCompScrollView;
     public GameObject elementCompScrollView;
     public GameObject combiColumnScrollView;
+    public Dropdown datasetDropdown;
 
     public GameObject mineralCompListPrefab;
 
@@ -46,10 +48,23 @@ public class BothController : MonoBehaviour {
     public Slider progressBar;
     public Text progressText;
 
+    string path;
+
     // Use this for initialization
     void Start()
     {
-        
+        datasetDropdown.onValueChanged.AddListener(delegate { ChangeDataset(); });
+
+        path = Application.dataPath;
+        if (Application.platform == RuntimePlatform.OSXPlayer)
+        {
+            path += "/../../";
+        }
+        else if (Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+            path += "/../";
+        }
+        path += "/Mineral Tables/";
     }
     
     // Update is called once per frame
@@ -200,6 +215,56 @@ public class BothController : MonoBehaviour {
                 i++;
             }
         }
+    }
+
+    public void ChangeDataset()
+    {
+        Debug.Log("name = " + datasetDropdown.options[datasetDropdown.value].text);
+        StartCoroutine(FastDownload(path + datasetDropdown.options[datasetDropdown.value].text, fileContents => fileContentString = fileContents));
+        string[,] datasetGrid = CSVReader.SplitCsvGrid(fileContentString);
+    }
+
+    public class MineralComposition
+    {
+        public string mineral { get; set; }
+        public double weight { get; set; }
+        public double startPoint { get; set; }
+
+        public MineralComposition(string mineral, double weight = 1, double startPoint = 1)
+        {
+            this.mineral = mineral;
+            this.weight = weight;
+            this.startPoint = startPoint;
+        }
+
+        public Dictionary<string, double> elementDictionary = new Dictionary<string, double>();
+
+        public double GetOtherValue()
+        {
+            double other = 100.0;
+            foreach (double val in elementDictionary.Values)
+            {
+                other -= val;
+            }
+            return other;
+        }
+    }
+
+    private IEnumerator FastDownload(string url, System.Action<string> result)
+    {
+        string s = "null";
+        try
+        {
+            s = File.ReadAllText(url).TrimEnd('\r', '\n');
+
+        }
+        catch (IOException e)
+        {
+            Debug.Log("<color=red>Error: " + e.GetType().Name + ": " + e.Message + "</color>");
+            //errorMessage = "Error! " + e.GetType().Name + ": " + e.Message;
+        }
+        yield return null;
+        result(s);
     }
 
     public void SetAllMineralWeights()

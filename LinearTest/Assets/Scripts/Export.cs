@@ -266,7 +266,7 @@ public class Export : MonoBehaviour
 
     public void WriteToFile(string filename)
     {
-        if (!File.Exists(filename))
+        if (true)//!File.Exists(filename))
         {
             // Create a file to write to.
             using (StreamWriter sw = File.CreateText(filename))

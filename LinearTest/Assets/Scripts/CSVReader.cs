@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using UnityEngine.UI;
 
 public class CSVReader : MonoBehaviour
 {
@@ -95,8 +96,6 @@ public class CSVReader : MonoBehaviour
         grid = SplitCsvGrid(csvFile);
 
         int gridHeight = 1 + grid.GetUpperBound(1);
-
-
 
         bool CompilingDatabase = false;
         if (CompilingDatabase)
