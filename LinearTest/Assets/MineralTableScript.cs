@@ -35,38 +35,14 @@ public class MineralTableScript : MonoBehaviour {
     public InputField MineralCompField;
 
     public List<InputField> allFields;
+    bool fieldListFilled = false;
 
     Color darkGreen = new Color(0f, 171 / 255f, 44 / 255f);
 
     // Use this for initialization
     void Start ()
     {
-        allFields.Add(AgField);
-        allFields.Add(AlField);
-        allFields.Add(AsField);
-        allFields.Add(AuField);
-        allFields.Add(BaField);
-        allFields.Add(CaField);
-        allFields.Add(CuField);
-        allFields.Add(FeField);
-        allFields.Add(KField);
-        allFields.Add(MgField);
-        allFields.Add(MnField);
-        allFields.Add(MoField);
-        allFields.Add(NaField);
-        allFields.Add(PField);
-        allFields.Add(PbField);
-        allFields.Add(SField);
-        allFields.Add(TeField);
-        allFields.Add(TiField);
-        allFields.Add(UField);
-        allFields.Add(ZnField);
-        allFields.Add(ZrField);
-
-        foreach(InputField inputField in allFields)
-        {
-            inputField.onEndEdit.AddListener(delegate { calcOther(); });
-        }
+        AddAllFields();
     }
 	
 	// Update is called once per frame
@@ -74,7 +50,43 @@ public class MineralTableScript : MonoBehaviour {
 	
 	}
 
-    void calcOther()
+    public void AddAllFields()
+    {
+        if (fieldListFilled == false)
+        {
+            allFields.Add(AgField);
+            allFields.Add(AlField);
+            allFields.Add(AsField);
+            allFields.Add(AuField);
+            allFields.Add(BaField);
+            allFields.Add(CaField);
+            allFields.Add(CuField);
+            allFields.Add(FeField);
+            allFields.Add(KField);
+            allFields.Add(MgField);
+            allFields.Add(MnField);
+            allFields.Add(MoField);
+            allFields.Add(NaField);
+            allFields.Add(PField);
+            allFields.Add(PbField);
+            allFields.Add(SField);
+            allFields.Add(TeField);
+            allFields.Add(TiField);
+            allFields.Add(UField);
+            allFields.Add(ZnField);
+            allFields.Add(ZrField);
+        }
+
+        foreach (InputField inputField in allFields)
+        {
+            inputField.onEndEdit.AddListener(delegate { calcOther(); });
+        }
+
+        fieldListFilled = true;
+
+    }
+
+    public void calcOther()
     {
         double otherVal = 100;
         bool isValid = true;

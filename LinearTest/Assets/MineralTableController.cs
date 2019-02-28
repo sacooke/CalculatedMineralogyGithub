@@ -6,6 +6,7 @@ using System.IO;
 
 public class MineralTableController : MonoBehaviour {
 
+    public FileChooser fileChooser;
     public GameObject TableEntryPrefab;
     public Transform Content;
     public List<MineralTableScript> mineralTableList;
@@ -14,6 +15,8 @@ public class MineralTableController : MonoBehaviour {
     public GameObject CSVOverwritePanel;
     public GameObject CSVFilenamePanel;
     public GameObject tableMenu;
+    public GameObject tableErrorPanel;
+    public Text tableErrorText;
     public GameObject mainMenu;
 
     public InputField CSVFilenameInputField;
@@ -22,9 +25,11 @@ public class MineralTableController : MonoBehaviour {
 
     string tempFilename;
     string path;
+    private string fileContentString;
+    string[,] importedDatasetGrid = { { "null" } };
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 
         path = Application.dataPath;
         if (Application.platform == RuntimePlatform.OSXPlayer)
@@ -51,13 +56,20 @@ public class MineralTableController : MonoBehaviour {
 	
 	}
 
-    public void CreateTableEntry()
+    public void PressAddMTSButton()
+    {
+        CreateTableEntry();
+    }
+
+    public MineralTableScript CreateTableEntry()
     {
         GameObject g = GameObject.Instantiate(TableEntryPrefab);
         g.transform.SetParent(Content);
-        mineralTableList.Add(g.GetComponent<MineralTableScript>());
+        MineralTableScript mts = g.GetComponent<MineralTableScript>();
+        mineralTableList.Add(mts);
         g.transform.localScale = new Vector3(1, 1, 1);
-        g.GetComponent<MineralTableScript>().controller = this;
+        mts.controller = this;
+        return mts;
     }
 
     public void DestroyTableEntry(MineralTableScript mts)
@@ -65,14 +77,24 @@ public class MineralTableController : MonoBehaviour {
         mineralTableList.Remove(mts);
     }
 
+    public void DestroyAllListEntries()
+    {
+        
+        for (int i = mineralTableList.Count - 1; i >= 0; i--)
+        {
+            MineralTableScript mts = mineralTableList[i];
+            DestroyTableEntry(mineralTableList[i]);
+
+            mts.DeleteThis();
+        }
+        nameField.text = "";
+        CSVFilenameInputField.text = "";
+
+    }
+
     public void ReturnToMainMenu()
     {
-        foreach(MineralTableScript mts in mineralTableList)
-        {
-            DestroyTableEntry(mts);
-            nameField.text = "";
-            CSVFilenameInputField.text = "";
-        }
+        DestroyAllListEntries();
         tableMenu.SetActive(false);
         mainMenu.SetActive(true);
     }
@@ -248,13 +270,13 @@ public class MineralTableController : MonoBehaviour {
             else
                 outputLine += "0,";
             if (mts.ZrField.text != "")
-                outputLine += (mts.ZrField.text);
+                outputLine += (mts.ZrField.text + ",");
             else
-                outputLine += "0";
+                outputLine += "0,";
             if (mts.AssayWeightField.text != "")
-                outputLine += (mts.AssayWeightField.text);
+                outputLine += (mts.AssayWeightField.text + ",");
             else
-                outputLine += "0";
+                outputLine += "0,";
             if (mts.WLSStartField.text != "")
                 outputLine += (mts.WLSStartField.text);
             else
@@ -269,5 +291,244 @@ public class MineralTableController : MonoBehaviour {
             sw.Write(export.sb.ToString());
         }*/
 
+    }
+
+
+    public void OpenFileDialog()
+    {
+        fileChooser.setup(FileChooser.OPENSAVE.OPEN, "csv");
+        fileChooser.callbackYes = delegate (string filename) {
+            fileChooser.gameObject.SetActive(false);
+            if (File.Exists(filename))
+            {
+                LoadDatasetCSV(filename);
+
+            }
+            else
+            {
+                Debug.Log("The file does not exist: " + filename);
+            }
+        };
+        fileChooser.callbackNo = delegate () {
+            fileChooser.gameObject.SetActive(false);
+        };
+    }
+
+    public void LoadDatasetCSV(string filename)
+    {
+        StartCoroutine(ImportSamples(filename));
+
+    }
+
+
+    public void VerifyCSV(string filename)
+    {
+        //export.SetFilenameString(filename);
+        Debug.Log("upper bound length = " + importedDatasetGrid.GetUpperBound(0));
+        if(importedDatasetGrid.GetUpperBound(0) != 24)
+        {
+            ShowTableError("csv file does not contain the correct amount of columns");
+            return;
+        }
+
+        if (importedDatasetGrid[0, 0] != "Mineral Composition")
+        {
+            ShowTableError("csv file does not contain a 'Mineral Composition' column");
+            return;
+        }
+        if (importedDatasetGrid[1, 0] != "Ag")
+        {
+            ShowTableError("csv file does not contain a 'Ag' column");
+            return;
+        }
+        if (importedDatasetGrid[2, 0] != "Al")
+        {
+            ShowTableError("csv file does not contain a 'Al' column");
+            return;
+        }
+        if (importedDatasetGrid[3, 0] != "As")
+        {
+            ShowTableError("csv file does not contain a 'As' column");
+            return;
+        }
+        if (importedDatasetGrid[4, 0] != "Au")
+        {
+            ShowTableError("csv file does not contain a 'Au' column");
+            return;
+        }
+        if (importedDatasetGrid[5, 0] != "Ba")
+        {
+            ShowTableError("csv file does not contain a 'Ba' column");
+            return;
+        }
+        if (importedDatasetGrid[6, 0] != "Ca")
+        {
+            ShowTableError("csv file does not contain a 'Ca' column");
+            return;
+        }
+        if (importedDatasetGrid[7, 0] != "Cu")
+        {
+            ShowTableError("csv file does not contain a 'Cu' column");
+            return;
+        }
+        if (importedDatasetGrid[8, 0] != "Fe")
+        {
+            ShowTableError("csv file does not contain a 'Fe' column");
+            return;
+        }
+        if (importedDatasetGrid[9, 0] != "K")
+        {
+            ShowTableError("csv file does not contain a 'K' column");
+            return;
+        }
+        if (importedDatasetGrid[10, 0] != "Mg")
+        {
+            ShowTableError("csv file does not contain a 'Mg' column");
+            return;
+        }
+        if (importedDatasetGrid[11, 0] != "Mn")
+        {
+            ShowTableError("csv file does not contain a 'Mn' column");
+            return;
+        }
+        if (importedDatasetGrid[12, 0] != "Mo")
+        {
+            ShowTableError("csv file does not contain a 'Mo' column");
+            return;
+        }
+        if (importedDatasetGrid[13, 0] != "Na")
+        {
+            ShowTableError("csv file does not contain a 'Na' column");
+            return;
+        }
+        if (importedDatasetGrid[14, 0] != "P")
+        {
+            ShowTableError("csv file does not contain a 'P' column");
+            return;
+        }
+        if (importedDatasetGrid[15, 0] != "Pb")
+        {
+            ShowTableError("csv file does not contain a 'Pb' column");
+            return;
+        }
+        if (importedDatasetGrid[16, 0] != "S")
+        {
+            ShowTableError("csv file does not contain a 'S' column");
+            return;
+        }
+        if (importedDatasetGrid[17, 0] != "Te")
+        {
+            ShowTableError("csv file does not contain a 'Te' column");
+            return;
+        }
+        if (importedDatasetGrid[18, 0] != "Ti")
+        {
+            ShowTableError("csv file does not contain a 'Ti' column");
+            return;
+        }
+        if (importedDatasetGrid[19, 0] != "U")
+        {
+            ShowTableError("csv file does not contain a 'U' column");
+            return;
+        }
+        if (importedDatasetGrid[20, 0] != "Zn")
+        {
+            ShowTableError("csv file does not contain a 'Zn' column");
+            return;
+        }
+        if (importedDatasetGrid[21, 0] != "Zr")
+        {
+            ShowTableError("csv file does not contain a 'Zr' column");
+            return;
+        }
+        if (importedDatasetGrid[22, 0] != "Assay Weight")
+        {
+            ShowTableError("csv file does not contain a 'Assay Weight' column");
+            return;
+        }
+        if (importedDatasetGrid[23, 0] != "WLS Starting Point")
+        {
+            ShowTableError("csv file does not contain a 'WLS Starting Point' column");
+            return;
+        }
+        /*
+        for (int i = 0; i < importedDatasetGrid.GetUpperBound(0); i++)
+        {
+            Debug.Log("upperbound " + i + " = " + importedDatasetGrid[i, 0]);
+
+        }*/
+        DestroyAllListEntries();
+        string csvName = filename.Substring(filename.LastIndexOf('\\') + 1, filename.Length - filename.LastIndexOf('\\') - 1 - 4);
+        Debug.Log("CSVNAME = " + csvName);
+        nameField.text = csvName;
+        for (int i = 1; i <= importedDatasetGrid.GetUpperBound(1); i++)
+        {
+            MineralTableScript mts = CreateTableEntry();
+            mts.AddAllFields();
+            mts.MineralCompField.text = importedDatasetGrid[0, i];
+            int j = 1;
+            foreach(InputField field in mts.allFields)
+            {
+                field.text = importedDatasetGrid[j, i];
+                j++;
+            }
+            mts.AssayWeightField.text = importedDatasetGrid[j, i];
+            mts.WLSStartField.text = importedDatasetGrid[j+1, i];
+            mts.calcOther();
+        }
+
+    }
+    private IEnumerator ImportSamples(string url)
+    {
+        //FilenameText.text = url.Substring(url.LastIndexOf("\\") + 1);
+        yield return StartCoroutine(FastDownload(url, fileContents => fileContentString = fileContents));
+        Debug.Log(fileContentString);
+        if (fileContentString != null && fileContentString.Length > 0 && fileContentString != "null")
+        {
+            importedDatasetGrid = CSVReader.SplitCsvGrid(fileContentString);
+        }
+        else
+        {
+            Debug.Log("Error: File Content is null");
+            //DisplayErrorMessage(errorMessage);
+        }
+
+        yield return null;
+        VerifyCSV(url);
+
+    }
+
+
+
+    private IEnumerator FastDownload(string url, System.Action<string> result)
+    {
+        string s = "null";
+        try
+        {
+            s = File.ReadAllText(url).TrimEnd('\r', '\n');
+
+        }
+        catch (IOException e)
+        {
+            Debug.Log("<color=red>Error: " + e.GetType().Name + ": " + e.Message + "</color>");
+            //errorMessage = "Error! " + e.GetType().Name + ": " + e.Message;
+        }
+        yield return null;
+        result(s);
+    }
+
+    public void ShowTableError(string error)
+    {
+        tableErrorPanel.SetActive(true);
+        tableMenu.SetActive(false);
+        tableErrorText.text = error;
+    }
+
+    public void CloseTableError()
+    {
+        tableErrorPanel.SetActive(false);
+        tableMenu.SetActive(true);
+
+        tableErrorText.text = "";
     }
 }

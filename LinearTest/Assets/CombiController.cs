@@ -55,7 +55,7 @@ public class CombiController : MonoBehaviour {
     void Start () {
         //Debug.Log("The calculation here is wrong. Need to compare it with the original version to check what the problem is. Seems to lie in the sumproduct of x and [THING], but there's also an issue where the final value (100) isn't being accounted for.");
 
-        AddAllCMCs();
+        //AddAllCMCs();
 
         //TestScript1.Doit();
 
@@ -1009,7 +1009,7 @@ public class CombiController : MonoBehaviour {
         ExitQXRDMenu();
     }
 
-
+    /*
     public void CalculateCombi2(bool toCSV)
     {
         string fullExportString = "";
@@ -1132,7 +1132,7 @@ public class CombiController : MonoBehaviour {
                 Debug.Log("combinedDoubleList: " + thirdArray);
 
                 Debug.Log("LENGTH OF SAMPLES: " + combinedDoubleList.Length);
-                Debug.Log("LENGTH OF X: " + x.Length);*/
+                Debug.Log("LENGTH OF X: " + x.Length);
 
 
                 x[0] = chemicalDoubleList[0];
@@ -1177,7 +1177,7 @@ public class CombiController : MonoBehaviour {
                 {
                     secondArray += d.ToString() + ", ";
                 }
-                Debug.Log("x: " + secondArray);*/
+                Debug.Log("x: " + secondArray);
 
                 alglib.minlmcreatev(combinedDoubleList.Length, x, 0.0001, out state);
                 alglib.minlmsetbc(state, bndl, bndu);
@@ -1202,19 +1202,17 @@ public class CombiController : MonoBehaviour {
 
 
         }
-    }   //CalculateCombi()
+    }   //CalculateCombi()*/
 
 
     public void CalculateCombi(bool toCSV)
     {
-        Debug.Log("CalculateCombi");
         StartCoroutine("EnumerateCombi", toCSV);
 
     }
 
     public IEnumerator EnumerateCombi(bool toCSV)
     {
-        Debug.Log("EnumerateCombi");
         bothController.loadingMenu.SetActive(true);
         bothController.sharedMenu.SetActive(false);
         bothController.QXRDMenu.SetActive(false);
@@ -1230,6 +1228,7 @@ public class CombiController : MonoBehaviour {
         List<string> QXRDHeaderList = new List<string>();
         List<int> assayIndexList = new List<int>();
         List<int> QXRDIndexList = new List<int>();
+        List<bool> assayIsPPMList = new List<bool>();
         List<double> assayRelativeErrorList = new List<double>();
         List<double> QXRDRelativeErrorList = new List<double>();
         List<double> assayAbsoluteErrorList = new List<double>();
@@ -1272,6 +1271,7 @@ public class CombiController : MonoBehaviour {
                 //AssayDataList contains all the _ppm data so that we can use them with the CMC dictionaries later
                 assayHeaderList.Add(elem.Substring(0, elem.IndexOf('_')));//, elem.Length-elem.IndexOf('_')));
                 assayIndexList.Add(CMELE.index);
+                assayIsPPMList.Add(elem.Substring(elem.IndexOf('_') + 1,elem.Length-elem.IndexOf('_')-1) =="ppm");
                 assayRelativeErrorList.Add(CMELE.ElementRelativeError);
                 assayAbsoluteErrorList.Add(CMELE.ElementAbsoluteError);
                 //Debug.Log("it = " + elem.Substring(0, elem.IndexOf('_')));//, elem.Length - elem.IndexOf('_')));
@@ -1358,24 +1358,24 @@ public class CombiController : MonoBehaviour {
             {
 
                 //EVERYTYHING BELOW HERE IS OLD===============================================
-                CombiMineralComposition CMC;
+                BothController.MineralComposition MC;
                 double val = 0;
                 //Debug.Log("minlist[" + i + "] = " + minList[i]);
                 //Debug.Log("elementList[" + j + "] = " + elementList[j]);
 
                 //Get the AMC for the Mineral Composition or singular Element
-                if (combiMineralDict.TryGetValue(minList[l], out CMC))
+                if (bothController.currentMineralDict.TryGetValue(minList[l], out MC))
                 {
-                    //Find the element value for the particular element within the AMC
-                    CMC.elementDictionary.TryGetValue(assayHeaderList[j], out val); //=================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    //Find the element value for the particular element within the Mineral Library
+                    MC.elementDictionary.TryGetValue(assayHeaderList[j], out val); //=================<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     mineral2DArray[j][l] = val;
                     //Debug.Log("m[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
                 }
-                else if (combiElementDict.TryGetValue(minList[l], out CMC))
+                else if (bothController.elementDict.TryGetValue(minList[l], out MC))
                 {
                     //Debug.Log("l = " + l);
                     //Debug.Log("trying to get value: " + assayHeaderList[j]);
-                    CMC.elementDictionary.TryGetValue(assayHeaderList[j], out val);
+                    MC.elementDictionary.TryGetValue(assayHeaderList[j], out val);
                     //Debug.Log("got: " + val);
                     mineral2DArray[j][l] = val;
                     //Debug.Log("e[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
@@ -1416,7 +1416,7 @@ public class CombiController : MonoBehaviour {
         //========================DEBUG ENTIRE GRID===================================
 
         //Debug.Log("o[" + simplexArray2.GetUpperBound(0) + ", " + i + "] = " + other);
-        int h = 0;
+        /*int h = 0;
         Debug.Log("mineral2DArray length 1 = " + mineral2DArray.Length);
         Debug.Log("mineral2DArray length 2 = " + mineral2DArray[0].Length);
         //i <= simplexArray.GetUpperBound(0); i++)
@@ -1430,8 +1430,8 @@ public class CombiController : MonoBehaviour {
             }
             Debug.Log("<color=green>" + h + ": </color>" + outputLine);
             h++;
-        }
-
+        }*/
+        //===========================================================================
 
         //Now that we've set up all the universal parameters, we can start calculating
         foreach (Toggle tog in bothController.sampleToggles)
@@ -1460,7 +1460,11 @@ public class CombiController : MonoBehaviour {
                     //Debug.Log("element: " + ep + "," + s + " = " + csvController.grid[ep, s]);
                     if (!double.TryParse(csvController.grid[ep, s], out elementDoubleList[i]))
                         Debug.Log("<color=red>error: could not parse double</color>");
-                    //Debug.Log("elementDoubleList[" + i + "] = " + elementDoubleList[i]);
+                    Debug.Log("elementDoubleList[" + i + "] = " + elementDoubleList[i]);
+                    Debug.Log("isPPM? = " + assayIsPPMList[i]);
+                    if (assayIsPPMList[i])
+                        elementDoubleList[i] *= 0.001;
+                    Debug.Log("elementDoubleList2[" + i + "] = " + elementDoubleList[i]);
                     i++;
                 }
 
@@ -1620,14 +1624,14 @@ public class CombiController : MonoBehaviour {
                 }
                 absoluteError[k] = -1;
 
-                Debug.Log("relativeError: " + DebugWholeArray(relativeError) + " (" + relativeError.Length + ")");
-                Debug.Log("absoluteError: " + DebugWholeArray(absoluteError) + " (" + absoluteError.Length + ")");
-                Debug.Log("X: " + DebugWholeArray(x) + " (" + x.Length + ")");
-                Debug.Log("bndl: " + DebugWholeArray(bndl) + " (" + bndl.Length + ")");
-                Debug.Log("bndu: " + DebugWholeArray(bndu) + " (" + bndu.Length + ")");
+                //Debug.Log("relativeError: " + DebugWholeArray(relativeError) + " (" + relativeError.Length + ")");
+                //Debug.Log("absoluteError: " + DebugWholeArray(absoluteError) + " (" + absoluteError.Length + ")");
+                //Debug.Log("X: " + DebugWholeArray(x) + " (" + x.Length + ")");
+                //Debug.Log("bndl: " + DebugWholeArray(bndl) + " (" + bndl.Length + ")");
+                //Debug.Log("bndu: " + DebugWholeArray(bndu) + " (" + bndu.Length + ")");
 
 
-
+                
                 //assaydataother and such
                 //double AssayDataOther = GetOtherValue(AssayDataList);
 
@@ -2027,7 +2031,7 @@ public class CombiController : MonoBehaviour {
     } // Gauss()
 
 
-
+    /*
     public void oldCalcCombi()
     {
         foreach (Toggle tog in sampleToggles)
@@ -2102,7 +2106,7 @@ public class CombiController : MonoBehaviour {
                 Debug.Log("combinedDoubleList: " + thirdArray);
 
                 Debug.Log("LENGTH OF SAMPLES: " + combinedDoubleList.Length);
-                Debug.Log("LENGTH OF X: " + x.Length);*/
+                Debug.Log("LENGTH OF X: " + x.Length);
 
 
                 x[0] = chemicalDoubleList[0];
@@ -2147,7 +2151,7 @@ public class CombiController : MonoBehaviour {
                 {
                     secondArray += d.ToString() + ", ";
                 }
-                Debug.Log("x: " + secondArray);*/
+                Debug.Log("x: " + secondArray);
 
                 alglib.minlmcreatev(combinedDoubleList.Length, x, 0.0001, out state);
                 alglib.minlmsetbc(state, bndl, bndu);
@@ -2172,7 +2176,7 @@ public class CombiController : MonoBehaviour {
 
 
         }
-    }   //CalculateCombi()
+    }   //CalculateCombi()*/
 
     bool ContainsNoCase(string source, string toCheck)
     {

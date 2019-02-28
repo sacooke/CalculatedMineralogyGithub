@@ -102,7 +102,7 @@ public class Export : MonoBehaviour
             tempFilename = filename;
             tempToCsv = false;
             CombiOverwritePanel.SetActive(true);
-            combiController.combiMenu.SetActive(false);
+            bothController.QXRDMenu.SetActive(false);
             Debug.Log("overwrite?");
         }
     }
@@ -128,7 +128,7 @@ public class Export : MonoBehaviour
             tempFilename = filename;
             tempToCsv = false;
             AssayOverwritePanel.SetActive(true);
-            assayController.assayMenu.SetActive(false);
+            bothController.sharedMenu.SetActive(false);
             Debug.Log("overwrite?");
         }
     }
@@ -136,7 +136,7 @@ public class Export : MonoBehaviour
     public void CombiOverwrite(bool overwrite)
     {
         CombiOverwritePanel.SetActive(false);
-        bothController.sharedMenu.SetActive(true);
+        bothController.QXRDMenu.SetActive(true);
         if (overwrite)
         {
             StartNewStringbuilder();
@@ -187,7 +187,7 @@ public class Export : MonoBehaviour
             tempFilename = filename;
             tempToCsv = true;
             CombiOverwritePanel.SetActive(true);
-            bothController.sharedMenu.SetActive(false);
+            bothController.QXRDMenu.SetActive(false);
             Debug.Log("overwrite?");
         }
     }

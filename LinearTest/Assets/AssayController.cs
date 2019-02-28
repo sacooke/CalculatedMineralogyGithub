@@ -92,7 +92,7 @@ CT      -   constraint types, array[K]:
         double result = SumProduct(c, resultArray);
         Debug.Log("Result: " + result);*/
 
-        AddAllAMCs();
+        //AddAllAMCs();
 
 
 
@@ -728,22 +728,22 @@ CT      -   constraint types, array[K]:
                     //Debug.Log("For j <= " + simplexArray2.GetUpperBound(0));
                     for (int j = 0; j <= simplexArray.GetUpperBound(0) - 1; j++)//i <= simplexArray.GetUpperBound(0); i++)
                     {
-                        AssayMineralComposition AMC;
+                        BothController.MineralComposition MC;
                         double val = 0;
                         //Debug.Log("minlist[" + i + "] = " + minList[i]);
                         //Debug.Log("elementList[" + j + "] = " + elementList[j]);
 
                         //Get the AMC for the Mineral Composition or singular Element
-                        if (assayMineralDict.TryGetValue(minList[i], out AMC))
+                        if (bothController.currentMineralDict.TryGetValue(minList[i], out MC))
                         {
                             //Find the element value for the particular element within the AMC
-                            AMC.elementDictionary.TryGetValue(elementList[j], out val);
+                            MC.elementDictionary.TryGetValue(elementList[j], out val);
                             simplexArray[j, i] = val;
                             //Debug.Log("m[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
                         }
-                        else if (assayElementDict.TryGetValue(minList[i], out AMC))
+                        else if (bothController.elementDict.TryGetValue(minList[i], out MC))
                         {
-                            AMC.elementDictionary.TryGetValue(elementList[j], out val);
+                            MC.elementDictionary.TryGetValue(elementList[j], out val);
                             simplexArray[j, i] = val;
                             //Debug.Log("e[" + j + ", " + i + "] = " + val + "(" + minList[i] + "/" + elementList[j] + ")");
                         }
@@ -1136,16 +1136,16 @@ CT      -   constraint types, array[K]:
                     
                     for (int j = 0; j <= simplexArray.GetUpperBound(0) - 1; j++)//i <= simplexArray.GetUpperBound(0); i++)
                     {
-                        AssayMineralComposition AMC;
+                        BothController.MineralComposition MC;
                         double val = 0;
-                        if (assayMineralDict.TryGetValue(minList[i], out AMC))
+                        if (bothController.currentMineralDict.TryGetValue(minList[i], out MC))
                         {
-                            AMC.elementDictionary.TryGetValue(elementList[j], out val);
+                            MC.elementDictionary.TryGetValue(elementList[j], out val);
                             simplexArray[j, i] = val;
                         }
-                        else if (assayElementDict.TryGetValue(minList[i], out AMC))
+                        else if (bothController.elementDict.TryGetValue(minList[i], out MC))
                         {
-                            AMC.elementDictionary.TryGetValue(elementList[j], out val);
+                            MC.elementDictionary.TryGetValue(elementList[j], out val);
                             simplexArray[j, i] = val;
                         }
                         else
@@ -1290,8 +1290,8 @@ CT      -   constraint types, array[K]:
                     export.WriteStringToStringBuilder("");
                 }
 
-                Debug.Log("target function value: " + rep.f);
-                Debug.Log("Values: " + alglib.ap.format(x, 2));
+                //Debug.Log("target function value: " + rep.f);
+                //Debug.Log("Values: " + alglib.ap.format(x, 2));
 
 
 

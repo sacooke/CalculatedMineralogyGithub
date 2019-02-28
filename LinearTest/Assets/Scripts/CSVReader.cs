@@ -89,7 +89,6 @@ public class CSVReader : MonoBehaviour
     //Converts the csv file into a 2d array
     public void InitialiseGrid(bool isAssay)
     {
-        Debug.Log("initing");
 
         //ASSAY is just _pc and Other, and is used with simplex
 
@@ -142,7 +141,7 @@ public class CSVReader : MonoBehaviour
         GetChemicals(grid); //pc or wt%
         GetSamples(grid);
         
-        Debug.Log("elements/chemicals/samples: " + ElementCheckFailed + "/" + ChemicalCheckFailed + "/" + SampleCheckFailed);
+        //Debug.Log("elements/chemicals/samples: " + ElementCheckFailed + "/" + ChemicalCheckFailed + "/" + SampleCheckFailed);
 
         assayMode = isAssay;
 
@@ -412,14 +411,14 @@ public class CSVReader : MonoBehaviour
             totalChem += d;
         }
         chemTest.Add(10000.0 - totalChem);
-        string dString = "";
+        /*string dString = "";
         foreach (double d in chemTest)
         {
             dString += d;
             dString += ", ";
         }
 
-        Debug.Log("d - " + dString);
+        Debug.Log("d - " + dString);*/
 
         return chemTest;
 

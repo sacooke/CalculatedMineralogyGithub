@@ -50,10 +50,17 @@ public class BothController : MonoBehaviour {
 
     string path;
 
+    public Dictionary<string, Dataset> datasetDict;
+    public Dictionary<string, MineralComposition> elementDict;
+    public Dictionary<string, MineralComposition> currentMineralDict;
+    public Dataset defaultDataset;
+
+    public bool assayMode;
+
     // Use this for initialization
     void Start()
     {
-        datasetDropdown.onValueChanged.AddListener(delegate { ChangeDataset(); });
+        datasetDropdown.onValueChanged.AddListener(delegate { StartCoroutine(ChangeDataset()); });
 
         path = Application.dataPath;
         if (Application.platform == RuntimePlatform.OSXPlayer)
@@ -65,6 +72,10 @@ public class BothController : MonoBehaviour {
             path += "/../";
         }
         path += "/Mineral Tables/";
+
+        AddAllMCs();
+
+        datasetDict = new Dictionary<string, Dataset>();
     }
     
     // Update is called once per frame
@@ -74,6 +85,7 @@ public class BothController : MonoBehaviour {
 
     public void Initialise(bool isAssay)
     {
+        assayMode = isAssay;
         mainMenu.SetActive(false);
         sharedMenu.SetActive(true);
         assayMenu.SetActive(isAssay);
@@ -135,6 +147,8 @@ public class BothController : MonoBehaviour {
                     g.GetComponent<CombiMineralElementListEntry>().index = i;
                     if (ContainsNoCase(columnHeader, "_ppm"))
                         g.GetComponent<CombiMineralElementListEntry>().ElementToggle.isOn = true;
+                    else if (ContainsNoCase(columnHeader, "_pc"))
+                        g.GetComponent<CombiMineralElementListEntry>().ElementToggle.isOn = true;
                     else if (ContainsNoCase(columnHeader, "_wt%"))
                         g.GetComponent<CombiMineralElementListEntry>().MineralToggle.isOn = true;
                     //g.GetComponent<CombiMineralElementListEntry>().ElementToggle.
@@ -152,37 +166,54 @@ public class BothController : MonoBehaviour {
             }
         }
 
+        //Add all mineral compositions and elements to the corresponding lists
+        int k = 0;
+        //Dataset dataset = new Dataset(defaultMineralDict);
+        
+        datasetDict.Add("Default", defaultDataset);
 
-        if(isAssay)
+
+        Dictionary<string, MineralComposition> defaultMineralDict = defaultDataset.mineralDict;
+
+        currentMineralDict = defaultMineralDict;
+
+        foreach (MineralComposition mc in defaultMineralDict.Values)
         {
-            int i = 0;
-            foreach (AssayController.AssayMineralComposition amc in assayController.assayMineralDict.Values)
-            {
 
-                GameObject g = GameObject.Instantiate(mineralCompListPrefab) as GameObject;
-                g.transform.SetParent(mineralCompScrollView.transform, false);
-                MineralCompositionListEntry mcle = g.GetComponent<MineralCompositionListEntry>();
-                mcle.label.text = amc.mineral;
-                mcle.MineralComp = amc.mineral;
-                mcle.index = i;
-                g.GetComponentInChildren<InputField>().text = amc.weight.ToString();
-                mineralToggles.Add(g.GetComponent<Toggle>());
-                i++;
-            }
-            foreach (AssayController.AssayMineralComposition amc in assayController.assayElementDict.Values)
-            {
+            GameObject g = GameObject.Instantiate(mineralCompListPrefab) as GameObject;
+            g.transform.SetParent(mineralCompScrollView.transform, false);
+            MineralCompositionListEntry mcle = g.GetComponent<MineralCompositionListEntry>();
+            mcle.label.text = mc.mineral;
+            mcle.MineralComp = mc.mineral;
+            mcle.index = k;
+            if (isAssay)
+                g.GetComponentInChildren<InputField>().text = mc.weight.ToString();
+            else
+                g.GetComponentInChildren<InputField>().text = mc.startPoint.ToString();
+            mineralToggles.Add(g.GetComponent<Toggle>());
+            k++;
+        }
 
-                GameObject g = GameObject.Instantiate(mineralCompListPrefab) as GameObject;
-                g.transform.SetParent(elementCompScrollView.transform, false);
-                MineralCompositionListEntry mcle = g.GetComponent<MineralCompositionListEntry>();
-                mcle.label.text = amc.mineral;
-                mcle.MineralComp = amc.mineral;
-                mcle.index = i;
-                g.GetComponent<Toggle>().isOn = false;
-                g.GetComponentInChildren<InputField>().text = amc.weight.ToString();
-                elementToggles.Add(g.GetComponent<Toggle>());
-                i++;
-            }
+        foreach (MineralComposition mc in elementDict.Values)
+        {
+
+            GameObject g = GameObject.Instantiate(mineralCompListPrefab) as GameObject;
+            g.transform.SetParent(elementCompScrollView.transform, false);
+            MineralCompositionListEntry mcle = g.GetComponent<MineralCompositionListEntry>();
+            mcle.label.text = mc.mineral;
+            mcle.MineralComp = mc.mineral;
+            mcle.index = k;
+            g.GetComponent<Toggle>().isOn = false;
+            if (isAssay)
+                g.GetComponentInChildren<InputField>().text = mc.weight.ToString();
+            else
+                g.GetComponentInChildren<InputField>().text = mc.startPoint.ToString();
+            elementToggles.Add(g.GetComponent<Toggle>());
+            k++;
+        }
+        /*
+        if (isAssay)
+        {
         }
         else
         {
@@ -214,14 +245,593 @@ public class BothController : MonoBehaviour {
                 elementToggles.Add(g.GetComponent<Toggle>());
                 i++;
             }
+        }*/
+    }
+
+    public IEnumerator ChangeDataset()
+    {
+
+        Dataset ds;
+        if (!datasetDict.TryGetValue(datasetDropdown.options[datasetDropdown.value].text, out ds))
+        {
+            Debug.Log("dataset not found - creating new one");
+            Dictionary<string, MineralComposition> mineralDict = new Dictionary<string, MineralComposition>();
+            yield return StartCoroutine(FastDownload(path + datasetDropdown.options[datasetDropdown.value].text, fileContents => fileContentString = fileContents));
+            string[,] datasetGrid = CSVReader.SplitCsvGrid(fileContentString);
+
+            for (int i = 1; i <= datasetGrid.GetUpperBound(1); i++)
+            {
+                string columnHeader = datasetGrid[0, i];
+
+                string mineralComp = datasetGrid[0, i];
+                MineralComposition MC = new MineralComposition(mineralComp);
+                double[] val = new double[] { Double.Parse(datasetGrid[1, i]),
+                                                    Double.Parse(datasetGrid[2, i]),
+                                                    Double.Parse(datasetGrid[3, i]),
+                                                    Double.Parse(datasetGrid[4, i]),
+                                                    Double.Parse(datasetGrid[5, i]),
+                                                    Double.Parse(datasetGrid[6, i]),
+                                                    Double.Parse(datasetGrid[7, i]),
+                                                    Double.Parse(datasetGrid[8, i]),
+                                                    Double.Parse(datasetGrid[9, i]),
+                                                    Double.Parse(datasetGrid[10, i]),
+                                                    Double.Parse(datasetGrid[11, i]),
+                                                    Double.Parse(datasetGrid[12, i]),
+                                                    Double.Parse(datasetGrid[13, i]),
+                                                    Double.Parse(datasetGrid[14, i]),
+                                                    Double.Parse(datasetGrid[15, i]),
+                                                    Double.Parse(datasetGrid[16, i]),
+                                                    Double.Parse(datasetGrid[17, i]),
+                                                    Double.Parse(datasetGrid[18, i]),
+                                                    Double.Parse(datasetGrid[19, i]),
+                                                    Double.Parse(datasetGrid[20, i]),
+                                                    Double.Parse(datasetGrid[21, i]) };
+                FillMCDatabase(MC, val);
+                MC.weight = double.Parse(datasetGrid[22, i]);
+                MC.startPoint = double.Parse(datasetGrid[23, i]);
+
+                mineralDict.Add(mineralComp, MC);
+            }
+            ds = new Dataset(mineralDict);
+            datasetDict.Add(datasetDropdown.options[datasetDropdown.value].text, ds);
+        }
+
+        currentMineralDict = ds.mineralDict;
+        mineralToggles.Clear();
+        foreach (Transform child in mineralCompScrollView.transform)
+            GameObject.Destroy(child.gameObject);
+        int k = 0;
+
+        foreach (MineralComposition mc in currentMineralDict.Values)
+        {
+            GameObject g = GameObject.Instantiate(mineralCompListPrefab) as GameObject;
+            g.transform.SetParent(mineralCompScrollView.transform, false);
+            MineralCompositionListEntry mcle = g.GetComponent<MineralCompositionListEntry>();
+            mcle.label.text = mc.mineral;
+            mcle.MineralComp = mc.mineral;
+            mcle.index = k;
+            if (assayMode)
+                g.GetComponentInChildren<InputField>().text = mc.weight.ToString();
+            else
+                g.GetComponentInChildren<InputField>().text = mc.startPoint.ToString();
+            mineralToggles.Add(g.GetComponent<Toggle>());
+            k++;
+        }
+
+        foreach (Transform child in elementCompScrollView.transform)
+        {
+            
+            MineralCompositionListEntry mcle = child.gameObject.GetComponent<MineralCompositionListEntry>();
+            mcle.index = k;
+            k++;
+        }
+        yield return null;
+
+    }
+    public class Dataset
+    {
+        public Dictionary<string, MineralComposition> mineralDict { get; set; }
+
+        public Dataset(Dictionary<string, MineralComposition> mineralDict)
+        {
+            this.mineralDict = mineralDict;
         }
     }
 
-    public void ChangeDataset()
+
+    public void AddAllMCs()
     {
-        Debug.Log("name = " + datasetDropdown.options[datasetDropdown.value].text);
-        StartCoroutine(FastDownload(path + datasetDropdown.options[datasetDropdown.value].text, fileContents => fileContentString = fileContents));
-        string[,] datasetGrid = CSVReader.SplitCsvGrid(fileContentString);
+
+        Dictionary<string, MineralComposition> defaultMineralDict = new Dictionary<string, MineralComposition>();
+        elementDict = new Dictionary<string, MineralComposition>();
+
+        string mineralComp;
+        MineralComposition MC;
+
+        mineralComp = "Other(Quartz)";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 7;
+        MC.startPoint = 10.00;
+
+        mineralComp = "Feld_Alb_Ca-Na";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 10.41, 0, 0, 0, 0.38, 0, 0.05, 0.11, 0.01, 0, 0, 7.8, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 5;
+        MC.startPoint = 10.00;
+
+        mineralComp = "Feld_Alb_Na";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 10.4, 0, 0, 0, 0, 0, 0.04, 0.24, 0.02, 0, 0, 8.21, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 5;
+        MC.startPoint = 10.00;
+
+        mineralComp = "FeldsparK";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 9.817163594, 0, 0, 0, 0.12149786, 0, 0.0979097, 13.33707643, 0, 0, 0, 0.126114876, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 7;
+        MC.startPoint = 10.00;
+
+        mineralComp = "FeldsKBa";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 9.85, 0, 0, 0.25, 0, 0, 0.08, 13.5, 0, 0.03, 0, 0.31, 0, 0, 0, 0, 0.03, 0, 0, 0 });
+        MC.weight = 7;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Feld_Plag";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 15.3732, 0, 0, 0, 7.8908, 0, 0.199, 0.1423, -0.0012, -0.0065, 0, 3.8507, 0, 0, 0, 0, 0.002, 0, 0, 0 });
+        MC.weight = 3;
+        MC.startPoint = 10.00;
+
+        mineralComp = "Carb_Calc";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 40.04426534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 0.3;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Carb_Ank";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 20.0185592, 0, 12.55342226, 0, 6.071985112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 5.7;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Carb_Dol";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 21.73, 0, 0, 0, 13.18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 3;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Rhodonite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 47.8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 3;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Siderite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 3;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Anhydrite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 29.44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23.55, 0, 0, 0, 0, 0 });
+        MC.weight = 1.3;
+        MC.startPoint = 1.00;
+
+        mineralComp = "ChloriteFe";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 9.6754, 0, 0, 0, 0.1066, 0, 20.3305, 0.0161, 9.3554, 0.0787, 0, 0.0455, 0, 0, 0, 0, 0.0163, 0, 0, 0 });
+        MC.weight = 10;
+        MC.startPoint = 5.00;
+
+        mineralComp = "ChloriteMg";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 10.0939, 0, 0, 0, 0.0377, 0, 10.5241, 0.0335, 14.3654, 0.0387, 0, 0.0293, 0, 0, 0, 0, 0.0267, 0, 0, 0 });
+        MC.weight = 10;
+        MC.startPoint = 5.00;
+
+        mineralComp = "Muscovite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 19.5, 0, 0, 0, 0, 0, 0.08, 8.37, 0.05, 0.093, 0, 0.47, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 7;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Musc_Phengite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 16.46, 0, 0, 0, 0, 0, 3.19, 9.14, 0.81, 0, 0, 0.08, 0, 0, 0, 0, 0.1, 0, 0, 0 });
+        MC.weight = 4;
+        MC.startPoint = 2.00;
+
+        mineralComp = "BiotMg";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 7.5391, 0, 0, 0, 0.0156, 0, 7.9141, 7.8631, 11.8337, 0.052, 0, 0.0718, 0, 0, 0, 0, 1.0092, 0, 0, 0 });
+        MC.weight = 9;
+        MC.startPoint = 2.00;
+
+        mineralComp = "BiotFe";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 7.3702, 0, 0, 0, 0.1426, 0, 13.0428, 7.3473, 8.2094, 0.0686, 0, 0.0769, 0, 0, 0, 0, 0.9201, 0, 0, 0 });
+        MC.weight = 9;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Amph_tscher";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 7.33, 0, 0, 0, 7.7, 0, 13.72, 0.62, 5.76, 0.33, 0, 1.43, 0, 0, 0, 0, 0.74, 0, 0, 0 });
+        MC.weight = 5;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Amph_Act";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 1.5633, 0, 0, 0, 8.7168, 0, 12.7119, 0.1038, 8.065, 0.0905, 0, 0.204, 0, 0, 0, 0, 0.0574, 0, 0, 0 });
+        MC.weight = 8;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Amph_HorMg";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 3.42, 0, 0, 0, 8.63, 0, 11.26, 0.43, 8.03, 0.48, 0, 0.78, 0, 0, 0, 0, 0.53, 0, 0, 0 });
+        MC.weight = 7.5;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Amph_Trem";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0.9295, 0, 0, 0, 9.3243, 0, 6.3783, 0.0668, 11.4574, 0.1231, 0, 0.2079, 0, 0, 0, 0, 0.0767, 0, 0, 0 });
+        MC.weight = 6;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Epid_LC";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 12.5294, 0, 0, 0, 16.5257, 0, 9.494, 0, 0.0194, 0.1798, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 4;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Epid_Clzt";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 17.8137858, 0, 0, 0, 17.63863053, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 3;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Magnetite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 72.34827478, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 7;
+        MC.startPoint = 2.00;
+
+        mineralComp = "Apatite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 39.05798859, 0, 0, 0, 0, 0, 0, 0, 18.17529238, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 10;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Chalcopyrite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 34.5, 30.49887156, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0 });
+        MC.weight = 8;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Pyrite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 46.59103012, 0, 0, 0, 0, 0, 0, 0, 53.4, 0, 0, 0, 0, 0 });
+        MC.weight = 5;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Spalerite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 2.86, 0, 0, 0, 0, 0, 0, 0, 33.06, 0, 0, 0, 64.07, 0 });
+        MC.weight = 5;
+        MC.startPoint = 1.00;
+
+        mineralComp = "galena";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86.6, 13.4, 0, 0, 0, 0, 0 });
+        MC.weight = 5;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Uraninite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 88.15, 0, 0 });
+        MC.weight = 10;
+        MC.startPoint = 0.10;
+
+        mineralComp = "Arsenopyrite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 46, 0, 0, 0, 0, 34.3, 0, 0, 0, 0, 0, 0, 0, 19.7, 0, 0, 0, 0, 0 });
+        MC.weight = 10;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Molybdenite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.9, 0, 0, 0, 40.1, 0, 0, 0, 0, 0 });
+        MC.weight = 10;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Chalcocite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 79.85, 0, 0, 0, 0, 0, 0, 0, 0, 20.15, 0, 0, 0, 0, 0 });
+        MC.weight = 6;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Sphene/titanite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 20.44022825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24.46569855, 0, 0, 0 });
+        MC.weight = 2;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Rutile";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59.96494742, 0, 0, 0 });
+        MC.weight = -1;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Barite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 58.84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13.74, 0, 0, 0, 0, 0 });
+        MC.weight = -1;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Kaolinite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 20.75, 0, 0, 0, 0.04, 0, 0.16, 0.17, 0.04, 0, 0, 0.07, 0, 0, 0, 0, 0.05, 0, 0, 0 });
+        MC.weight = 7.1;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Smectite/Montmorillonite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 9.44, 0, 0, 0, 0.49, 0, 2.23, 0.37, 1.87, 0.023, 0, 1.61, 0, 0, 0, 0, 0.04, 0, 0, 0 });
+        MC.weight = 7.2;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Jarosite";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 33.45, 7.81, 0, 0, 0, 0, 0, 0, 12.81, 0, 0, 0, 0, 0 });
+        MC.weight = 5.0;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Tour_Fe";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 13.07, 0, 0, 0, 1.43, 0, 9.21, 0.04, 5.23, 0, 0, 1.26, 0, 0, 0, 0, 1.51, 0, 0, 0 });
+        MC.weight = 7.5;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Tour_Mg";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 18.03, 0, 0, 0, 0.45, 0, 2.38, 0.01, 5.69, 0, 0, 1.46, 0, 0, 0, 0, 0.24, 0, 0, 0 });
+        MC.weight = 6;
+        MC.startPoint = 1.00;
+
+        mineralComp = "Chrysocolla";
+        MC = new MineralComposition(mineralComp);
+        defaultMineralDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 2.05, 0, 0, 0, 0, 33.86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = 0;
+        MC.startPoint = 1.00;
+
+
+        defaultDataset = new Dataset(defaultMineralDict);
+
+
+
+
+        mineralComp = "Ag";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Al";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "As";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Au";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Ba";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Ca";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Cu";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Fe";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "K";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Mg";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Mn";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Mo";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Na";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "P";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Pb";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "S";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Te";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Ti";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "U";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Zn";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+
+        mineralComp = "Zr";
+        MC = new MineralComposition(mineralComp);
+        elementDict.Add(mineralComp, MC);
+        FillMCDatabase(MC, new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100 });
+        MC.weight = -100;
+        MC.startPoint = 0.01;
+    }
+
+    public void FillMCDatabase(MineralComposition MC, double[] val)
+    {
+        MC.elementDictionary.Add("Ag", val[0]);
+        MC.elementDictionary.Add("Al", val[1]);
+        MC.elementDictionary.Add("As", val[2]);
+        MC.elementDictionary.Add("Au", val[3]);
+        MC.elementDictionary.Add("Ba", val[4]);
+        MC.elementDictionary.Add("Ca", val[5]);
+        MC.elementDictionary.Add("Cu", val[6]);
+        MC.elementDictionary.Add("Fe", val[7]);
+        MC.elementDictionary.Add("K", val[8]);
+        MC.elementDictionary.Add("Mg", val[9]);
+        MC.elementDictionary.Add("Mn", val[10]);
+        MC.elementDictionary.Add("Mo", val[11]);
+        MC.elementDictionary.Add("Na", val[12]);
+        MC.elementDictionary.Add("P", val[13]);
+        MC.elementDictionary.Add("Pb", val[14]);
+        MC.elementDictionary.Add("S", val[15]);
+        MC.elementDictionary.Add("Te", val[16]);
+        MC.elementDictionary.Add("Ti", val[17]);
+        MC.elementDictionary.Add("U", val[18]);
+        MC.elementDictionary.Add("Zn", val[19]);
+        MC.elementDictionary.Add("Zr", val[20]);
+
+
+        //Ag	Al	As	Au	Ba	Ca	Cu	Fe	K	Mg	Mn	Mo	Na	P	Pb	S	Te	Ti	U	Zn	Zr
+
+
+        //string[] ArrayOfElements = new string[] { "Al", "As", "Ba", "Ca", "Cu", "Fe", "K", "Mg", "Mn", "Mo", "Na", "P", "S", "Ti", "W" };
     }
 
     public class MineralComposition
@@ -347,6 +957,11 @@ public class BothController : MonoBehaviour {
                 Debug.Log("default executed");
                 break;
         }
+    }
+
+    public void RestartScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainScene");
     }
 
 
