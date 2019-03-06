@@ -20,6 +20,8 @@ public class QXRDListEntry : MonoBehaviour
     {
         MineralComp = label.text;
         index = this.transform.GetSiblingIndex();
+
+        //dropdown.OnSelect();
     }
 
     // Update is called once per frame

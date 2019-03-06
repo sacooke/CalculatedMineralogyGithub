@@ -76,6 +76,11 @@ public class BothController : MonoBehaviour {
         AddAllMCs();
 
         datasetDict = new Dictionary<string, Dataset>();
+
+        var texture = new Texture2D(1, 1); // creating texture with 1 pixel
+        texture.SetPixel(0, 0, Color.blue); // setting to this pixel some color
+        texture.Apply(); //applying texture. necessarily
+        datasetDropdown.options[0].image = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0));
     }
     
     // Update is called once per frame

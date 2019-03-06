@@ -557,6 +557,7 @@ CT      -   constraint types, array[K]:
 
     public void InitialiseAssay()
     {
+        Debug.Log("init assay");
         mainMenu.SetActive(false);
         assayMenu.SetActive(true);
         for (int i = 0; i < csvController.samplePositions.Count; i++)
@@ -1065,9 +1066,11 @@ CT      -   constraint types, array[K]:
             if (tog.isOn)
             {
                 string elemString = tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp;
+                tog.isOn = true;
                 minList.Add(elemString);
                 weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : -100);
                 columnNames += "," + elemString;
+                
             }
         }
 

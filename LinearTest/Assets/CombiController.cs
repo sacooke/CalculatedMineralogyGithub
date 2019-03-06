@@ -1254,7 +1254,7 @@ public class CombiController : MonoBehaviour {
             {
                 string elemString = tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp;
                 minList.Add(elemString);
-                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : -100); //If a weight for the mineral doesnt exist, default to -100
+                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : 0.01); //If a weight for the mineral doesnt exist, default to -100
                 columnNames += "," + elemString;
             }
         }
@@ -1442,7 +1442,7 @@ public class CombiController : MonoBehaviour {
                 //this involves combiSampleValues 
 
                 int s = tog.gameObject.GetComponent<SampleListEntry>().index;
-                elementDoubleList = new double[csvController.elementPositions.Count + 1];
+                elementDoubleList = new double[assayIndexList.Count + 1];//csvController.elementPositions.Count + 1
 
                 string id = csvController.grid[0, s];
 
@@ -1453,33 +1453,31 @@ public class CombiController : MonoBehaviour {
                     export.WriteStringToStringBuilder("");
                 }
 
-
+                
                 int i = 0;
-                foreach (int ep in csvController.elementPositions)
+                foreach (int ep in assayIndexList)
                 {
                     //Debug.Log("element: " + ep + "," + s + " = " + csvController.grid[ep, s]);
                     if (!double.TryParse(csvController.grid[ep, s], out elementDoubleList[i]))
                         Debug.Log("<color=red>error: could not parse double</color>");
-                    Debug.Log("elementDoubleList[" + i + "] = " + elementDoubleList[i]);
-                    Debug.Log("isPPM? = " + assayIsPPMList[i]);
+                    //If the value is in ppm, convert it to pc by dividing it by 10000
                     if (assayIsPPMList[i])
-                        elementDoubleList[i] *= 0.001;
-                    Debug.Log("elementDoubleList2[" + i + "] = " + elementDoubleList[i]);
+                        elementDoubleList[i] *= 0.0001;
                     i++;
                 }
 
 
                 double otherDouble = 100;
-                for (int j = 0; j < csvController.elementPositions.Count; j++)
+                for (int j = 0; j < assayIndexList.Count; j++)
                 {
                     otherDouble -= elementDoubleList[j];
                 }
-                elementDoubleList[csvController.elementPositions.Count] = otherDouble;
+                elementDoubleList[assayIndexList.Count] = otherDouble;
 
 
-                chemicalDoubleList = new double[csvController.chemicalPositions.Count];
+                chemicalDoubleList = new double[QXRDIndexList.Count];//csvController.chemicalPositions.Count
                 i = 0;
-                foreach (int cp in csvController.chemicalPositions)
+                foreach (int cp in QXRDIndexList)
                 {
                     //Debug.Log("chemical: " + cp + "," + s + " = " + csvController.grid[cp, s]);
                     if (!double.TryParse(csvController.grid[cp, s], out chemicalDoubleList[i]))

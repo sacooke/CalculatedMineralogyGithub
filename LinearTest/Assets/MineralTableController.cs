@@ -482,7 +482,6 @@ public class MineralTableController : MonoBehaviour {
     {
         //FilenameText.text = url.Substring(url.LastIndexOf("\\") + 1);
         yield return StartCoroutine(FastDownload(url, fileContents => fileContentString = fileContents));
-        Debug.Log(fileContentString);
         if (fileContentString != null && fileContentString.Length > 0 && fileContentString != "null")
         {
             importedDatasetGrid = CSVReader.SplitCsvGrid(fileContentString);

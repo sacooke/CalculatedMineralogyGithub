@@ -41,7 +41,7 @@ public class CSVReader : MonoBehaviour
     public List<string> chemicalList = new List<string>();
     public List<int> chemicalPositions = new List<int>();
     public int chemicalCount = 0;
-
+    
     public List<string> sampleList = new List<string>();
     public List<int> samplePositions = new List<int>();
     public int sampleCount = 0;
@@ -137,9 +137,10 @@ public class CSVReader : MonoBehaviour
             return;
         }
 
-        GetElements(grid); //ppm
-        GetChemicals(grid); //pc or wt%
+        //GetElements(grid); //ppm
+        //GetChemicals(grid); //pc or wt%
         GetSamples(grid);
+        
         
         //Debug.Log("elements/chemicals/samples: " + ElementCheckFailed + "/" + ChemicalCheckFailed + "/" + SampleCheckFailed);
 
@@ -392,6 +393,8 @@ public class CSVReader : MonoBehaviour
             //fileImport.DisplayErrorMessage("Count not find element columns\n\nElement column headings must end with '_ppm'");
         }
     }
+
+
     public List<double> GetChemTestList(string[,] grid, int row)
     {
         chemTest.Clear();
