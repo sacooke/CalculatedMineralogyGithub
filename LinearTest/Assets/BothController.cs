@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Text.RegularExpressions;
 
 public class BothController : MonoBehaviour {
 
@@ -870,7 +871,10 @@ public class BothController : MonoBehaviour {
         string s = "null";
         try
         {
-            s = File.ReadAllText(url).TrimEnd('\r', '\n');
+            //s = File.ReadAllText(url).TrimEnd('\r', '\n');
+            foreach (string b in File.ReadAllLines(url))
+                if (Regex.IsMatch(b, "[^,]"))
+                    s += b + "\n";
 
         }
         catch (IOException e)

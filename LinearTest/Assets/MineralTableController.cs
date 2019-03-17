@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 
 public class MineralTableController : MonoBehaviour {
 
@@ -504,7 +505,10 @@ public class MineralTableController : MonoBehaviour {
         string s = "null";
         try
         {
-            s = File.ReadAllText(url).TrimEnd('\r', '\n');
+            //s = File.ReadAllText(url).TrimEnd('\r', '\n');
+            foreach (string b in File.ReadAllLines(url))
+                if (Regex.IsMatch(b, "[^,]"))
+                    s += b + "\n";
 
         }
         catch (IOException e)

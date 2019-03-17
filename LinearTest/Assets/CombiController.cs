@@ -974,10 +974,13 @@ public class CombiController : MonoBehaviour {
                     int optionVal = 0;
                     foreach(Dropdown.OptionData option in QLE.dropdown.options)
                     {
-                        if (ContainsNoCase(option.text, QLE.MineralComp.Substring(0, 6)))
+                        if (option.text.Length > 2)
                         {
-                            //Debug.Log(option.text + " has first three letters of " + QLE.MineralComp.Substring(0, 3));
-                            QLE.dropdown.value = optionVal;
+                            if (ContainsNoCase(option.text, QLE.MineralComp.Substring(0, 3)))
+                            {
+                                Debug.Log(option.text + " has first three letters of " + QLE.MineralComp.Substring(0, 3));
+                                QLE.dropdown.value = optionVal;
+                            }
                         }
                         optionVal++;
                     }

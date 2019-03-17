@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.IO;
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 public class TrainingController : MonoBehaviour {
 
@@ -23,15 +25,20 @@ public class TrainingController : MonoBehaviour {
     string[,] AssayTrainingTable;
     string[,] DatasetTable;
 
+    public GameObject QXRDPrefab;
+    public GameObject QXRDScrollview;
+
+    List<float> bestWeights = new List<float>();
+
     // Use this for initialization
-    void Start () {
+    void Start() {
+        PopulateDatasetDropdown();
+    }
+
+    // Update is called once per frame
+    void Update() {
 
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
 
 
@@ -103,6 +110,89 @@ public class TrainingController : MonoBehaviour {
         datasetDropdown.AddOptions(datasetStrings);
     }
 
+    public void BeginTraining()
+    {
+        StartCoroutine("CreateAndValidateTables");
+    }
+    /*
+    public IEnumerable<T> SliceRow<T>(this T[,] array, int row)
+    {
+        for (var i = array.GetLowerBound(1); i <= array.GetUpperBound(1); i++)
+        {
+            yield return array[row, i];
+        }
+    }
+
+    public IEnumerable<T> SliceColumn<T>(this T[,] array, int column)
+    {
+        for (var i = array.GetLowerBound(0); i <= array.GetUpperBound(0); i++)
+        {
+            yield return array[i, column];
+        }
+    }*/
+    public string[] GetSlice(string[,] grid, int index, bool isColumn)
+    {
+        string[] slice;
+        if (isColumn)
+        {
+            slice = new string[grid.GetUpperBound(1) + 1];
+            for (int y = 0; y <= grid.GetUpperBound(1); y++)
+                slice[y] = grid[index, y];
+        }
+        else
+        {
+            slice = new string[grid.GetUpperBound(0) + 1];
+            for (int x = 0; x <= grid.GetUpperBound(0); x++)
+                slice[x] = grid[x, index];
+
+        }
+        return slice;
+    }
+
+
+    public string[] GetSlice(string[,] grid, string index, bool isColumn)
+    {
+        string[] slice;
+        if (isColumn)
+        {
+            int indexVal = -1;
+            for (int x = 0; x <= grid.GetUpperBound(0); x++)
+                if (MatchesNoCase(grid[x, 0], index))
+                    indexVal = x;
+            if (indexVal != -1)
+            {
+                slice = new string[grid.GetUpperBound(1) + 1];
+                for (int y = 0; y <= grid.GetUpperBound(1); y++)
+                    slice[y] = grid[indexVal, y];
+            }
+            else
+            {
+                Debug.Log("<color=red>Error: Could not find column with the header '" + index + "'");
+                slice = new string[0];
+            }
+        }
+        else
+        {
+            int indexVal = -1;
+            for (int y = 0; y <= grid.GetUpperBound(0); y++)
+                if (MatchesNoCase(grid[0, y], index))
+                    indexVal = y;
+            if (indexVal != -1)
+            {
+                slice = new string[grid.GetUpperBound(0) + 1];
+                for (int x = 0; x <= grid.GetUpperBound(0); x++)
+                    slice[x] = grid[x, indexVal];
+            }
+            else
+            {
+                Debug.Log("<color=red>Error: Could not find column with the header '" + index + "'");
+                slice = new string[0];
+            }
+
+        }
+        return slice;
+    }
+
 
     public IEnumerator CreateAndValidateTables()
     {
@@ -153,29 +243,187 @@ public class TrainingController : MonoBehaviour {
             MC.startPoint = double.Parse(DatasetTable[23, i]);
 
             mineralDict.Add(mineralComp, MC);
+
         }
 
-        //CHECK:
-        //Does dataset grid have the name number of rows as combi results grid has columns?
-        //Does Assay have the same number of samples as Combi?
 
 
+        FillQXRDList();
 
         yield return null;
     }
 
+    public void DoValidate()
+    {
+        //CHECK:
+        //Does dataset grid have the name number of rows as combi results grid has columns?
+        //Does Assay have the same number of samples as Combi?
+
+        bool isValid = true;
+        for (int y = 1; y <= AssayTrainingTable.GetUpperBound(1); y++)
+        {
+            string[] b = { "", "" };
+            Debug.Log("does combicolumn contain " + AssayTrainingTable[0, y]);
+            if (GetSlice(CombiResultTable, 0, true).Any(AssayTrainingTable[0, y].Contains))
+                Debug.Log("yep");
+        }
+
+
+
+    }
+
+    public void FillQXRDList()
+    {
+        QXRDListEntry QLE;
+        List<string> mineralList = new List<string>();
+
+        foreach (string column in GetSlice(CombiResultTable, 0, false))
+        {
+            if (column != "" && column != "Residual SSQ" && column != "degreesFreedom" && column != "probability" && column != "Sample no")
+                mineralList.Add(column);
+        }
+        int i = 0;
+        foreach (string row in GetSlice(DatasetTable, 0, true))
+        {
+            GameObject g = GameObject.Instantiate(QXRDPrefab) as GameObject;
+            g.transform.SetParent(QXRDScrollview.transform, false);
+            QLE = g.GetComponent<QXRDListEntry>();
+            QLE.index = i;
+            QLE.SetLabel(row);
+            QLE.AddToDropdown(mineralList);
+            int optionVal = 0;
+            foreach (Dropdown.OptionData option in QLE.dropdown.options)
+            {
+                if (option.text.Length > 2 && QLE.MineralComp.Length > 2)
+                {
+                    if (ContainsNoCase(option.text, QLE.MineralComp.Substring(0, 3)))
+                    {
+                        Debug.Log(option.text + " has first three letters of " + QLE.MineralComp.Substring(0, 3));
+                        QLE.dropdown.value = optionVal;
+                    }
+                    optionVal++;
+                }
+            }
+            i++;
+
+        }
+    }
+
+    public void TrainAssay()
+    {
+
+
+
+        Debug.Log("THE NEXT STEP IS LIKELY TO TURN THIS FOR LOOP INTO A SINGLE EXECUTION AND PASS THE NECESSARY VALUES TO VARIABLES THAT CAN HANDLE THE NEXT LOOPS AFTER THE CALCULATION IS DONE");
+
+
+
+
+        string[] groupColumn = GetSlice(DatasetTable, "group", true);
+        string[] maxWeightsColumn = GetSlice(DatasetTable, "max", true);
+        string[] minWeightsColumn = GetSlice(DatasetTable, "min", true);
+        List<int> group1Indexes = new List<int>();
+        List<int> group2Indexes = new List<int>();
+        List<int> group3Indexes = new List<int>();
+        List<int> group4Indexes = new List<int>();
+        List<int> group5Indexes = new List<int>();
+        List<float> maxWeights = new List<float>();
+        List<float> minWeights = new List<float>();
+
+        //for each of the items in the QXRD list that arent paired with a None, cross check their index with the groupcolumn
+        //if it's 0, nothing happens
+        //if it's greater than zero,
+        //      
+        int i = 0;
+        int row = 1;
+        foreach (Transform QXRD in QXRDScrollview.transform)
+        {
+            QXRDListEntry QLE = QXRD.GetComponent<QXRDListEntry>();
+            //if the paired mineral is not 'None'
+            if (QLE.dropdown.value != 0)
+            {
+                float f;
+                if (float.TryParse(maxWeightsColumn[row], out f))
+                {
+                    bestWeights.Add(f);
+                    maxWeights.Add(f);
+                }
+                else
+                {
+                    bestWeights.Add(0);
+                    maxWeights.Add(0);
+                }
+                if (float.TryParse(minWeightsColumn[row], out f))
+                {
+                    minWeights.Add(f);
+                }
+                else
+                {
+                    minWeights.Add(0);
+                }
+                if (groupColumn[row] == "1")
+                    group1Indexes.Add(i);
+                if (groupColumn[row] == "2")
+                    group2Indexes.Add(i);
+                if (groupColumn[row] == "3")
+                    group3Indexes.Add(i);
+                if (groupColumn[row] == "4")
+                    group4Indexes.Add(i);
+                if (groupColumn[row] == "5")
+                    group5Indexes.Add(i);
+
+                i++;
+            }
+            row++;
+        }
+
+
+        //RON'S PSEUDOLOOP
+        //bestWeights = create first list of weights
+        //while(number of completed loops < 3)
+        //for(int m = 0; m < numberofMineralCompositionsinGroup1; m++)
+        //  thisMin = listOfMinsInGroup1(m)
+        //  thisMinWeights = 0, min, (0.75*min+0.25*max), (min+max)/2, (0.25*min+0.75*max), max
+        //  for(int j = 0; j <= 5; j++)
+        //      minWeights(thisMin) = thisMinWeights[j]
+        //      startCoroutine(EnumerateAssayWeightIterator)
+        //      if(absluteDifference < currentDifference)
+        //          bestWeights[thisMin] = thisMinWeights[j]
+        //repeat for loop for other groups
+        
+        //Group 1
+        for(int g = 0; g < group1Indexes.Count; g++)
+        {
+            float min = minWeights[group1Indexes[g]];
+            float max = maxWeights[group1Indexes[g]];
+
+            float[] weightRange = { 0f, min, (0.75f * min) + (0.25f * max), (min+max)/2, (0.25f * min) + (0.75f * max), max };
+            List<float> currentWeights = bestWeights;
+            for (int w = 0; w <= 5; w++)
+            {
+                currentWeights[group1Indexes[g]] = w;
+
+            }
+        }
+    }
+
     public string[] GetColumn(string[,] grid, int column)
     {
-        return grid[column];
+        //return grid[column];
+        string[] toReturn = { };
+        return toReturn;
     }
 
     private IEnumerator FastDownload(string url, System.Action<string> result)
     {
-        string s = "null";
+        string s = "";
         try
         {
-            s = File.ReadAllText(url).TrimEnd('\r', '\n');
-
+            //s = File.ReadAllText(url).TrimEnd('\r', '\n');
+            //s = File.ReadAllText(url).Split(" \r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Where(c => c.Length > 0);
+            foreach (string b in File.ReadAllLines(url).Where(line => line != ""))
+                if (Regex.IsMatch(b, "[^,]"))//.TrimEnd('\r', '\n')
+                    s += b + "\n";//Debug.Log(b);
         }
         catch (IOException e)
         {
@@ -190,29 +438,39 @@ public class TrainingController : MonoBehaviour {
     public IEnumerator EnumerateAssayWeightIterator(bool toCSV)
     {
 
-        string fullExportString = "";
-        string columnNames = "Sample No.,Score";
+        //string fullExportString = "";
+        //string columnNames = "Sample No.,Score";
 
 
         List<string> minList = new List<string>();
+        List<int> combiColumnPositions = new List<int>();
         List<double> weightList = new List<double>();
 
         List<string> elementList = new List<string>();
         List<int> columnIndexList = new List<int>();
         double result;
 
+
+
         //Compile list of mineral compositions to be used in the calculations from the scrollviews of minerals and elements
-        /*foreach (Toggle tog in bothController.mineralCompScrollView.transform.GetComponentsInChildren<Toggle>())
+        //but do this elsewhere, it's so inefficient
+        foreach (Transform child in QXRDScrollview.transform)
         {
-            if (tog.isOn)
+            QXRDListEntry qle = child.gameObject.GetComponent<QXRDListEntry>();
+            if (qle.dropdown.value != 0)
             {
-                string minString = tog.gameObject.GetComponent<MineralCompositionListEntry>().MineralComp;
+                //add in the mineral compositions
+                //these should be the ones that are the qxrd list names, not the dropdowns
+                string minString = qle.MineralComp;
                 minList.Add(minString);
-                weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : 1);
-                columnNames += "," + minString;
+                combiColumnPositions.Add(qle.dropdown.value);
+                //weightList.Add(double.TryParse(tog.GetComponentInChildren<InputField>().text, out result) ? result : 1);
+                Debug.Log("COME BACK TO THE WEIGHT");
+                //columnNames += "," + minString;
             }
         }
-        foreach (Toggle tog in bothController.elementCompScrollView.transform.GetComponentsInChildren<Toggle>())
+        //probably include all elements?
+        /*foreach (Toggle tog in bothController.elementCompScrollView.transform.GetComponentsInChildren<Toggle>())
         {
             if (tog.isOn)
             {
@@ -223,10 +481,12 @@ public class TrainingController : MonoBehaviour {
                 columnNames += "," + elemString;
 
             }
-        }
+        }*/
 
-        //compile list of elements to be used in the calculations from the scrollview of column names
-        foreach (Toggle tog in bothController.columnScrollView.transform.GetComponentsInChildren<Toggle>())
+        //==========================================================================================================================
+        //compile list of samples to use from the samples that are shared between combiresults and assaytraining
+        //and do it elsewhere
+        /*foreach (Toggle tog in bothController.columnScrollView.transform.GetComponentsInChildren<Toggle>())
         {
             if (tog.isOn)
             {
@@ -234,14 +494,7 @@ public class TrainingController : MonoBehaviour {
                 elementList.Add(elem.Substring(0, elem.IndexOf('_')));//, elem.Length-elem.IndexOf('_')));
                 columnIndexList.Add(tog.gameObject.GetComponent<SampleListEntry>().index);
             }
-        }
-        //If we're exporting to a CSV, we have to write the column headers. Otherwise, we start with the date and time that the file was created
-        if (toCSV)
-            export.WriteStringToStringBuilder(columnNames);
-        else
-        {
-            export.WriteStringToStringBuilder("==========");
-        }
+        }*/
 
         int maxSamples = 0;
 
@@ -261,17 +514,11 @@ public class TrainingController : MonoBehaviour {
             {
                 int s = tog.gameObject.GetComponent<SampleListEntry>().index;
 
-                csvController.GetChemTestList(csvController.grid, s);
+                //'chemtest' list is a list of all element values in the given row
+                //csvController.GetChemTestList(csvController.grid, s);
 
 
-                string id = csvController.grid[0, s];
-
-                if (!toCSV)
-                {
-                    export.WriteStringToStringBuilder("");
-                    export.WriteStringToStringBuilder("ID: " + id);
-                    export.WriteStringToStringBuilder("");
-                }
+                string id = AssayTrainingTable[0, s];
 
 
 
@@ -282,6 +529,8 @@ public class TrainingController : MonoBehaviour {
                 double[,] simplexArray = new double[elementList.Count + 1, minList.Count];
 
                 double[] c = new double[simplexArray.GetUpperBound(1) + 1];
+
+                Debug.Log("don't forget to set the correct bothcontroller.elementDict");
 
                 for (int i = 0; i <= simplexArray.GetUpperBound(1); i++)
                 {
@@ -321,205 +570,220 @@ public class TrainingController : MonoBehaviour {
                                                     { -100, -80.6, -76.26, -57.87, -69.8, -64.54, -79.1, 0, 0, 0, 0}
                                                     };*/
 
-        /*double[] cn = new double[columnIndexList.Count + 1];//csvController.chemTest.ToArray();
-        double cnOther = 10000;
-        for (int i = 0; i < columnIndexList.Count; i++)
-        {
-            double.TryParse(csvController.grid[columnIndexList[i], s], out cn[i]);
-            cn[i] *= 100;
-            cnOther -= cn[i];
-        }
-        cn[cn.Length - 1] = cnOther;
+                //list of elements in the assayTable grid columns?
+                double[] cn = new double[columnIndexList.Count + 1];//csvController.chemTest.ToArray();
+                double cnOther = 10000;
+                for (int i = 0; i < columnIndexList.Count; i++)
+                {
+                    double.TryParse(csvController.grid[columnIndexList[i], s], out cn[i]);
+                    cn[i] *= 100;
+                    cnOther -= cn[i];
+                }
+                cn[cn.Length - 1] = cnOther;
 
 
 
 
-        if (!toCSV)
-        {
-            string temp = "Sample Composition: ";
-            foreach (double d in cn)
-                temp += d + ", ";
-            export.WriteStringToStringBuilder("");
-            export.WriteStringToStringBuilder(temp);
+                if (!toCSV)
+                {
+                    string temp = "Sample Composition: ";
+                    foreach (double d in cn)
+                        temp += d + ", ";
+                    export.WriteStringToStringBuilder("");
+                    export.WriteStringToStringBuilder(temp);
 
-            temp = "Weights: ";
-            foreach (double d in c)
-            {
-                double dFixed = d * -1;
-                temp += dFixed + ", ";
+                    temp = "Weights: ";
+                    foreach (double d in c)
+                    {
+                        double dFixed = d * -1;
+                        temp += dFixed + ", ";
+                    }
+                    export.WriteStringToStringBuilder(temp);
+                }
+
+
+                alglib.minlpstate state;
+                alglib.minlpreport rep;
+                alglib.minlpcreate(simplexArray.GetUpperBound(1) + 1, out state);
+                alglib.minlpsetcost(state, c);
+                alglib.minlpsetbcall(state, 0, 100);
+                //alglib.minlpsetscale(state, scale);
+                //alglib.minlpsetcost(state, bndl); //replace bndl with something
+                //alglib.minlpsetbc(state, bndl, bndu);
+                /*alglib.minlpsetlc1(state, true); //a, ct is constraint types so >0 is >= =0 is = and <0 is <=, k*/
+                /*
+        CT      -   constraint types, array[K]:
+                    * if CT[i]>0, then I-th constraint is A[i,*]*x >= A[i,n]
+                    * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
+                    * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]*/
+                alglib.minlpsetlc2(state, simplexArray, cn, cn); //al, au
+                                                                 //int[] ct = { };
+                                                                 //alglib.minlpsetlc1(state, simplexArrayLC1, ct);
+                alglib.minlpoptimize(state);
+                alglib.minlpresults(state, out x, out rep);
+
+                if (!toCSV)
+                {
+                    export.WriteStringToStringBuilder("");
+                    export.WriteStringToStringBuilder("");
+                    switch (rep.terminationtype)
+                    {
+                        case -4:
+                            export.WriteStringToStringBuilder("LP problem is primal unbounded(dual infeasible)");
+                            Debug.Log("LP problem is primal unbounded(dual infeasible)");
+                            break;
+                        case -3:
+                            export.WriteStringToStringBuilder("LP problem is primal infeasible(dual unbounded)");
+                            Debug.Log("LP problem is primal infeasible(dual unbounded)");
+                            break;
+                        case 1:
+                            export.WriteStringToStringBuilder("successful completion");
+                            Debug.Log("successful completion 1");
+                            break;
+                        case 2:
+                            export.WriteStringToStringBuilder("successful completion");
+                            Debug.Log("successful completion 2");
+                            break;
+                        case 3:
+                            export.WriteStringToStringBuilder("successful completion");
+                            Debug.Log("successful completion 3");
+                            break;
+                        case 4:
+                            export.WriteStringToStringBuilder("successful completion");
+                            Debug.Log("successful completion 4");
+                            break;
+                        case 5:
+                            export.WriteStringToStringBuilder("Max Iterations was reached");
+                            Debug.Log("MaxIts steps was taken");
+                            break;
+                        case 7:
+                            export.WriteStringToStringBuilder("stopping conditions are too stringent, further improvement is impossible, X contains best point found so far.");
+                            Debug.Log("stopping conditions are too stringent, further improvement is impossible, X contains best point found so far.");
+                            break;
+                    }
+                    export.WriteStringToStringBuilder("");
+                    export.WriteStringToStringBuilder("Score: " + ((rep.f / 100) * -1));
+                    export.WriteStringToStringBuilder("Values: " + alglib.ap.format(x, 2));
+
+                    string dualLine = "Dual Variables: ";
+
+                    foreach (double d in rep.y)
+                    {
+                        dualLine += d;
+                        dualLine += ", ";
+                    }
+
+                    export.WriteStringToStringBuilder(dualLine);
+
+
+                    export.WriteStringToStringBuilder("primal feasibility error: " + rep.primalerror);
+                    export.WriteStringToStringBuilder("iteration count: " + rep.iterationscount);
+
+                    string statsLine = "stats: ";
+
+                    foreach (int i in rep.stats)
+                    {
+                        statsLine += i;
+                        statsLine += ", ";
+                    }
+
+                    ///Debug.Log("array[N+M], statuses of box (N) and linear (M) constraints: " + statsLine);
+                    export.WriteStringToStringBuilder("array[N+M], statuses of box (N) and linear (M) constraints: " + statsLine);
+                    export.WriteStringToStringBuilder("");
+                    export.WriteStringToStringBuilder("---------------------------------");
+                    export.WriteStringToStringBuilder("");
+                }
+
+                //Debug.Log("target function value: " + rep.f);
+                //Debug.Log("Values: " + alglib.ap.format(x, 2));
+
+
+
+
+
+                string exportResult = alglib.ap.format(x, 2);
+                //Debug.Log("exportResult: " + exportResult);
+
+                string truncatedExportResult = exportResult.Substring(1, exportResult.Length - 2);
+
+                double[] resultArray = Array.ConvertAll(truncatedExportResult.Split(','), new Converter<string, double>(Double.Parse));
+
+                int d2 = simplexArray.GetUpperBound(1) + 1;
+                const int doubleSize = 8;
+                double[] target = new double[d2];
+
+                /*Buffer.BlockCopy(simplexArray, doubleSize * d2 * 0, target, 0, doubleSize * d2);
+                double column1 = SumProduct(target, resultArray);
+                Debug.Log("Result1: " + column1 + ", " + cn[0]);
+                Buffer.BlockCopy(simplexArray, doubleSize * d2 * 1, target, 0, doubleSize * d2);
+                column1 = SumProduct(target, resultArray);
+                Debug.Log("Result2: " + column1 + ", " + cn[1]);
+                Buffer.BlockCopy(simplexArray, doubleSize * d2 * 2, target, 0, doubleSize * d2);
+                column1 = SumProduct(target, resultArray);
+                Debug.Log("Result3: " + column1 + ", " + cn[2]);
+                Buffer.BlockCopy(simplexArray, doubleSize * d2 * 3, target, 0, doubleSize * d2);
+                column1 = SumProduct(target, resultArray);
+                Debug.Log("Result4: " + column1 + ", " + cn[3]);
+                Buffer.BlockCopy(simplexArray, doubleSize * d2 * 4, target, 0, doubleSize * d2);
+                column1 = SumProduct(target, resultArray);
+                Debug.Log("Result5: " + column1 + ", " + cn[4]);
+
+                Debug.Log("c length = " + c.Length);
+                Debug.Log("resultArray length = " + resultArray.Length);
+                Debug.Log("Simp " + simplexArray.GetUpperBound(0) + ", " + simplexArray.GetUpperBound(1));
+                Debug.Log("Cn " + cn.Length);*/
+
+
+
+                string resultLine = "resultArray: ";
+
+                foreach (double i in resultArray)
+                {
+                    resultLine += i;
+                    resultLine += ", ";
+                }
+                Debug.Log(resultLine);
+
+                double endProduct = SumProduct(c, resultArray);
+
+                double score = ((rep.f / 100.0) * -1);
+
+                if (toCSV)
+                    export.WriteStringToStringBuilder(id + "," + score.ToString() + "," + truncatedExportResult);
+
+                //Debug.Log("<color=green>--------------------------</color>");
+                bothController.progressBar.value++;
+                bothController.progressText.text = bothController.progressBar.value + "/" + maxSamples;
+                yield return null;
+
+                //Debug.Log("'Result': " + result);
             }
-            export.WriteStringToStringBuilder(temp);
+
+
         }
 
-
-        alglib.minlpstate state;
-        alglib.minlpreport rep;
-        alglib.minlpcreate(simplexArray.GetUpperBound(1) + 1, out state);
-        alglib.minlpsetcost(state, c);
-        alglib.minlpsetbcall(state, 0, 100);
-        //alglib.minlpsetscale(state, scale);
-        //alglib.minlpsetcost(state, bndl); //replace bndl with something
-        //alglib.minlpsetbc(state, bndl, bndu);
-        /*alglib.minlpsetlc1(state, true); //a, ct is constraint types so >0 is >= =0 is = and <0 is <=, k*/
-        /*
-CT      -   constraint types, array[K]:
-            * if CT[i]>0, then I-th constraint is A[i,*]*x >= A[i,n]
-            * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
-            * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]*/
-        /*alglib.minlpsetlc2(state, simplexArray, cn, cn); //al, au
-        //int[] ct = { };
-        //alglib.minlpsetlc1(state, simplexArrayLC1, ct);
-        alglib.minlpoptimize(state);
-        alglib.minlpresults(state, out x, out rep);
-
-        if (!toCSV)
+        // Create a file to write to.
+        using (StreamWriter sw = File.CreateText(export.tempFilename))
         {
-            export.WriteStringToStringBuilder("");
-            export.WriteStringToStringBuilder("");
-            switch (rep.terminationtype)
-            {
-                case -4:
-                    export.WriteStringToStringBuilder("LP problem is primal unbounded(dual infeasible)");
-                    Debug.Log("LP problem is primal unbounded(dual infeasible)");
-                    break;
-                case -3:
-                    export.WriteStringToStringBuilder("LP problem is primal infeasible(dual unbounded)");
-                    Debug.Log("LP problem is primal infeasible(dual unbounded)");
-                    break;
-                case 1:
-                    export.WriteStringToStringBuilder("successful completion");
-                    Debug.Log("successful completion 1");
-                    break;
-                case 2:
-                    export.WriteStringToStringBuilder("successful completion");
-                    Debug.Log("successful completion 2");
-                    break;
-                case 3:
-                    export.WriteStringToStringBuilder("successful completion");
-                    Debug.Log("successful completion 3");
-                    break;
-                case 4:
-                    export.WriteStringToStringBuilder("successful completion");
-                    Debug.Log("successful completion 4");
-                    break;
-                case 5:
-                    export.WriteStringToStringBuilder("Max Iterations was reached");
-                    Debug.Log("MaxIts steps was taken");
-                    break;
-                case 7:
-                    export.WriteStringToStringBuilder("stopping conditions are too stringent, further improvement is impossible, X contains best point found so far.");
-                    Debug.Log("stopping conditions are too stringent, further improvement is impossible, X contains best point found so far.");
-                    break;
-            }
-            export.WriteStringToStringBuilder("");
-            export.WriteStringToStringBuilder("Score: " + ((rep.f / 100) * -1));
-            export.WriteStringToStringBuilder("Values: " + alglib.ap.format(x, 2));
-
-            string dualLine = "Dual Variables: ";
-
-            foreach (double d in rep.y)
-            {
-                dualLine += d;
-                dualLine += ", ";
-            }
-
-            export.WriteStringToStringBuilder(dualLine);
-
-
-            export.WriteStringToStringBuilder("primal feasibility error: " + rep.primalerror);
-            export.WriteStringToStringBuilder("iteration count: " + rep.iterationscount);
-
-            string statsLine = "stats: ";
-
-            foreach (int i in rep.stats)
-            {
-                statsLine += i;
-                statsLine += ", ";
-            }
-
-            ///Debug.Log("array[N+M], statuses of box (N) and linear (M) constraints: " + statsLine);
-            export.WriteStringToStringBuilder("array[N+M], statuses of box (N) and linear (M) constraints: " + statsLine);
-            export.WriteStringToStringBuilder("");
-            export.WriteStringToStringBuilder("---------------------------------");
-            export.WriteStringToStringBuilder("");
+            sw.Write(export.sb.ToString());
         }
-
-        //Debug.Log("target function value: " + rep.f);
-        //Debug.Log("Values: " + alglib.ap.format(x, 2));
-
-
-
-
-
-        string exportResult = alglib.ap.format(x, 2);
-        //Debug.Log("exportResult: " + exportResult);
-
-        string truncatedExportResult = exportResult.Substring(1, exportResult.Length - 2);
-
-        double[] resultArray = Array.ConvertAll(truncatedExportResult.Split(','), new Converter<string, double>(Double.Parse));
-
-        int d2 = simplexArray.GetUpperBound(1) + 1;
-        const int doubleSize = 8;
-        double[] target = new double[d2];
-
-        /*Buffer.BlockCopy(simplexArray, doubleSize * d2 * 0, target, 0, doubleSize * d2);
-        double column1 = SumProduct(target, resultArray);
-        Debug.Log("Result1: " + column1 + ", " + cn[0]);
-        Buffer.BlockCopy(simplexArray, doubleSize * d2 * 1, target, 0, doubleSize * d2);
-        column1 = SumProduct(target, resultArray);
-        Debug.Log("Result2: " + column1 + ", " + cn[1]);
-        Buffer.BlockCopy(simplexArray, doubleSize * d2 * 2, target, 0, doubleSize * d2);
-        column1 = SumProduct(target, resultArray);
-        Debug.Log("Result3: " + column1 + ", " + cn[2]);
-        Buffer.BlockCopy(simplexArray, doubleSize * d2 * 3, target, 0, doubleSize * d2);
-        column1 = SumProduct(target, resultArray);
-        Debug.Log("Result4: " + column1 + ", " + cn[3]);
-        Buffer.BlockCopy(simplexArray, doubleSize * d2 * 4, target, 0, doubleSize * d2);
-        column1 = SumProduct(target, resultArray);
-        Debug.Log("Result5: " + column1 + ", " + cn[4]);
-
-        Debug.Log("c length = " + c.Length);
-        Debug.Log("resultArray length = " + resultArray.Length);
-        Debug.Log("Simp " + simplexArray.GetUpperBound(0) + ", " + simplexArray.GetUpperBound(1));
-        Debug.Log("Cn " + cn.Length);*/
-
-
-
-        /*string resultLine = "resultArray: ";
-
-        foreach (double i in resultArray)
-        {
-            resultLine += i;
-            resultLine += ", ";
-        }
-        Debug.Log(resultLine);*/
-
-        /*double endProduct = SumProduct(c, resultArray);
-
-        double score = ((rep.f / 100.0) * -1);
-
-        if (toCSV)
-            export.WriteStringToStringBuilder(id + "," + score.ToString() + "," + truncatedExportResult);
-
-        //Debug.Log("<color=green>--------------------------</color>");
-        bothController.progressBar.value++;
-        bothController.progressText.text = bothController.progressBar.value + "/" + maxSamples;
-        yield return null;
-
-        //Debug.Log("'Result': " + result);
+        bothController.loadingMenu.SetActive(false);
+        bothController.sharedMenu.SetActive(true); */
+                 yield return null;
     }
-
-
-}
-
-// Create a file to write to.
-using (StreamWriter sw = File.CreateText(export.tempFilename))
-{
-    sw.Write(export.sb.ToString());
-}
-bothController.loadingMenu.SetActive(false);
-bothController.sharedMenu.SetActive(true);*/
-        yield return null;
+    bool ContainsNoCase(string source, string toCheck)
+    {
+        bool returnable = false;
+        if (source.IndexOf(toCheck, StringComparison.OrdinalIgnoreCase) >= 0)
+            returnable = true;
+        return returnable;
+    }
+    bool MatchesNoCase(string source, string toCheck)
+    {
+        bool returnable = false;
+        if (System.String.Equals(source, toCheck, System.StringComparison.OrdinalIgnoreCase))
+            returnable = true;
+        return returnable;
     }
 
 }

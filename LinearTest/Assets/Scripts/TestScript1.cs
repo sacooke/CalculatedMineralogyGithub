@@ -100,7 +100,10 @@ public class TestScript1 : MonoBehaviour {
         string s = "null";
         try
         {
-            s = File.ReadAllText(url).TrimEnd('\r', '\n');
+            //s = File.ReadAllText(url).TrimEnd('\r', '\n');
+            foreach (string b in File.ReadAllLines(url))
+                if (System.Text.RegularExpressions.Regex.IsMatch(b, "[^,]"))
+                    s += b + "\n";
 
         }
         catch (IOException e)
