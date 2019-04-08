@@ -16,6 +16,7 @@ public class Export : MonoBehaviour
 {
     public GameObject CombiOverwritePanel;
     public GameObject AssayOverwritePanel;
+    public GameObject TrainingOverwritePanel;
 
     public FileChooser fileChooser;
     public static string fileName;
@@ -28,9 +29,11 @@ public class Export : MonoBehaviour
     public CombiController combiController;
     public AssayController assayController;
     public BothController bothController;
-    
+    public TrainingController trainingController;
+
 
     bool tempToCsv;
+    int tempOption;
 
     // Use this for initialization
     void Start()
@@ -75,6 +78,21 @@ public class Export : MonoBehaviour
                 ExportDataToTXTAssay(filename);
             else if (format == "csv")
                 ExportDataToCSVAssay(filename);
+        };
+        fileChooser.callbackNo = delegate () {
+            fileChooser.gameObject.SetActive(false);
+        };
+    }
+
+    public void OpenFileDialogTraining(int option)
+    {
+        //0 = weights
+        //1 = just assay
+        //2 = assay and combi
+        fileChooser.setup(FileChooser.OPENSAVE.SAVE, "csv");
+        fileChooser.callbackYes = delegate (string filename) {
+            fileChooser.gameObject.SetActive(false);
+            ExportDataToCSVTraining(filename, option);
         };
         fileChooser.callbackNo = delegate () {
             fileChooser.gameObject.SetActive(false);
@@ -167,6 +185,16 @@ public class Export : MonoBehaviour
         }
 
     }
+    public void TrainingOverwrite(bool overwrite)
+    {
+        TrainingOverwritePanel.SetActive(false);
+        trainingController.trainingSubmenu3.SetActive(true);
+        if (overwrite)
+        {
+            trainingController.ExportTrainingData(tempFilename, tempOption);
+        }
+
+    }
 
     public void ExportDataToCSVCombi(string filename)
     {
@@ -212,6 +240,22 @@ public class Export : MonoBehaviour
             tempToCsv = true;
             AssayOverwritePanel.SetActive(true);
             bothController.sharedMenu.SetActive(false);
+            Debug.Log("overwrite?");
+        }
+    }
+    public void ExportDataToCSVTraining(string filename, int option)
+    {
+        if (!File.Exists(filename))
+        {
+            Debug.Log("got this far");
+            trainingController.ExportTrainingData(filename, option);
+        }
+        else
+        {
+            tempFilename = filename;
+            tempOption = option;
+            TrainingOverwritePanel.SetActive(true);
+            trainingController.trainingMenu.SetActive(false);
             Debug.Log("overwrite?");
         }
     }

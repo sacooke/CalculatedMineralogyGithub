@@ -1141,6 +1141,10 @@ CT      -   constraint types, array[K]:
                     {
                         BothController.MineralComposition MC;
                         double val = 0;
+                        if (i < 3 && j < 3)
+                        {
+                            Debug.Log(i + ": checking if " + minList[i] + " is in currentMineralDict or elementDict");
+                        }
                         if (bothController.currentMineralDict.TryGetValue(minList[i], out MC))
                         {
                             MC.elementDictionary.TryGetValue(elementList[j], out val);
@@ -1200,7 +1204,9 @@ CT      -   constraint types, array[K]:
                     export.WriteStringToStringBuilder(temp);
                 }
 
-                
+                Debug.Log("Simplex array:");
+                CSVReader.DebugOutputGrid(simplexArray);
+
                 alglib.minlpstate state;
                 alglib.minlpreport rep;
                 alglib.minlpcreate(simplexArray.GetUpperBound(1) + 1, out state);
@@ -1306,6 +1312,10 @@ CT      -   constraint types, array[K]:
                 string truncatedExportResult = exportResult.Substring(1, exportResult.Length - 2);
 
                 double[] resultArray = Array.ConvertAll(truncatedExportResult.Split(','), new Converter<string, double>(Double.Parse));
+                string resultString = "";
+                foreach (double d in resultArray)
+                    resultString += d.ToString("F3") + ",";
+                Debug.Log("results: " + resultString);
 
                 int d2 = simplexArray.GetUpperBound(1) + 1;
                 const int doubleSize = 8;
@@ -1710,17 +1720,7 @@ CT      -   constraint types, array[K]:
         
     }
 
-
-
-
-
-
-
-
-
-
-
-
+    
 
 
     public void SetSampleValuesList(double[] sampleArray)

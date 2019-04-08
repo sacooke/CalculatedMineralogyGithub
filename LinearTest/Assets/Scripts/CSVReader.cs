@@ -321,6 +321,40 @@ public class CSVReader : MonoBehaviour
         return outputGrid;
     }
 
+    // splits a CSV file into a 2D string array
+    static public double[,] SplitCsvGridJustDoubles(string csvText)
+    {
+        csvText = csvText.TrimEnd('\r', '\n');
+        string[] lines = csvText.Split("\n"[0]);
+
+        // finds the max width of row
+        int width = 0;
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string[] row = SplitCsvLine(lines[i]);
+            width = Mathf.Max(width, row.Length-1);
+        }
+
+        // creates new 2D double grid to output to
+        double[,] outputGrid = new double[width, lines.Length];
+        for (int y = 1; y < lines.Length; y++)
+        {
+            string[] row = SplitCsvLine(lines[y]);
+            for (int x = 1; x < row.Length; x++)
+            {
+                double d;
+                //Debug.Log("parsing " + row[x]);
+                outputGrid[x-1, y-1] = Double.TryParse(row[x], out d) ? d : 0;
+
+                // This line was to replace "" with " in my output. 
+                // Include or edit it as you wish.
+                //outputGrid[x, y] = outputGrid[x, y].Replace("\"\"", "\"");
+            }
+        }
+
+        return outputGrid;
+    }
+
     // splits a CSV row 
     static public string[] SplitCsvLine(string line)
     {
